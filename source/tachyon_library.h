@@ -9,7 +9,7 @@
 // #include <thread>
 // #include <mutex>
 
-namespace vmec
+namespace tyon
 {
     // Alias namespace
     namespace chrono = std::chrono;
@@ -47,7 +47,7 @@ namespace vmec
 
     // -- Globals Variables --
     // make sure to initialize Pointer Types before using
-    extern vmec::time_monotonic g_program_epoch;
+    extern tyon::time_monotonic g_program_epoch;
     extern bool g_little_endian;
     extern i32 g_log_largest_category;
     extern memory_stack_allocator* g_allocator;
@@ -65,15 +65,15 @@ namespace vmec
     {
         byte* data = nullptr;
 
-        inline VMEC_FORCEINLINE
+        inline TYON_FORCEINLINE
         COPY_CONSTRUCTOR raw_pointer()
         {}
 
-        inline VMEC_FORCEINLINE
+        inline TYON_FORCEINLINE
         COPY_CONSTRUCTOR raw_pointer( raw_pointer& rhs )
         { this->data = rhs.data; }
 
-        inline VMEC_FORCEINLINE
+        inline TYON_FORCEINLINE
         CONSTRUCTOR raw_pointer( void* rhs )
         { this->data = reinterpret_cast<byte*>(rhs); }
 
@@ -81,59 +81,78 @@ namespace vmec
         operator [] ( i64 arg)
         { return data[arg]; }
 
+        /** return the address as if 'arg' is added using pointer arithmatic */
         template <typename T>
-        T&
-        index_as( i64 arg )
-        { return *reinterpret_cast<T*>( data + arg ); }
+        T*
+        stride( i64 arg )
+        {
+            T* base = reinterpret_cast<T*>( data );
+            return  (base + arg);
+        }
 
-        // Index using the stride of sizeof(T)
+        /** Index using the stride of sizeof(T)
+         *
+         * This means treating the adress as a pointer of type 'T' and accessing it as if
+         * it were an array using 'arg' as the index. */
         template <typename T>
         T&
         stride_as( i64 arg )
         { return reinterpret_cast<T*>(data)[arg]; }
 
+        /* 'reinterpret_cast' value pointed to by 'data' as type 'T'.
+         *
+         * This is a conventience function to make it easier to do
+         * type-casting. Since this is a raw pointer it carries no sense of
+         * typing information. So we don't, and cannot possibly do "type-safe"
+         * conversions. */
         template <typename T>
-        VMEC_FORCEINLINE T&
+        TYON_FORCEINLINE T&
         as()
         { return *reinterpret_cast<T*>(data); }
 
-        VMEC_FORCEINLINE u32&
+        TYON_FORCEINLINE u32&
         as_u32()
         { return *reinterpret_cast<u32*>(data); }
 
-        VMEC_FORCEINLINE u64&
+        TYON_FORCEINLINE u64&
         as_u64()
         { return *reinterpret_cast<u64*>(data); }
 
-        VMEC_FORCEINLINE u128&
+        TYON_FORCEINLINE u128&
         as_u128()
         { return *reinterpret_cast<u128*>(data); }
 
-        VMEC_FORCEINLINE byte&
+        /** De-reference the data as if it were a byte */
+        TYON_FORCEINLINE byte&
         operator * ()
         { return (*data); }
 
+        /** Perform pointer arithmatic, 1 unit is a byte */
         raw_pointer
         operator + ( i64 rhs )
         { return raw_pointer { data + rhs }; }
 
+        /** Perform pointer arithmatic, 1 unit is a byte */
         void
         operator += ( i64 rhs )
         { this->data += rhs; }
 
+        /** Perform pointer arithmatic, 1 unit is a byte */
         raw_pointer
         operator - ( i64 rhs )
         { return raw_pointer { data - rhs }; }
 
+        /** Perform pointer arithmatic, 1 unit is a byte */
         void
         operator -= ( i64 rhs )
         { this->data -= rhs; }
 
+        /** Perform pointer arithmatic, increment by 1, 1 unit is a byte */
         raw_pointer
         operator ++ ()
         { this->data += 1; return *this; }
 
-        // Post-Fix Operator
+        /** Post-Fix Operator pointer arithmatic, 1 unit is a byte */
         raw_pointer
         operator ++ ( i32 )
         {
@@ -142,15 +161,23 @@ namespace vmec
             return result;
         }
 
+        /* Convert to 'void*'.
+         *
+         * This makes this a full primitive replacement */
         inline
         operator void* ()
         { return data; }
 
+        /* Convert to any pointer
+         *
+         * This provides behaviour similar to C's 'void*'. Where it is a generic
+         * pointer interchangible with any other pointer. */
         template <typename T>
         inline
         operator T* ()
         { return reinterpret_cast<T*>( data ); }
 
+        /* Allow comparison to nullptr like 'void*' */
         inline bool
         operator == ( std::nullptr_t rhs )
         { return data == nullptr; }
@@ -161,7 +188,7 @@ namespace vmec
     constexpr f64 pi_ = 3.141592653589793;
 
     // -- Basic Utilities --
-    #define vmec_print( ... ) log(  __FILE__, __VA_ARGS__ )
+    #define tyon_print( ... ) log(  __FILE__, __VA_ARGS__ )
 
     template<typename... t_formattable>
     void
@@ -233,32 +260,32 @@ namespace vmec
 
     // #define log_flush() std::cout.flush()
     #define log_flush() fflush( stdout );
-    #define vmec_log( ... ) log( "VMEC", __VA_ARGS__);
-    #define vmec_logf( format_string, ... ) log_format( "VMEC", format_string, __VA_ARGS__ );
-    #define vmec_log_error( message )                                           \
-            log_error_format( "VMEC Error", "{} @ {}:{}: {}",                   \
+    #define tyon_log( ... ) log( "TYON", __VA_ARGS__);
+    #define tyon_logf( format_string, ... ) log_format( "TYON", format_string, __VA_ARGS__ );
+    #define tyon_log_error( message )                                           \
+            log_error_format( "TYON Error", "{} @ {}:{}: {}",                   \
                           __FUNCTION__, __FILE__, __LINE__, message );          \
         log_flush();
 
     // Like log_error but shorter name
-    #define vmec_error( message )                                       \
-        log_error_format( "VMEC Error", "{} @ {}:{}: {}",               \
+    #define tyon_error( message )                                       \
+        log_error_format( "TYON Error", "{} @ {}:{}: {}",               \
                           __FUNCTION__, __FILE__, __LINE__, message );  \
         log_flush();
 
-    #define vmec_errorf( format_string, ... )                   \
-        log_error_format( "VMEC ERROR", format_string, __VA_ARGS__ );
+    #define tyon_errorf( format_string, ... )                   \
+        log_error_format( "TYON ERROR", format_string, __VA_ARGS__ );
 
-    #define vmec_variable( var ) log_format( "VMEC", #var" [ {} ]", var );
-    #define vmec_logf_error( format_string, ... )                   \
-        log_error_format( "VMEC ERROR", format_string, __VA_ARGS__ );
-    #define profiler_log( ... ) log( "VMEC Profiler", __VA_ARGS__);
+    #define tyon_variable( var ) log_format( "TYON", #var" [ {} ]", var );
+    #define tyon_logf_error( format_string, ... )                   \
+        log_error_format( "TYON ERROR", format_string, __VA_ARGS__ );
+    #define profiler_log( ... ) log( "TYON Profiler", __VA_ARGS__);
 
-    #define VMEC_UNSUPPORTED()
-    #define VMEC_NOP() void(0);
-    #define VMEC_UNIMPLIMENTED();
-    #define VMEC_TESTING( x ) x;
-    #define VMEC_TODO( explanation );
+    #define TYON_UNSUPPORTED()
+    #define TYON_NOP() void(0);
+    #define TYON_UNIMPLIMENTED();
+    #define TYON_TESTING( x ) x;
+    #define TYON_TODO( explanation );
 
     /** Make sure condition is true or break and show message
      * It's an assert. okay. */
@@ -268,7 +295,7 @@ namespace vmec
             log_error_format( "Error Guard", "{} @ {}:{}: Condition: ({}): {}", \
                 __FUNCTION__, __FILE__, __LINE__, #condition, message );        \
             log_flush();                                                        \
-            VMEC_BREAK();                                                       \
+            TYON_BREAK();                                                       \
         };
 
     // #define ERROR_GUARD( condition, message ) \
@@ -277,7 +304,7 @@ namespace vmec
     //         printf( "\e[0;31m[Error Guard]    %s @ %s:%d: Condition: (%s): %s \e[0m \n", \
     //             __FUNCTION__, __FILE__, __LINE__, #condition, message );    \
     //         log_flush(); \
-    //         VMEC_BREAK(); \
+    //         TYON_BREAK(); \
     //     };
 
     #define ERROR_GUARD_NULL( value ) \
@@ -543,7 +570,7 @@ namespace vmec
         return (bytes + (alignment - (bytes % alignment)));
     }
 
-    VMEC_FORCEINLINE isize
+    TYON_FORCEINLINE isize
     memory_align( isize bytes, i32 alignment );
 
     // -- Container Types --
@@ -574,12 +601,12 @@ namespace vmec
             be destroyed for as long as possible, such pointers are marked as borrowed */
         bool borrowed = false;
 
-        VMEC_FORCEINLINE t_any&
+        TYON_FORCEINLINE t_any&
         operator *() { return (*data); }
-        VMEC_FORCEINLINE t_any&
+        TYON_FORCEINLINE t_any&
         operator []( isize i ) { return data[i]; }
 
-        VMEC_FORCEINLINE
+        TYON_FORCEINLINE
         CONSTRUCTOR pointer( std::nullptr_t rhs )
         {
             this->data = rhs;
@@ -591,7 +618,7 @@ namespace vmec
         }
 
         template <typename t_other>
-        VMEC_FORCEINLINE t_self&
+        TYON_FORCEINLINE t_self&
         operator =( pointer<t_other>& rhs )
         {
             this->data = reinterpret_cast<t_any*>( rhs.data );
@@ -605,7 +632,7 @@ namespace vmec
             return *this;
         }
 
-        VMEC_FORCEINLINE t_self&
+        TYON_FORCEINLINE t_self&
         operator =( t_any* rhs )
         {
             this->data = rhs;
@@ -1169,24 +1196,24 @@ namespace vmec
         DESTRUCTOR ~time_scope();
     };
 
-    #define VMEC_CONCAT_IMPL( x, y ) x##y
-    #define VMEC_CONCAT( x, y ) VMEC_CONCAT_IMPL( x, y )
+    #define TYON_CONCAT_IMPL( x, y ) x##y
+    #define TYON_CONCAT( x, y ) TYON_CONCAT_IMPL( x, y )
 
     #define PROFILE_SCOPE( name ) \
-        ZoneNamedN( VMEC_CONCAT(__tracy, __COUNTER__), (name), true );
+        ZoneNamedN( TYON_CONCAT(__tracy, __COUNTER__), (name), true );
     #define PROFILE_SCOPE_FUNCTION()                                                \
-        ZoneNamed( VMEC_CONCAT(__tracy, __COUNTER__), true );
+        ZoneNamed( TYON_CONCAT(__tracy, __COUNTER__), true );
 
     #define TIME_SCOPED( name ) \
-        auto VMEC_CONCAT(_profile_block_, __LINE__) =                               \
+        auto TYON_CONCAT(_profile_block_, __LINE__) =                               \
             time_scope( (name) , "time taken to execute function");                 \
-        ZoneNamedN( VMEC_CONCAT(__tracy, __COUNTER__), (name), true );
+        ZoneNamedN( TYON_CONCAT(__tracy, __COUNTER__), (name), true );
 
     // Time the function scope this macro is in and log the result
     #define TIME_SCOPED_FUNCTION() \
-        auto VMEC_CONCAT(_profile_block_, __LINE__) =                               \
+        auto TYON_CONCAT(_profile_block_, __LINE__) =                               \
             time_scope( __FUNCTION__ , "time taken to execute function");           \
-        ZoneNamed( VMEC_CONCAT(__tracy, __COUNTER__), true );
+        ZoneNamed( TYON_CONCAT(__tracy, __COUNTER__), true );
 
     #define f_TIME_SCOPED_ACCUMULATED( NAME, ID ) \
         {                                                                           \
@@ -1974,7 +2001,7 @@ namespace vmec
             static t_pixel stub_pixel;
             if (data == nullptr)
             {
-                vmec_log_error( "Image has no associated storage" );
+                tyon_log_error( "Image has no associated storage" );
                 return stub_pixel;
             }
             return data[ std::clamp<isize>( i, 0, size_pixels() -1 ) ];
@@ -2223,9 +2250,9 @@ namespace vmec
 
 // -- String Formatters --
 template <>
-struct fmt::formatter< vmec::vec2_i64 > : formatter<string_view>
+struct fmt::formatter< tyon::vec2_i64 > : formatter<string_view>
 {
-    auto format( vmec::vec2_i64 arg, format_context& context ) const -> format_context::iterator
+    auto format( tyon::vec2_i64 arg, format_context& context ) const -> format_context::iterator
     {
         string_view data = fmt::format( "[{} {}]", arg.x, arg.y );
         return formatter<string_view>::format( data, context );

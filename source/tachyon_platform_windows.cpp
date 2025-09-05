@@ -5,7 +5,7 @@
 
 namespace fs = std::filesystem;
 
-namespace vmec
+namespace tyon
 {
 
     auto file_self_directory() -> fpath
@@ -48,7 +48,7 @@ namespace vmec
     fresult
     thread_self_name( fstring name )
     {
-        // pthread_setname_np(pthread_self(), "vmec_render");
+        // pthread_setname_np(pthread_self(), "tyon_render");
         return true;
     }
 
@@ -68,7 +68,7 @@ namespace vmec
         BOOL error = SetThreadPriority( thread, THREAD_PRIORITY_LOWEST );
         result = error;
         // if (error == 0) {
-        //     vmec_log("Failed to set thread priority"); log_flush();
+        //     tyon_log("Failed to set thread priority"); log_flush();
         //     *(char*)0 = 0; // Crash
         // }
 
@@ -89,14 +89,14 @@ namespace vmec
         // HMODULE kernel = GetModuleHandle( "kernel32.dll" );
         // if (kernel == NULL)
         // {
-        //     vmec_log_error( "Failed to get kernel32 handle" );
+        //     tyon_log_error( "Failed to get kernel32 handle" );
         // }
-        // vmec_log( "getting proc address" );
+        // tyon_log( "getting proc address" );
         // GetLogicalProcessorInformationEx =
         //     reinterpret_cast<proc_LogicalProcessorInformationEx>(GetProcAddress( kernel , "GetLogicalProcessorInformationEx"));
         // if (dyn_GetLogicalProcessorInformationEx == nullptr)
         // {
-        //     vmec_log_error("GetLogicalProcessorInformationEx symbol could not be loaded ");
+        //     tyon_log_error("GetLogicalProcessorInformationEx symbol could not be loaded ");
         //     return result;
         // }
         DWORD _info_size = 1024* sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX);
@@ -113,7 +113,7 @@ namespace vmec
             );
         if (fetch_ok == false)
         {
-            log_error_format( "VMEC Windows", "Failed to processor information twice." );
+            log_error_format( "TYON Windows", "Failed to processor information twice." );
             return result;
         }
 
@@ -240,7 +240,7 @@ namespace vmec
 
         if (cpu.package_count > 1)
         {
-            vmec_log_error(
+            tyon_log_error(
                 "More than 1 package count is not supported for "
                 "diagnostics yet, system information will probably be incorrect" );
         }

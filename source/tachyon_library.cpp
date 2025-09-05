@@ -7,7 +7,7 @@
 
 namespace fs = std::filesystem;
 
-namespace vmec
+namespace tyon
 {
     time_monotonic g_program_epoch = time_now();
     bool g_little_endian = test_little_endian();
@@ -230,7 +230,7 @@ namespace vmec
         }
     }
 
-    VMEC_FORCEINLINE isize
+    TYON_FORCEINLINE isize
     memory_align( isize bytes, i32 alignment )
     {
         return (bytes + (alignment - (bytes % alignment)));
@@ -432,9 +432,9 @@ namespace vmec
         // Cleanup
         fclose( file_ );
         if (write_ok)
-        { vmec_log( fmt::format( "Wrote binary file '{}'", arg->filename ) ); }
+        { tyon_log( fmt::format( "Wrote binary file '{}'", arg->filename ) ); }
         else
-        { log_error_format( "VMEC", "Failed to write binary file '{}'", arg->filename  ); }
+        { log_error_format( "TYON", "Failed to write binary file '{}'", arg->filename  ); }
         ERROR_GUARD( write_ok, "File wrote less than full data or failed" );
 
         return write_ok;
@@ -556,12 +556,12 @@ namespace vmec
         }
         if (result)
         {
-            log_format( "VMEC Asset", "Successfully loaded file {} at path '{}' using loader '{}'",
+            log_format( "TYON Asset", "Successfully loaded file {} at path '{}' using loader '{}'",
                         arg->name, arg->file.filename, arg->loader_name );
         }
         else
         {
-            log_error_format( "VMEC Asset", "Failed to load file {} at path '{}' using loader '{}'",
+            log_error_format( "TYON Asset", "Failed to load file {} at path '{}' using loader '{}'",
                               arg->name, arg->file.filename, arg->loader_name );
         }
         return result;
@@ -592,7 +592,7 @@ namespace vmec
 // void*
 // ::operator new( usize bytes )
 // {
-//     using namespace vmec;
+//     using namespace tyon;
 //     void* result = nullptr;
 //     // g_taint_allocator_lock.lock();
 
@@ -604,7 +604,7 @@ namespace vmec
 // void*
 // ::operator new[]( usize bytes )
 // {
-//     using namespace vmec;
+//     using namespace tyon;
 //     void* result = nullptr;
 //     // g_taint_allocator_lock.lock();
 //     // g_taint_allocator->allocate_raw( bytes );
@@ -617,7 +617,7 @@ namespace vmec
 // void
 // ::operator delete(void* ptr) noexcept
 // {
-//     using namespace vmec;
+//     using namespace tyon;
 //     if (ptr == nullptr) { return; }
 //     // g_taint_allocator_lock.lock();
 

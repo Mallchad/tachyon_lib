@@ -15,7 +15,7 @@ namespace platform
 
 namespace fs = std::filesystem;
 
-namespace vmec
+namespace tyon
 {
 
     auto file_self_directory() -> fpath
@@ -62,7 +62,7 @@ namespace vmec
                 close( fd );
             }
         }
-        vmec_logf( "Write file '{}' occupying {} logical bytes", arg->filename, arg->memory.size );
+        tyon_logf( "Write file '{}' occupying {} logical bytes", arg->filename, arg->memory.size );
         return true;
     }
 
@@ -80,9 +80,9 @@ namespace vmec
         // Cleanup
         close( fd );
         if (write_ok)
-        { vmec_log( fmt::format( "Wrote binary file '{}'", arg->filename ) ); }
+        { tyon_log( fmt::format( "Wrote binary file '{}'", arg->filename ) ); }
         else
-        { log_error_format( "VMEC", "Failed to write binary file '{}'", arg->filename  ); }
+        { log_error_format( "TYON", "Failed to write binary file '{}'", arg->filename  ); }
         ERROR_GUARD( write_ok, "File wrote less than full data or failed" );
 
 
@@ -109,7 +109,7 @@ namespace vmec
         pthread_setname_np( pthread_self(), name.c_str() );
         if ((name.size() + 1) >= 16)
         {
-            vmec_log_error(
+            tyon_log_error(
                 "pthread doesn't support names large than 16 including the null terminator" );
             return false;
         }

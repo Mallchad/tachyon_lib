@@ -121,30 +121,30 @@ struct version
     u8 vcs_hash[40] = {};
 };
 
-// VMEC_BREAK should be valid in release builds
-#define VMEC_SIGTRAP 5
+// TYON_BREAK should be valid in release builds
+#define TYON_SIGTRAP 5
 
 #if (REFLECTION_COMPILER_CLANG)
     #define FORCEINLINE __attribute__((always_inline))
-    #define VMEC_FORCEINLINE __attribute__((always_inline))
-    #define VMEC_BREAK() __builtin_debugtrap();
-    #define VMEC_PREFETCH_CACHELINE( address ) __builtin_prefetch( address );
+    #define TYON_FORCEINLINE __attribute__((always_inline))
+    #define TYON_BREAK() __builtin_debugtrap();
+    #define TYON_PREFETCH_CACHELINE( address ) __builtin_prefetch( address );
 #elif (REFLECTION_COMPILER_GCC)
     #define FORCEINLINE __attribute__((always_inline))
-    #define VMEC_FORCEINLINE __attribute__((always_inline))
-    #define VMEC_BREAK() raise(VMEC_SIGTRAP);
-    #define VMEC_PREFETCH_CACHELINE( address ) __builtin_prefetch( address );
+    #define TYON_FORCEINLINE __attribute__((always_inline))
+    #define TYON_BREAK() raise(TYON_SIGTRAP);
+    #define TYON_PREFETCH_CACHELINE( address ) __builtin_prefetch( address );
 
 #elif (REFLECTION_COMPILER_MSVC)
     #define FORCEINLINE __forceinline
-    #define VMEC_FORCEINLINE __forceinline
-    #define VMEC_BREAK() __debugbreak();
-    #define VMEC_PREFETCH_CACHELINE( address ) PrefetchCacheLine( PF_TEMPORAL_LEVEL_1, (address) );
+    #define TYON_FORCEINLINE __forceinline
+    #define TYON_BREAK() __debugbreak();
+    #define TYON_PREFETCH_CACHELINE( address ) PrefetchCacheLine( PF_TEMPORAL_LEVEL_1, (address) );
 #else
     #define FORCEINLINE
-    #define VMEC_FORCEINLINE
-    #define VMEC_BREAK() raise(VMEC_SIGTRAP);
-    #define VMEC_PREFETCH_CACHELINE( address ) ERROR_PREFETCH_NOT_DEFINED
+    #define TYON_FORCEINLINE
+    #define TYON_BREAK() raise(TYON_SIGTRAP);
+    #define TYON_PREFETCH_CACHELINE( address ) ERROR_PREFETCH_NOT_DEFINED
 #endif // compiler
 
 
@@ -166,7 +166,7 @@ using real = realNumber;
 
 using std::vector;
 
-/* namespace vmec
+/* namespace tyon
    {
        FORWARD struct time_stopwatch;
        FORWARD struct time_scope;

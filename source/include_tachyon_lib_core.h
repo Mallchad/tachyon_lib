@@ -75,10 +75,10 @@
 /** -- Project Local --
  * We put all defines here in a namespace not to stop namespace resolution,
  * but rather to allow name conflict resolution.
- * ie, even with `using namespace ray` and `using namespace vmec` you have 2 varients of `Vector3`
- * You can trivially resolve it by doing with `ray::Vector3` or `vmec::Vector3`
+ * ie, even with `using namespace ray` and `using namespace tyon` you have 2 varients of `Vector3`
+ * You can trivially resolve it by doing with `ray::Vector3` or `tyon::Vector3`
  *
- * The other 'vmec' files haven't been updated correctly to work this way so it's being left for now
+ * The other 'tyon' files haven't been updated correctly to work this way so it's being left for now
  */
 #include "tachyon_code_helpers.h"
 #include "tachyon_reflection.h"
