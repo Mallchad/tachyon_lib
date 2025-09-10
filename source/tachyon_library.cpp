@@ -10,15 +10,20 @@ namespace fs = std::filesystem;
 namespace tyon
 {
     time_monotonic g_program_epoch = time_now();
-    bool g_little_endian = test_little_endian();
+    bool g_little_endian = true;
     i32 g_log_largest_category = 0;
     memory_stack_allocator* g_allocator = nullptr;
     memory_stack_allocator* g_taint_allocator;
     std::mutex* g_allocator_lock = nullptr;
     std::mutex g_taint_allocator_lock = {};
 
+    raw_pointer g_null_read;
+    raw_pointer g_null_write;
+
+    library_context* g_library = nullptr;
+    logger* g_logger = nullptr;
     asset g_asset_stub = {};
-    asset_machine* g_asset;
+    asset_machine* g_asset = nullptr;
 
     null_type null;
 
@@ -565,6 +570,62 @@ namespace tyon
                               arg->name, arg->file.filename, arg->loader_name );
         }
         return result;
+    }
+
+    // -- Logging --
+
+    void
+    logger::write_message_simple( fstring message )
+    {
+        std::scoped_lock _lock( write_lock );
+        this->messages.append( message );
+
+        // Write to log file if possible
+        if (log_file == nullptr)
+        { log_file = fopen( "latest.log", "w" ); }
+        if (log_file)
+        { fwrite( message.data(), 1, message.size(), log_file ); }
+
+        fflush( log_file );
+        if (console_output_enabled)
+        {
+            fmt::print( "{}", message );
+        }
+    }
+
+    void
+    logger::write_error_simple( fstring message )
+    {
+        this->messages.append( message );
+        if (console_output_enabled)
+        {
+            fmt::print( fmt::emphasis::bold | fmt::fg(fmt::color::red), "{}", message );
+        }
+    }
+
+    void
+    library_context_init( library_context* arg )
+    {
+        if (arg->initialized)
+        {
+            printf( "library has already been initialized but 'library_context_init'"
+                    "was called again" );
+            TYON_BREAK();
+        }
+        g_program_epoch = time_now();
+        g_allocator = &arg->global_allocator;
+        g_allocator_lock = &arg->global_allocator_lock;
+        // g_taint_allocator_lock = &arg->taint_allocator_lock;
+        g_logger = &arg->default_logger;
+
+        // Using logging, needs to run after logging setup
+        g_little_endian = test_little_endian();
+        // Use malloc on purpose to take advantage of virtual memory
+        g_null_read = reinterpret_cast<byte*>( malloc( 1'000'000'000 ) );
+        g_null_write = reinterpret_cast<byte*>( malloc( 1'000'000'000 ) );
+
+        // Finished!
+        arg->initialized = true;
     }
 
     // -- Platform Library --

@@ -44,6 +44,16 @@ namespace tyon
     FORWARD struct asset_machine;
     FORWARD template<typename t_signature> struct generic_procedure;
     FORWARD template <typename T> struct array;
+    FORWARD struct logger;
+    FORWARD struct string;
+    FORWARD struct library_context;
+
+    template<typename... t_formattable> void
+    FORWARD FUNCTION log( cstring category, t_formattable... messages );
+    template<typename... t_formattable> void
+    FORWARD FUNCTION log_format_impl( cstring category, t_formattable... messages );
+    template<typename... t_formattable> void
+    FORWARD FUNCTION log_error_format_impl( cstring category, fstring formatted_message );
 
     // -- Globals Variables --
     // make sure to initialize Pointer Types before using
@@ -56,6 +66,12 @@ namespace tyon
     extern std::mutex g_taint_allocator_lock;
     constexpr isize memory_default_block_size = 268'435'456;
 
+    // TODO: Make these use null pages
+    extern raw_pointer g_null_read;
+    extern raw_pointer g_null_write;
+
+    extern library_context* g_library;
+    extern logger* g_logger;
     extern asset g_asset_stub;
     extern asset_machine* g_asset;
 
@@ -188,75 +204,6 @@ namespace tyon
     constexpr f64 pi_ = 3.141592653589793;
 
     // -- Basic Utilities --
-    #define tyon_print( ... ) log(  __FILE__, __VA_ARGS__ )
-
-    template<typename... t_formattable>
-    void
-    FUNCTION log( const char* category, t_formattable... messages )
-    {
-        u64 category_size = strlen( category );
-        fstring padding;
-        g_log_largest_category = u32(category_size > g_log_largest_category ? category_size :
-                                          g_log_largest_category);
-        padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
-
-        fstring partial;
-        partial.reserve( 100 );
-        FOLD((partial += fmt::format( "{} ", messages ) ), ...);
-        fstring full = fmt::format( "[{}]{}{}\n", category, padding, partial );
-        bool output_enabled = 1;
-        if (output_enabled)
-        {
-            // std::cout << "[" << category << "]" << padding;
-            // ((std::cout << messages  << " "), ...) << "\n";
-            fmt::print( "{}", full );
-            // fmt::print(  );
-        }
-    }
-
-    template<typename... t_formattable>
-    void
-    FUNCTION log_format_impl( const char* category, fstring message )
-    {
-        u64 category_size = strlen( category );
-        fstring padding;
-        g_log_largest_category = u32(category_size > g_log_largest_category ?
-                                           category_size :
-                                           g_log_largest_category);
-        padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
-
-        fstring full = fmt::format( "[{}]{}{} \n", category, padding, message );
-        bool output_enabled = 1;
-        if (output_enabled)
-        {
-            fmt::print( "{}", full );
-        }
-    }
-    #define log_format( CATEGORY_, FORMAT_, ...)                      \
-        log_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
-
-    template<typename... t_formattable>
-    void
-    FUNCTION log_error_format_impl( const char* category, fstring message )
-    {
-        u64 category_size = strlen( category );
-        fstring padding;
-        g_log_largest_category = u32(category_size > g_log_largest_category ?
-                                     category_size :
-                                     g_log_largest_category);
-        padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
-
-        fstring full = fmt::format( "[{}]{}{} \n", category, padding, message );
-        bool output_enabled = 1;
-        if (output_enabled)
-        {
-            fmt::print( fmt::emphasis::bold | fmt::fg(fmt::color::red), "{}", full );
-        }
-    }
-    /** We setup as a macro so that fmtlib can statically compile the string
-     * then pass it along to the actual implimentation that is runtime. */
-    #define log_error_format( CATEGORY_, FORMAT_, ...) \
-        log_error_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
 
     // #define log_flush() std::cout.flush()
     #define log_flush() fflush( stdout );
@@ -286,6 +233,9 @@ namespace tyon
     #define TYON_UNIMPLIMENTED();
     #define TYON_TESTING( x ) x;
     #define TYON_TODO( explanation );
+
+    #define log_error_format( CATEGORY_, FORMAT_, ...)                      \
+        log_error_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
 
     /** Make sure condition is true or break and show message
      * It's an assert. okay. */
@@ -1078,11 +1028,11 @@ namespace tyon
     FUNCTION time_now_utc();
 
     template <typename t_numeric = f32>
-    u64
+    t_numeric
     FUNCTION time_now_utc_seconds()
     {
         using t_duration = chrono::duration<t_numeric, std::ratio<1>>;
-        t_duration epoch = chrono::system_clock::now().time_since_epoch();
+        time_date::duration epoch = chrono::system_clock::now().time_since_epoch();
         t_numeric result = chrono::duration_cast< t_duration >( epoch ).count();
         return result;
     }
@@ -2244,6 +2194,146 @@ namespace tyon
 
     fresult
     thread_self_name( fstring name );
+
+    template <typename T>
+    struct dynamic_span
+    {
+        T* data;
+        i64 size;
+    };
+
+    struct string
+    {
+        i64 size = 0;
+        array< dynamic_span<char> > parts;
+
+        inline i64 parts_size()
+        { return parts.head_size; }
+
+        string&
+        append( fstring arg )
+        {
+            dynamic_span<char> message;
+            message.size = arg.size();
+            message.data = memory_allocate<char>( message.size + 1);
+            parts.push_tail( message );
+            memory_copy_raw( message.data, arg.data(), message.size );
+            size += message.size;
+
+            return *this;
+        }
+
+        string&
+        operator += ( fstring rhs )
+        {
+            this->append( rhs );
+            return *this;
+        }
+
+        operator fstring()
+        {
+            PROFILE_SCOPE_FUNCTION();
+            fstring result;
+            result.reserve( size );
+            dynamic_span<char> x_part;
+            for (i64 i=0; i < parts.head_size; ++i)
+            {
+                x_part = parts[i];
+                result.append( x_part.data, x_part.size );
+            }
+            return std::move(result);
+        }
+    };
+
+    struct logger
+    {
+        i32 flushed_messages = 0;
+        tyon::string messages;
+        bool console_output_enabled = true;
+
+        std::mutex write_lock;
+        FILE* log_file = nullptr;
+
+        void
+        write_message_simple( fstring string );
+
+        void
+        write_error_simple( fstring message );
+    };
+
+    template<typename... t_formattable>
+    void
+    FUNCTION log( const char* category, t_formattable... messages )
+    {
+        PROFILE_SCOPE_FUNCTION();
+        u64 category_size = strlen( category );
+        fstring padding;
+        g_log_largest_category = u32(category_size > g_log_largest_category ? category_size :
+                                     g_log_largest_category);
+        padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
+
+        fstring partial;
+        partial.reserve( 100 );
+        FOLD((partial += fmt::format( "{} ", messages ) ), ...);
+        fstring full = fmt::format( "[{0}][{1}]{2}{3}\n",
+                                    time_now_utc_seconds<i64>(), category, padding, partial );
+        bool output_enabled = 1;
+
+        g_logger->write_message_simple( full );
+    }
+
+    #define log_format( CATEGORY_, FORMAT_, ...)                      \
+        log_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
+    template<typename... t_formattable>
+    void
+    FUNCTION log_format_impl( cstring category, fstring formatted_message )
+    {
+        PROFILE_SCOPE_FUNCTION();
+        u64 category_size = strlen( category );
+        fstring padding;
+        g_log_largest_category = u32(category_size > g_log_largest_category ?
+                                     category_size :
+                                     g_log_largest_category);
+        padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
+
+        fstring full = fmt::format( "[{0}][{1}]{2}{3} \n",
+                                    time_now_utc_seconds<i64>(), category, padding, formatted_message );
+
+        g_logger->write_message_simple( full );
+    }
+
+    template<typename... t_formattable>
+    void
+    FUNCTION log_error_format_impl( cstring category, fstring formatted_message )
+    {
+        PROFILE_SCOPE_FUNCTION();
+        u64 category_size = strlen( category );
+        fstring padding;
+        g_log_largest_category = u32(category_size > g_log_largest_category ?
+                                     category_size :
+                                     g_log_largest_category);
+        padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
+
+        fstring full = fmt::format( "[{0}][{1}]{2}{3} \n",
+                                    time_now_utc_seconds<i64>(), category, padding, formatted_message );
+
+        g_logger->write_error_simple( full );
+    }
+
+    struct library_context
+    {
+        bool initialized = false;
+        memory_stack_allocator global_allocator;
+        std::mutex global_allocator_lock;
+        // Temporary. Needs to be removed when we have a proper global allocator
+        std::mutex taint_allocator_lock;
+        logger default_logger;
+        raw_pointer null_read;
+        raw_pointer null_write;
+    };
+
+    void
+    library_context_init( library_context* arg );
 
 }
 
