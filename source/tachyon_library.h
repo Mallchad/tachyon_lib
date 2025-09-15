@@ -232,7 +232,7 @@ namespace tyon
     #define TYON_NOP() void(0);
     #define TYON_UNIMPLIMENTED();
     #define TYON_TESTING( x ) x;
-    #define TYON_TODO( explanation );
+    #define TYON_TODO( explanation )
 
     #define log_error_format( CATEGORY_, FORMAT_, ...)                      \
         log_error_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
