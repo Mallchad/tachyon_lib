@@ -659,6 +659,19 @@ namespace tyon
         TODO: Not implemented fully yet*/
         bool active_range = true;
 
+        /** Default Constructor */
+        CONSTRUCTOR array() {}
+
+        CONSTRUCTOR array( std::initializer_list<T> arg )
+        {
+            this->size_ = this->head_size = arg.size();
+            this->change_allocation( this->size_ );
+            isize i = 0;
+            for (auto x : arg ) { data[i] = x; ++i; }
+            ERROR_GUARD( i <= this->size_,
+                         "Index overran initializer list, memory is likely corrupted" );
+        }
+
         bool
         change_allocation( i_memory_allocator* allocator, isize count )
         {
