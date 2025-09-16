@@ -206,27 +206,31 @@ namespace tyon
     // -- Basic Utilities --
 
     // #define log_flush() std::cout.flush()
+    #define TYON_LOG_ERROR( CATEGORY_, MESSAGE_ )                       \
+        log_error_format( (CATEGORY_), "{} @ {}:{}: {}",                \
+                          __FUNCTION__, __FILE__, __LINE__, MESSAGE_ );
+
     #define log_flush() fflush( stdout );
-    #define tyon_log( ... ) log( "TYON", __VA_ARGS__);
+    #define tyon_log( ... ) log( "Tachyon", __VA_ARGS__);
     #define tyon_logf( format_string, ... ) log_format( "TYON", format_string, __VA_ARGS__ );
     #define tyon_log_error( message )                                           \
-            log_error_format( "TYON Error", "{} @ {}:{}: {}",                   \
+            log_error_format( "Tachyon Error", "{} @ {}:{}: {}",                   \
                           __FUNCTION__, __FILE__, __LINE__, message );          \
         log_flush();
 
     // Like log_error but shorter name
     #define tyon_error( message )                                       \
-        log_error_format( "TYON Error", "{} @ {}:{}: {}",               \
+        log_error_format( "Tachyon Error", "{} @ {}:{}: {}",               \
                           __FUNCTION__, __FILE__, __LINE__, message );  \
         log_flush();
 
     #define tyon_errorf( format_string, ... )                   \
-        log_error_format( "TYON ERROR", format_string, __VA_ARGS__ );
+        log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
 
     #define tyon_variable( var ) log_format( "TYON", #var" [ {} ]", var );
     #define tyon_logf_error( format_string, ... )                   \
-        log_error_format( "TYON ERROR", format_string, __VA_ARGS__ );
-    #define profiler_log( ... ) log( "TYON Profiler", __VA_ARGS__);
+        log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
+    #define profiler_log( ... ) log( "Tachyon Profiler", __VA_ARGS__);
 
     #define TYON_UNSUPPORTED()
     #define TYON_NOP() void(0);
