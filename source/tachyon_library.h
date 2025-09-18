@@ -1,6 +1,8 @@
 
 #pragma once
 
+#define PROC auto
+
 /// Internal dependencies
 // #include <atomic>
 // #include <vector>
@@ -212,7 +214,7 @@ namespace tyon
 
     #define log_flush() fflush( stdout );
     #define tyon_log( ... ) log( "Tachyon", __VA_ARGS__);
-    #define tyon_logf( format_string, ... ) log_format( "TYON", format_string, __VA_ARGS__ );
+    #define tyon_logf( format_string, ... ) log_format( "Tachyon", format_string, __VA_ARGS__ );
     #define tyon_log_error( message )                                           \
             log_error_format( "Tachyon Error", "{} @ {}:{}: {}",                   \
                           __FUNCTION__, __FILE__, __LINE__, message );          \
@@ -227,7 +229,7 @@ namespace tyon
     #define tyon_errorf( format_string, ... )                   \
         log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
 
-    #define tyon_variable( var ) log_format( "TYON", #var" [ {} ]", var );
+    #define tyon_variable( var ) log_format( "Tachyon", #var" [ {} ]", var );
     #define tyon_logf_error( format_string, ... )                   \
         log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
     #define profiler_log( ... ) log( "Tachyon Profiler", __VA_ARGS__);
@@ -526,6 +528,17 @@ namespace tyon
 
     TYON_FORCEINLINE isize
     memory_align( isize bytes, i32 alignment );
+
+    /** There were supposed to be std::unique_ptr compat functions here which
+     * supposed to work with memory_allocate give them ownership of values
+     * allocated elsewhere, but since arena's will deallocate these values at
+     * random this doesn't make sense, which unique_ptr can neither cope with
+     * things not allocated by 'new' nor values stored with a different lifetime
+     * to the arena it's associated.
+     *
+     * Perhaps a better system is to associate entity-like things with a
+     * resource arena and let it handle the resources, rather than allowing you
+     * to pass around unique_ptr's randomally */
 
     // -- Container Types --
 
@@ -870,10 +883,16 @@ namespace tyon
             push_tail( item );
         }
 
+        PROC resize( usize count )
+        {
+            change_allocation( isize(count) );
+            head_size = count;
+        }
+
         void
         FUNCTION reserve( usize count )
         {
-             change_allocation( isize(count) );
+            change_allocation( isize(count) );
         }
 
         usize
@@ -2336,6 +2355,34 @@ namespace tyon
 
         g_logger->write_error_simple( full );
     }
+
+    // -- Resource System --
+
+    using proc_resource_destroy = void();
+
+    /** Scoped generic resource management container
+     *
+    * This is a crude attempt to solve resource management in a way that isn't
+    * restricted to one-struct per resource semantics. Constructors,
+    * destructors, or otherwise.
+    *
+    * The method uses arena bound resource lifetimes. Essentially every resource
+    * is bound to an arena. And it can either be freed from the arena manually
+    * or be cleanuped up when it goes out of scope. */
+    struct resource_arena
+    {
+        using cleanup_delegate = generic_procedure<proc_resource_destroy>;
+
+        uid id;
+        // The resource_arena this area belongs to. This arena will die with its parent.
+        uid parent;
+        array<cleanup_delegate> destroy_stack;
+
+        // CONSTRUCTOR resource_arena() = delete;
+
+        PROC push_cleanup( cleanup_delegate arg ) -> void;
+        DESTRUCTOR ~resource_arena();
+    };
 
     struct library_context
     {

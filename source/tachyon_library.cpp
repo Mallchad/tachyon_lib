@@ -241,6 +241,26 @@ namespace tyon
         return (bytes + (alignment - (bytes % alignment)));
     }
 
+    PROC resource_arena::push_cleanup( cleanup_delegate arg ) -> void
+    {
+        destroy_stack.push_tail( arg );
+    }
+
+    // Resource Library
+    DESTRUCTOR resource_arena::~resource_arena()
+    {
+        constexpr bool debug = true;
+        for (i32 i=0; i < destroy_stack.size(); ++i)
+        {
+            i32 i_reverse = (destroy_stack.size() - i - 1);
+            destroy_stack[i_reverse].invoke();
+            if constexpr (debug)
+            {
+
+            }
+        }
+    }
+
     // -- Container Types --
 
     // -- Time Library -
@@ -439,7 +459,7 @@ namespace tyon
         if (write_ok)
         { tyon_log( fmt::format( "Wrote binary file '{}'", arg->filename ) ); }
         else
-        { log_error_format( "TYON", "Failed to write binary file '{}'", arg->filename  ); }
+        { log_error_format( "Tachyon", "Failed to write binary file '{}'", arg->filename  ); }
         ERROR_GUARD( write_ok, "File wrote less than full data or failed" );
 
         return write_ok;

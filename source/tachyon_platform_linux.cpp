@@ -82,7 +82,7 @@ namespace tyon
         if (write_ok)
         { tyon_log( fmt::format( "Wrote binary file '{}'", arg->filename ) ); }
         else
-        { log_error_format( "TYON", "Failed to write binary file '{}'", arg->filename  ); }
+        { log_error_format( "Tachyon", "Failed to write binary file '{}'", arg->filename  ); }
         ERROR_GUARD( write_ok, "File wrote less than full data or failed" );
 
 
