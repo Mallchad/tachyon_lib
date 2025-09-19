@@ -857,7 +857,7 @@ namespace tyon
         FUNCTION protect()
         {
             // Crash
-            *(char*)0 = 1;
+            TYON_BREAK();
         }
 
         /** Zero from 0 to 'head_size' memory and set head and tail to zero. */
