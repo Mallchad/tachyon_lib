@@ -335,6 +335,7 @@ namespace tyon
         }
 
         virtual raw_pointer allocate_raw( isize bytes ) PURE;
+        PROC virtual allocate_raw_fast( i64 bytes ) -> raw_pointer PURE;
         virtual void deallocate( void* address ) PURE;
         /** Clear all stored allocations and zero memory */
         virtual void blank_all() PURE;
@@ -416,6 +417,8 @@ namespace tyon
         }
 
         raw_pointer allocate_raw( isize bytes ) override;
+
+        PROC allocate_raw_fast( i64 bytes ) -> raw_pointer override;
 
         void
         deallocate( void* address ) override;

@@ -166,6 +166,13 @@ namespace tyon
         return result;
     }
 
+    PROC memory_stack_allocator::allocate_raw_fast( i64 bytes ) -> raw_pointer
+    {
+        buffer* block = &(blocks.back());
+        return (block->data + block->head_size);
+    }
+
+
     void
     memory_stack_allocator::deallocate( void* address )
     {
