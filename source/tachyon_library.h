@@ -1767,24 +1767,20 @@ namespace tyon
     template <typename t_procedure>
     struct defer_procedure
     {
-        generic_procedure<t_procedure> deferred;
+        using t_self = defer_procedure<t_procedure>;
+        t_procedure deferred;
 
-        template <typename t_callable>
-        COPY_CONSTRUCTOR defer_procedure ( const t_callable& proc )
-        {
-            deferred.assign( proc );
-        }
+        COPY_CONSTRUCTOR defer_procedure ( t_procedure&& proc ) :
+            deferred( std::move(proc) )  {}
 
         DESTRUCTOR ~defer_procedure()
         {
-            deferred.invoke();
+            deferred();
         }
     };
 
 #define DEFER( name, ... ) defer _deferred = [&] { __VA_ARGS__ };
 #define DEFER_NAMED( name, ... ) defer name = [&] { __VA_ARGS__ };
-
-    using defer = defer_procedure<void()>;
 
     /** -- Type Support Library --
      *
