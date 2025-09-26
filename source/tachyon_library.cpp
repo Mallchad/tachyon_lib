@@ -624,6 +624,15 @@ namespace tyon
     logger::write_error_simple( fstring message )
     {
         this->messages.append( message );
+
+        // Write to log file if possible
+        if (log_file == nullptr)
+        { log_file = fopen( "latest.log", "w" ); }
+        if (log_file)
+        { fwrite( message.data(), 1, message.size(), log_file ); }
+
+        // Ensure file has synchronized messages before proceeding
+        fflush( log_file );
         if (console_output_enabled)
         {
             fmt::print( fmt::emphasis::bold | fmt::fg(fmt::color::red), "{}", message );

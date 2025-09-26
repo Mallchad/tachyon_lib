@@ -83,15 +83,12 @@ namespace tyon
     {
         byte* data = nullptr;
 
-        inline TYON_FORCEINLINE
         COPY_CONSTRUCTOR raw_pointer()
         {}
 
-        inline TYON_FORCEINLINE
-        COPY_CONSTRUCTOR raw_pointer( raw_pointer& rhs )
+        COPY_CONSTRUCTOR raw_pointer( const raw_pointer& rhs )
         { this->data = rhs.data; }
 
-        inline TYON_FORCEINLINE
         CONSTRUCTOR raw_pointer( void* rhs )
         { this->data = reinterpret_cast<byte*>(rhs); }
 
@@ -209,15 +206,15 @@ namespace tyon
 
     // #define log_flush() std::cout.flush()
     #define TYON_LOG_ERROR( CATEGORY_, MESSAGE_ )                       \
-        log_error_format( (CATEGORY_), "{} @ {}:{}: {}",                \
-                          __FUNCTION__, __FILE__, __LINE__, MESSAGE_ );
+        log_error_format_impl( (CATEGORY_),                             \
+            fmt::format("{} @ {}:{}: {}", __FUNCTION__, __FILE__, __LINE__, MESSAGE_) );
 
     #define log_flush() fflush( stdout );
     #define tyon_log( ... ) log( "Tachyon", __VA_ARGS__);
     #define tyon_logf( format_string, ... ) log_format( "Tachyon", format_string, __VA_ARGS__ );
     #define tyon_log_error( message )                                           \
-            log_error_format( "Tachyon Error", "{} @ {}:{}: {}",                   \
-                          __FUNCTION__, __FILE__, __LINE__, message );          \
+        log_error_format_impl( "Tachyon Error",                         \
+            fmt::format("{} @ {}:{}: {}", __FUNCTION__, __FILE__, __LINE__, message) ); \
         log_flush();
 
     // Like log_error but shorter name
@@ -284,7 +281,7 @@ namespace tyon
 
     struct buffer
     {
-        byte* data = nullptr;
+        raw_pointer data;
         isize size = 0;
         isize head = 0;
         isize head_size = 0;
