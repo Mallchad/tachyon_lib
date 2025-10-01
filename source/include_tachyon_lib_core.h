@@ -72,6 +72,8 @@
 #include "../external/fmt/include/fmt/color.h"
 #include "../external/fmt/include/fmt/std.h"
 
+#include "Tracy.hpp"
+
 /** -- Project Local --
  * We put all defines here in a namespace not to stop namespace resolution,
  * but rather to allow name conflict resolution.

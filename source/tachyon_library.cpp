@@ -631,14 +631,7 @@ namespace tyon
         entry.message = message,
         entry.timestamp = time_now_utc();
 
-        // Write to log file if possible
-        if (log_file == nullptr)
-        { log_file = fopen( "latest.log", "w" ); }
-        if (log_file)
-        { fwrite( message.data(), 1, message.size(), log_file ); }
-
-        fflush( log_file );
-        if (console_output_enabled)
+        if (console_output_enabled || string_output_enabled)
         {
             i64 nanoseconds = time_to_epoch_nanoseconds( entry.timestamp );
             u64 category_size = category.size();
@@ -648,7 +641,19 @@ namespace tyon
                                          category_size :
                                          g_log_largest_category);
             padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
-            fmt::print( "[{}][{}] {} \n", nanoseconds, entry.category, entry.message );
+            fstring formatted_message = fmt::format(
+                "[{}][{}] {} \n", nanoseconds, entry.category, entry.message );
+            fmt::print( "{}", formatted_message );
+
+            if (string_output_enabled)
+            {
+                // Write to log file if possible
+                if (log_file == nullptr)
+                { log_file = fopen( "latest.log", "w" ); }
+                if (log_file)
+                { fwrite( formatted_message.data(), 1, formatted_message.size(), log_file ); }
+                fflush( log_file );
+            }
         }
     }
 

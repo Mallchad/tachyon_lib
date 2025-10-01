@@ -1242,7 +1242,7 @@ namespace tyon
     #define TIME_SCOPED(...)
     #define TIME_SCOPED_FUNCTION(...)
     #define PROFILE_SCOPE(...)
-    #define PROFILE_SCOPE_FUNCTION(...)
+    // #define PROFILE_SCOPE_FUNCTION(...)
 
     // -- Functional Programming Library --
 
@@ -2363,6 +2363,7 @@ namespace tyon
         tyon::string messages;
         array<log_entry> entries;
         bool console_output_enabled = true;
+        bool string_output_enabled = true;
 
         std::mutex write_lock;
         FILE* log_file = nullptr;
