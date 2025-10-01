@@ -602,25 +602,6 @@ namespace tyon
     // -- Logging --
 
     void
-    logger::write_message_simple( fstring message )
-    {
-        std::scoped_lock _lock( write_lock );
-        this->messages.append( message );
-
-        // Write to log file if possible
-        if (log_file == nullptr)
-        { log_file = fopen( "latest.log", "w" ); }
-        if (log_file)
-        { fwrite( message.data(), 1, message.size(), log_file ); }
-
-        fflush( log_file );
-        if (console_output_enabled)
-        {
-            fmt::print( "{}", message );
-        }
-    }
-
-    void
     logger::write_error_simple( fstring message )
     {
         this->messages.append( message );
@@ -643,7 +624,6 @@ namespace tyon
     {
         PROFILE_SCOPE_FUNCTION();
         std::scoped_lock _lock( write_lock );
-        this->messages.append( message );
 
         log_entry& entry = entries.push_tail( {} );
         entry.type = type;

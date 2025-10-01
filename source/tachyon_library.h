@@ -2368,9 +2368,6 @@ namespace tyon
         FILE* log_file = nullptr;
 
         void
-        write_message_simple( fstring string );
-
-        void
         write_error_simple( fstring message );
 
         void
