@@ -639,6 +639,39 @@ namespace tyon
         }
     }
 
+    PROC logger::write_message( fstring category, fstring message, e_log_entry type ) -> void
+    {
+        PROFILE_SCOPE_FUNCTION();
+        std::scoped_lock _lock( write_lock );
+        this->messages.append( message );
+
+        log_entry& entry = entries.push_tail( {} );
+        entry.type = type;
+        entry.category = category;
+        entry.message = message,
+        entry.timestamp = time_now_utc();
+
+        // Write to log file if possible
+        if (log_file == nullptr)
+        { log_file = fopen( "latest.log", "w" ); }
+        if (log_file)
+        { fwrite( message.data(), 1, message.size(), log_file ); }
+
+        fflush( log_file );
+        if (console_output_enabled)
+        {
+            i64 nanoseconds = time_to_epoch_nanoseconds( entry.timestamp );
+            u64 category_size = category.size();
+            fstring padding;
+
+            g_log_largest_category = u32(category_size > g_log_largest_category ?
+                                         category_size :
+                                         g_log_largest_category);
+            padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
+            fmt::print( "[{}][{}] {} \n", nanoseconds, entry.category, entry.message );
+        }
+    }
+
     void
     library_context_init( library_context* arg )
     {

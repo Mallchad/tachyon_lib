@@ -53,7 +53,7 @@ namespace tyon
     template<typename... t_formattable> void
     FORWARD FUNCTION log( cstring category, t_formattable... messages );
     template<typename... t_formattable> void
-    FORWARD FUNCTION log_format_impl( cstring category, t_formattable... messages );
+    FORWARD FUNCTION log_format_impl( fstring category, t_formattable... messages );
     template<typename... t_formattable> void
     FORWARD FUNCTION log_error_format_impl( cstring category, fstring formatted_message );
 
@@ -1063,6 +1063,28 @@ namespace tyon
     time_date
     FUNCTION time_now_utc();
 
+    template <typename t_numeric = u64>
+    t_numeric
+    FUNCTION time_to_epoch_nanoseconds( time_date arg )
+    {
+        using namespace std::chrono;
+        using t_duration = duration<t_numeric, std::nano >;
+        t_numeric result = time_point_cast<t_duration>( arg ).time_since_epoch().count();
+
+        return result;
+    }
+
+        template <typename t_numeric = i64>
+    t_numeric
+    FUNCTION time_to_epoch_nanoseconds( time_monotonic arg )
+    {
+        using namespace std::chrono;
+        using t_duration = duration<t_numeric, std::nano >;
+        t_numeric result = time_point_cast<time_monotonic, t_duration>( arg.time_since_epoch() );
+
+        return result;
+    }
+
     template <typename t_numeric = f32>
     t_numeric
     FUNCTION time_now_utc_seconds()
@@ -1110,7 +1132,7 @@ namespace tyon
     /// Returns time since a given time point in a given numeric type
     template <typename t_numeric = u64>
     t_numeric
-    FUNCTION time_elapsed_nanoseconds( monotonic_time start)
+    FUNCTION time_elapsed_nanoseconds( time_monotonic start)
     {
         using t_duration = chrono::duration<t_numeric, std::nano>;
         t_duration elapsed = time_now() - start;
@@ -2277,10 +2299,69 @@ namespace tyon
         }
     };
 
+    // Default allocator for logger
+    template <typename T, usize align = 0>
+    struct log_allocator
+    {
+        using value_type = char;
+        using pointer_type = char*;
+        using size_type = usize;
+        using difference_type = std::ptrdiff_t;
+        // using propagate_on_container_move_assignment = std::false_type;
+        // using is_always_equal = std::true_type;
+        // using rebind = void;
+
+        template <typename t_allocator>
+        struct rebind
+        { using other = log_allocator<t_allocator, align>; };
+
+        CONSTRUCTOR log_allocator() = default;
+
+        PROC allocate( usize bytes, const void* hint = 0 )  -> T*
+        {
+            return memory_allocate_raw( bytes );
+        }
+
+        PROC deallocate( T* address, usize bytes )
+        {
+            return;
+        }
+
+    };
+    template<typename A, typename B>
+    bool operator== ( log_allocator<A>& lhs, log_allocator<B>& rhs)
+    { return true; }
+
+    template<typename A, typename B>
+    bool operator!= ( log_allocator<A>& lhs, log_allocator<B>& rhs)
+    { return false; }
+
+    enum class e_log_entry
+    {
+        none = 0,
+        any = 1,
+        message = 2,
+        error = 3,
+        binary_primitive,
+        binary_custom
+    };
+
+    struct log_entry
+    {
+        // using log_string = std::basic_string< char, std::char_traits<char>, log_allocator<char, 0> >;
+        using log_string = fstring;
+
+        e_log_entry type;
+        log_string category;
+        log_string message;
+        time_date timestamp;
+    };
+
     struct logger
     {
         i32 flushed_messages = 0;
         tyon::string messages;
+        array<log_entry> entries;
         bool console_output_enabled = true;
 
         std::mutex write_lock;
@@ -2291,47 +2372,28 @@ namespace tyon
 
         void
         write_error_simple( fstring message );
+
+        void
+        write_message( fstring category, fstring message, e_log_entry type );
     };
 
     template<typename... t_formattable>
     void
-    FUNCTION log( const char* category, t_formattable... messages )
+    FUNCTION log( cstring category, t_formattable... messages )
     {
-        PROFILE_SCOPE_FUNCTION();
-        u64 category_size = strlen( category );
-        fstring padding;
-        g_log_largest_category = u32(category_size > g_log_largest_category ? category_size :
-                                     g_log_largest_category);
-        padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
-
-        fstring partial;
-        partial.reserve( 100 );
-        FOLD((partial += fmt::format( "{} ", messages ) ), ...);
-        fstring full = fmt::format( "[{0}][{1}]{2}{3}\n",
-                                    time_now_utc_seconds<i64>(), category, padding, partial );
-        bool output_enabled = 1;
-
-        g_logger->write_message_simple( full );
+        fstring formatted_message;
+        formatted_message.reserve( 100 );
+        FOLD((formatted_message += fmt::format( "{} ", messages ) ), ...);
+        g_logger->write_message( category, formatted_message, e_log_entry::message );
     }
 
     #define log_format( CATEGORY_, FORMAT_, ...)                      \
         log_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
     template<typename... t_formattable>
     void
-    FUNCTION log_format_impl( cstring category, fstring formatted_message )
+    FUNCTION log_format_impl( fstring category, fstring formatted_message )
     {
-        PROFILE_SCOPE_FUNCTION();
-        u64 category_size = strlen( category );
-        fstring padding;
-        g_log_largest_category = u32(category_size > g_log_largest_category ?
-                                     category_size :
-                                     g_log_largest_category);
-        padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
-
-        fstring full = fmt::format( "[{0}][{1}]{2}{3} \n",
-                                    time_now_utc_seconds<i64>(), category, padding, formatted_message );
-
-        g_logger->write_message_simple( full );
+        g_logger->write_message( category, formatted_message, e_log_entry::message );
     }
 
     template<typename... t_formattable>
