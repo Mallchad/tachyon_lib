@@ -2316,7 +2316,7 @@ namespace tyon
                 x_part = parts[i];
                 result.append( x_part.data, x_part.size );
             }
-            return std::move(result);
+            return result;
         }
     };
 
@@ -2464,7 +2464,7 @@ namespace tyon
     struct library_context
     {
         bool initialized = false;
-        memory_stack_allocator global_allocator( 4_GiB );
+        memory_stack_allocator global_allocator = memory_stack_allocator( 4_GiB );
         std::mutex global_allocator_lock;
         // Temporary. Needs to be removed when we have a proper global allocator
         std::mutex taint_allocator_lock;
