@@ -3,7 +3,7 @@
  * this can ripped out and relocated to another project by only changing a line or
  * two. Or none. */
 
-#include "include_core.h"
+#include "include_tachyon_lib_core.h"
 
 namespace fs = std::filesystem;
 
@@ -477,6 +477,7 @@ namespace tyon
     void
     asset_machinery_init()
     {
+        TIME_SCOPED_FUNCTION();
         i32 iteration_limit = 1000;
         fpath self_directory = file_self_directory();
         g_asset->search_paths.change_allocation( 20 );
@@ -660,6 +661,7 @@ namespace tyon
     void
     library_context_init( library_context* arg )
     {
+        TIME_SCOPED_FUNCTION();
         if (arg->initialized)
         {
             printf( "library has already been initialized but 'library_context_init'"

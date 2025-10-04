@@ -2464,7 +2464,9 @@ namespace tyon
     struct library_context
     {
         bool initialized = false;
-        memory_stack_allocator global_allocator = memory_stack_allocator( 4_GiB );
+        /** I swear to god I have to quite an operating system just to kill the
+            ginormous penalty of asking for a large amount of memory nicely */
+        memory_stack_allocator global_allocator = memory_stack_allocator( 400_MiB );
         std::mutex global_allocator_lock;
         // Temporary. Needs to be removed when we have a proper global allocator
         std::mutex taint_allocator_lock;
