@@ -784,10 +784,25 @@ namespace tyon
 
         /// Pushes a new item at off the tail (head + head_size) and increments 'head_size'
         T&
-        FUNCTION push_tail( T item )
+        FUNCTION push_tail( T& item )
         {
             if (bounded && (head + head_size >= size_))
             {
+                // Greedy, 2x allocation
+                bool resize_ok = change_allocation( std::max<isize>(size_, 1) * 2 );
+                ERROR_GUARD( resize_ok, "Serious error has occured if a resize failed" );
+            }
+            i64 index = head + (head_size++);
+            data[ index ] = item;
+            return data[ index ];
+        }
+
+        T&
+        FUNCTION push_tail( T&& item )
+        {
+            if (bounded && (head + head_size >= size_))
+            {
+                // Greedy, 2x allocation
                 bool resize_ok = change_allocation( std::max<isize>(size_, 1) * 2 );
                 ERROR_GUARD( resize_ok, "Serious error has occured if a resize failed" );
             }
@@ -878,9 +893,15 @@ namespace tyon
 
         // std::vector compat
         void
-        FUNCTION push_back( T item )
+        FUNCTION push_back( T& item )
         {
             push_tail( item );
+        }
+
+        void
+        FUNCTION push_back( T&& item )
+        {
+            push_tail( std::move( item ) );
         }
 
         PROC resize( usize count )
@@ -1239,9 +1260,9 @@ namespace tyon
     #define TIME_SCOPED_ACCUMULATED_FUNCTION() \
         TIME_EXPAND_MACRO( __FUNCTION__, __COUNTER__ )
 
-    #define TIME_SCOPED(...)
-    #define TIME_SCOPED_FUNCTION(...)
-    #define PROFILE_SCOPE(...)
+    // #define TIME_SCOPED(...)
+    // #define TIME_SCOPED_FUNCTION(...)
+    // #define PROFILE_SCOPE(...)
     // #define PROFILE_SCOPE_FUNCTION(...)
 
     // -- Functional Programming Library --
@@ -2443,7 +2464,7 @@ namespace tyon
     struct library_context
     {
         bool initialized = false;
-        memory_stack_allocator global_allocator;
+        memory_stack_allocator global_allocator( 4_GiB );
         std::mutex global_allocator_lock;
         // Temporary. Needs to be removed when we have a proper global allocator
         std::mutex taint_allocator_lock;
