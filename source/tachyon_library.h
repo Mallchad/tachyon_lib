@@ -1905,6 +1905,7 @@ namespace tyon
         constexpr CONSTRUCTOR uid( i64 _id )
             : id(_id), uuid() { }
         operator i64();
+        PROC valid() -> bool;
     };
 
     struct minihash

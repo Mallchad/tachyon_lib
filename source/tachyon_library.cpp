@@ -380,6 +380,9 @@ namespace tyon
     constexpr CONSTRUCTOR uid::uid( i64 _id, u128 _uuid ) : id( _id ), uuid( _uuid ) {}
     uid::operator i64() { return id; }
 
+    PROC uid::valid() -> bool
+    { return uuid.d[0] != 0;  }
+
     bool
     minihash::operator== ( minihash& rhs ) { return this->value == rhs.value; };
 
