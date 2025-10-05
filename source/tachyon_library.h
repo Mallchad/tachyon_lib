@@ -1374,7 +1374,7 @@ namespace tyon
         FORWARD template <typename t_procedure, typename t_impl_return> struct procedure_impl;
         FORWARD template <typename t_procedure, typename t_context> struct closure;
 
-        IMMEDIATE isize small_size = 64;
+        IMMEDIATE isize small_size = 128;
         alignas(16) byte small_storage[ small_size ];
         i_procedure_impl* impl = nullptr;
         bool enabled = false;
@@ -1549,7 +1549,7 @@ namespace tyon
         FORWARD template <typename t_procedure, typename t_impl_return> struct procedure_impl;
         FORWARD template <typename t_procedure, typename t_context> struct closure;
 
-        IMMEDIATE isize small_size = 64;
+        IMMEDIATE isize small_size = 128;
         alignas(16) byte small_storage[ small_size ];
         i_procedure_impl* impl = nullptr;
         bool enabled = false;
@@ -1835,10 +1835,8 @@ namespace tyon
     using u64 = uint64_t;
     struct u128
     {
-        u64 d[2] = {};
+        u8 d[16] = {};
         constexpr CONSTRUCTOR u128() = default;
-        constexpr CONSTRUCTOR u128( u64 low, u64 high )
-        { d[0] = low; d[1] = high; }
     };
     struct u256 { u64 d[4]; };
     struct u512 { u64 d[8]; };
@@ -1904,6 +1902,8 @@ namespace tyon
         constexpr CONSTRUCTOR uid( u128 _uuid ) : id(0), uuid( _uuid ) {}
         constexpr CONSTRUCTOR uid( i64 _id )
             : id(_id), uuid() { }
+        constexpr COPY_CONSTRUCTOR uid( const uid& arg )
+            : id(arg.id), uuid(arg.uuid) { }
         operator i64();
         PROC valid() -> bool;
     };
@@ -2490,6 +2490,38 @@ struct fmt::formatter< tyon::vec2_i64 > : formatter<string_view>
     {
         string_view data = fmt::format( "[{} {}]", arg.x, arg.y );
         return formatter<string_view>::format( data, context );
+    }
+};
+
+template <>
+struct fmt::formatter< tyon::uid > : formatter<string_view>
+{
+    auto format( tyon::uid arg, format_context& context ) const -> format_context::iterator
+    {
+        // TYON_BREAK();
+        tyon::uid tmp = arg;
+        i64 a = (u64)(tmp.uuid.d[0]);
+        tyon::raw_pointer data = &arg.uuid;
+        char hexbytes[] = "0123456789abcdefZZZZZZ";
+        char formatted[40] {};
+
+        // 8 bytes for full binary UUID
+        // 32 bytes for full formatted string
+        // 16 bytes for half string
+        for (int i = 0; i < 8; ++i)
+        {
+            // Mask off half byte to find hex code
+            // Remember that hex displays are always big endian so reverse byte order if little endian
+            i32 left = tyon::g_little_endian;
+            i32 right = 1 - tyon::g_little_endian;
+            formatted[ left + (i * 2) ] = hexbytes[ (data[ 0 + i] & 0x0F) ];
+            formatted[ right+ (i * 2) ] = hexbytes[ (data[ 0 + i] & 0xF0) >> 4 ];
+
+            formatted[ left + 16+ (i * 2) ] = hexbytes[ (data[ 8 + i] & 0x0F) ];
+            formatted[ right+ 16+ (i * 2) ] = hexbytes[ (data[ 8 + i] & 0xF0) >> 4 ];
+        }
+        fstring_view result = formatted;
+        return formatter<string_view>::format( result, context );
     }
 };
 
