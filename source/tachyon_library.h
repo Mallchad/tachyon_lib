@@ -512,10 +512,9 @@ namespace tyon
 
     template <typename T>
     bool
-    FUNCTION memory_different( T* a, T* b )
+    FUNCTION memory_different( T& a, T& b )
     {
-        using t_value = decltype(*a);
-        return std::memcmp( a, b, sizeof(t_value) );
+        return std::memcmp( &a, &b, sizeof(T) );
     }
 
     template <typename T>
@@ -853,6 +852,12 @@ namespace tyon
         {
             ERROR_GUARD( (i >= 0) || (i < size_), "Tried to access index ouside of bounds" );
             return data[std::clamp<i64>( i, 0, size_ )];
+        }
+
+        PROC address( isize i ) -> T*
+        {
+            ERROR_GUARD( (i >= 0) || (i < size_), "Tried to access index ouside of bounds" );
+            return data + std::clamp<i64>( i, 0, size_ );
         }
 
         t_self
@@ -2459,6 +2464,7 @@ namespace tyon
         // CONSTRUCTOR resource_arena() = delete;
 
         PROC push_cleanup( cleanup_delegate arg ) -> void;
+        PROC run_cleanup() -> void;
         DESTRUCTOR ~resource_arena();
     };
 

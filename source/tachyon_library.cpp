@@ -248,13 +248,7 @@ namespace tyon
         return (bytes + (alignment - (bytes % alignment)));
     }
 
-    PROC resource_arena::push_cleanup( cleanup_delegate arg ) -> void
-    {
-        destroy_stack.push_tail( arg );
-    }
-
-    // Resource Library
-    DESTRUCTOR resource_arena::~resource_arena()
+    PROC resource_arena::run_cleanup() -> void
     {
         constexpr bool debug = true;
         for (i32 i=0; i < destroy_stack.size(); ++i)
@@ -266,7 +260,18 @@ namespace tyon
 
             }
         }
+        destroy_stack.head_size = 0;
     }
+
+
+    PROC resource_arena::push_cleanup( cleanup_delegate arg ) -> void
+    {
+        destroy_stack.push_tail( arg );
+    }
+
+    // Resource Library
+    DESTRUCTOR resource_arena::~resource_arena()
+    { this->run_cleanup(); }
 
     // -- Container Types --
 

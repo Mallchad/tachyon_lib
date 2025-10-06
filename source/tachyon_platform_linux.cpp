@@ -97,8 +97,10 @@ namespace tyon
         platform::uuid_t generated;
         platform::uuid_generate( generated );
         u128 result = {};
+        u128 empty = {};
         memory_copy_unsafe<u128>( &result, &generated, 1 );
-        ERROR_GUARD( result.d[0], "Something is wrong if this a UUID comes back null" );
+        ERROR_GUARD( memory_different( result, empty ),
+                     "Something is wrong if this a UUID comes back null" );
 
         return result;
     }
