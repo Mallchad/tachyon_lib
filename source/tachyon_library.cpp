@@ -124,17 +124,17 @@ namespace tyon
     void memory_stack_allocator::operator= ( const memory_stack_allocator& )
     {}
 
-    raw_pointer memory_stack_allocator::allocate_raw( isize bytes )
+    raw_pointer memory_stack_allocator::allocate_raw( isize bytes, isize alignment )
     {
         isize size = (bytes);
         isize type_size = 1;
         buffer* block = &(blocks.back());
-        isize alignment = binary_alignment( 1, block->data + block->head_size );
-        void* head_data = (block->data + block->head_size + alignment);
+        isize alignment_bytes = binary_alignment( alignment, block->data + block->head_size );
+        void* head_data = (block->data + block->head_size + alignment_bytes);
         void* result = nullptr;
 
-        bool size_exceeded = ((alignment + block->head_size + size) > block->size);
-        if (size_exceeded)
+        bool size_exceeded = ((alignment_bytes + block->head_size + size) > block->size);
+        if (size_exceeded) [[unlikely]]
         {
             buffer new_block;
             i32 pages = i32(ceil(f32(size) / block_size));
@@ -149,8 +149,8 @@ namespace tyon
             blocks.push_back( new_block );
             // Fixup stale data
             block = &(blocks.back());
-            alignment = binary_alignment( 1, head_data );
-            head_data = (block->data + block->head_size + alignment);
+            alignment_bytes = binary_alignment( 1, head_data );
+            head_data = (block->data + block->head_size + alignment_bytes);
 
             if (new_block.data == nullptr) { return nullptr; }
         }
@@ -158,7 +158,7 @@ namespace tyon
         // Allocate the new memory
         memory_unpoison( head_data, size );
         result = reinterpret_cast<void*>( head_data );
-        block->head_size += (alignment + size);
+        block->head_size += (alignment_bytes + size);
         churn_bytes += size;
         ++churn;
         ++allocations;
@@ -166,10 +166,15 @@ namespace tyon
         return result;
     }
 
-    PROC memory_stack_allocator::allocate_raw_fast( i64 bytes ) -> raw_pointer
+    PROC memory_stack_allocator::allocate_raw_fast( i64 bytes, isize alignment ) -> raw_pointer
     {
         buffer* block = &(blocks.back());
-        return (block->data + block->head_size);
+        isize alignment_bytes = binary_alignment( alignment, block->data + block->head_size );
+        isize allocation_size = (alignment + block->head_size);
+        raw_pointer result = (block->data + allocation_size);
+        block->head_size += allocation_size;
+
+        return result;
     }
 
 
