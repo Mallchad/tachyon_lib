@@ -507,13 +507,15 @@ namespace tyon
     bool
     FUNCTION memory_same( T& a, T& b )
     {
-        return std::memcmp( &a, &b, sizeof(T) );
+        // Returns zero when same so compare to zero
+        return (std::memcmp( &a, &b, sizeof(T) ) == 0);
     }
 
     template <typename T>
     bool
     FUNCTION memory_different( T& a, T& b )
     {
+        // Returns zero when same so different is non-zero
         return std::memcmp( &a, &b, sizeof(T) );
     }
 

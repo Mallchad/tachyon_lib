@@ -391,7 +391,10 @@ namespace tyon
     uid::operator i64() { return id; }
 
     PROC uid::valid() -> bool
-    { return uuid.d[0] != 0;  }
+    {
+        auto empty = u128 {};
+        return memory_different( this->uuid, empty );
+    }
 
     bool
     minihash::operator== ( minihash& rhs ) { return this->value == rhs.value; };
