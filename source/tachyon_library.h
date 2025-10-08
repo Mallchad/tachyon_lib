@@ -705,7 +705,7 @@ namespace tyon
         change_allocation( isize count )
         {
             i_memory_allocator* allocator = (data.allocator ? data.allocator : g_allocator);
-            T* new_storage = allocator->allocate_raw( count * sizeof(T) );
+            T* new_storage = allocator->allocate_raw( count * sizeof(T), alignof(T) );
             ERROR_GUARD( new_storage != nullptr, "Allocation failed" );
             new(new_storage) T[count] {};
             if (data)
@@ -732,7 +732,8 @@ namespace tyon
         change_allocation_raw( isize count )
         {
             i_memory_allocator* allocator = (data.allocator ? data.allocator : g_allocator);
-            T* new_storage = reinterpret_cast<T*>( allocator->allocate_raw( count * sizeof(T) ) );
+            T* new_storage = reinterpret_cast<T*>(
+                allocator->allocate_raw( count * sizeof(T), alignof(T) ) );
             ERROR_GUARD( new_storage != nullptr, "Allocation failed" );
             if (data)
             {
