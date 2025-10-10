@@ -1295,7 +1295,7 @@ namespace tyon
         {   if (error == false)
             {   return value; }
             else
-            {   return default_value; }
+            {   TYON_BREAK(); return default_value; }
         }
     };
 

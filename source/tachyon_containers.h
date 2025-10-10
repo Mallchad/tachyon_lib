@@ -93,17 +93,17 @@ struct linked_list
         t_node* prev = nullptr;
         if (arg->prev && arg->next)
         {   // pass old references to prev and next
-            arg->prev.next = arg->next;
-            arg->next.prev = arg->prev;
+            nodes[ arg->prev ].next = arg->next;
+            nodes[ arg->next ].prev = arg->prev;
         }
         else if (arg->prev)
         {   // Only prev, no next node, nullify that reference and make it the tail
-            arg->prev = nullptr;
+            arg->prev = -1;
             tail_ = arg->prev;
         }
         else if (arg->next)
         {   // Only next, no prev node, nullify that reference and make it the head
-            arg->next = nullptr;
+            arg->next = -1;
             head_ = arg->next;
         }
 
@@ -175,7 +175,8 @@ struct linked_list
     {
         monad<indexer> result;
         // Flag an error is max is outsize of 'list_size' or 'head' is nullptr
-        if (max >= list_size || head_ < 0) { result.error = true; }
+        // Uses inclusive max
+        if (max > list_size || head_ < 0) { result.error = true; }
 
         result.value = indexer {
             .index = min,
