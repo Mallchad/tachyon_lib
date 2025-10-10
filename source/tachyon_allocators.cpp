@@ -5,7 +5,31 @@ namespace tyon
 
 PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_pointer
 {
-    return nullptr;
+    buffer* block = blocks.tail_address();
+    bool add_block = (blocks.size() == 0);
+    if (add_block)
+    {
+        block = &blocks.push_tail( {} );
+        block->data = malloc( 400_MiB );
+        block->size = 400_MiB;
+    }
+    heap_entry* entry = &entries.push_tail( {} )->value;
+    isize alignment_bytes = binary_alignment( alignment, block->data + block->head_size );
+    isize used_bytes = (block->head_size + alignment_bytes);
+    raw_pointer result = (block->data + used_bytes);
+
+    *entry = heap_entry {
+        .presented_pointer = result,
+        .position = block->head_size,
+        .size = used_bytes,
+        .alignment = alignment
+    };
+
+    // Just unpoison the past after alignment
+    memory_unpoison( result, bytes );
+    block->head_size += used_bytes;
+
+    return result;
 }
 PROC memory_heap_allocator::allocate_raw_fast( i64 bytes, isize alignment ) -> raw_pointer
 {
