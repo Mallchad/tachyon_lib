@@ -337,7 +337,7 @@ namespace tyon
         /** Clear all stored allocations and zero memory */
         virtual void blank_all() PURE;
         virtual allocator_info get_memory_statistics() PURE;
-        virtual ~i_allocator() {}
+        virtual DESTRUCTOR ~i_allocator() {}
     };
     using i_memory_allocator = i_allocator;
 
@@ -843,11 +843,11 @@ namespace tyon
         }
 
         T&
-        FUNCTION get_tail()
+        FUNCTION tail()
         { return data[ head+head_size -1 ]; }
 
         T*
-        get_tail_address()
+        tail_address()
         { return (data + head+head_size -1); }
 
         T&
@@ -929,6 +929,12 @@ namespace tyon
         {
             return head_size;
         }
+
+        PROC back() -> T&
+        {
+            this->tail();
+        }
+        // -- End of std::vector compat
 
         // Search from 0 to 'size'
         search_result<T>
@@ -1274,6 +1280,24 @@ namespace tyon
     // #define PROFILE_SCOPE_FUNCTION(...)
 
     // -- Functional Programming Library --
+
+    template <typename T, T default_value = T{}>
+    struct monad
+    {
+        // static_assert( default_value == default_value,
+                       // "Default value cannot work correctly if comparison is not valid" );
+        T value;
+        // Non-zero on error value
+        fresult error = false;
+
+        // Cast to value type, auto-stubs out
+        operator T()
+        {   if (error == false)
+            {   return value; }
+            else
+            {   return default_value; }
+        }
+    };
 
     inline bool function_simple_stub() { return false; }
     using function_simple = decltype( &function_simple_stub );

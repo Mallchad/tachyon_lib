@@ -544,7 +544,7 @@ namespace tyon
         if (new_asset)
         {
             g_asset->assets.push_back( asset{} );
-            result = g_asset->assets.get_tail_address();
+            result = g_asset->assets.tail_address();
             result->file.filename = filename;
             result->name = filename;
         }
