@@ -1281,7 +1281,7 @@ namespace tyon
 
     // -- Functional Programming Library --
 
-    template <typename T, T default_value = T{}>
+    template <typename T>
     struct monad
     {
         // static_assert( default_value == default_value,

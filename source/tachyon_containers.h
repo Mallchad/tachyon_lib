@@ -111,12 +111,15 @@ struct linked_list
         *arg = {};
         nodes.head_size--;
         list_size--;
+        ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ = -1 && tail_ == -1) ||
+                     (head_ >= 0 && tail_ >= 0),
+                     "Wut" );
     }
 
     /** LOOKING links in node order from head to tail */
-    PROC operator [] ( isize arg ) -> monad<t_node*, nullptr>
+    PROC operator [] ( isize arg ) -> monad<t_node*>
     {
-        monad<t_node*, nullptr> result;
+        monad<t_node*> result;
         t_node* x_node = head_;
         if ( head_ < 0 || arg > list_size)
         {   result.error = true;  return result; }
@@ -147,18 +150,20 @@ struct linked_list
         /** Returns true if this iteration should be used */
         PROC forward() -> fresult
         {
-            ERROR_GUARD( (value->next >= range_min) && (value->next <= range_max) ,
-                         "Containerb must be broken if the range check failed" );
+            do_iteration = (1+ index <= range_max);
+            if (do_iteration && value->next < 0)
+            {   tyon_error( "Container must be broken if the next node is negative" ); }
             value = &context->nodes[ value->next ];
             index += 1;
-            do_iteration = (index <= range_max);
             return do_iteration;
         }
 
         /** Returns true if this iteration should be used */
         PROC backward() -> fresult
         {
-            ERROR_GUARD( value->prev >= 0, "Container must be broken if the range check failed" );
+            do_iteration = (index - 1 <= range_max);
+            if (do_iteration && value->prev < 0)
+            {   tyon_error( "Container must be broken if the prev node is negative" ); }
             value = &context->nodes[ value->prev ];
             index -= 1;
             do_iteration = (index >= range_min);
@@ -171,14 +176,14 @@ struct linked_list
     };
 
     /** Uses exact inclusive range */
-    PROC indexer_ranged( isize min = 0, isize max = 0 ) -> monad<indexer>
+    PROC indexer_ranged( isize min = 0, isize max = 0 ) -> indexer
     {
-        monad<indexer> result;
+        indexer result;
         // Flag an error is max is outsize of 'list_size' or 'head' is nullptr
         // Uses inclusive max
-        if (max > list_size || head_ < 0) { result.error = true; }
+        if (max > list_size || head_ < 0) { return result; }
 
-        result.value = indexer {
+        result = indexer {
             .index = min,
             .context = this,
             .value = head(),
