@@ -36,7 +36,7 @@
     #undef max
     #undef MIN
     #undef MAX
-#endif // REFLECTION_PLATFORM_LINUX
+#endif // linux or _WIN32
 
 
 // -- stdlib / STL --
@@ -62,11 +62,11 @@
 // fmtlib
 // Causing exceptions on formatting code is just bad. don't do it.
 #define FMT_HEADER_ONLY 1
-#define FMT_USE_CONSTEXPR 1
+// #define FMT_USE_CONSTEXPR 1
 // #define FMT_USE_CONSTEVAL 0
 // #define FMT_ENFORCE_COMPILE_STRING 1
 #define FMT_USE_EXCEPTIONS 0
-#define FMT_DISABLE_CONSTEVAL 1
+// #define FMT_DISABLE_CONSTEVAL 1
 
 #include "../external/fmt/include/fmt/format.h"
 #include "../external/fmt/include/fmt/color.h"
@@ -82,6 +82,7 @@
  *
  * The other 'tyon' files haven't been updated correctly to work this way so it's being left for now
  */
+
 #include "tachyon_code_helpers.h"
 #include "tachyon_reflection.h"
 #include "tachyon_library.h"
@@ -93,3 +94,4 @@
 #elif (REFLECTION_PLATFORM_WINDOWS)
     #include "tachyon_platform_windows.h"
 #endif // REFLECTION_PLATFORM
+

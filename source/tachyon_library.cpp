@@ -177,6 +177,12 @@ namespace tyon
         return result;
     }
 
+    PROC memory_stack_allocator::allocate_relocate( void* reference, i64 bytes ) -> raw_pointer
+    {
+        // reallocation doesn't make a tonne of sense on stack allocates... Leave it broken for now
+        return nullptr;
+    }
+
 
     void
     memory_stack_allocator::deallocate( void* address )

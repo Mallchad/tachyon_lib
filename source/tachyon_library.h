@@ -333,6 +333,7 @@ namespace tyon
 
         virtual raw_pointer allocate_raw( isize bytes, isize alignment = 1 ) PURE;
         PROC virtual allocate_raw_fast( i64 bytes, isize alignment = 1 ) -> raw_pointer PURE;
+        PROC virtual allocate_relocate( void* reference, i64 bytes ) -> raw_pointer PURE;
         virtual void deallocate( void* address ) PURE;
         /** Clear all stored allocations and zero memory */
         virtual void blank_all() PURE;
@@ -416,6 +417,8 @@ namespace tyon
         raw_pointer allocate_raw( isize bytes, isize alignment = 1 ) override;
 
         PROC allocate_raw_fast( i64 bytes, isize alignment = 1 ) -> raw_pointer override;
+
+        PROC allocate_relocate( void* reference, i64 bytes ) -> raw_pointer override;
 
         void
         deallocate( void* address ) override;
@@ -1295,7 +1298,7 @@ namespace tyon
         {   if (error == false)
             {   return value; }
             else
-            {   TYON_BREAK(); return default_value; }
+            {   return {}; }
         }
     };
 

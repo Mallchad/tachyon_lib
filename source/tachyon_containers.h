@@ -47,6 +47,9 @@ struct linked_list
         tail_ = new_node->index;
 
         ++list_size;
+                ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ = -1 && tail_ == -1) ||
+                     (head_ >= 0 && tail_ >= 0),
+                     "Wut" );
         return new_node;
     }
 
@@ -63,6 +66,9 @@ struct linked_list
         tail() = {};
         nodes.head_size--;
 
+        ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ = -1 && tail_ == -1) ||
+                     (head_ >= 0 && tail_ >= 0),
+                     "Wut" );
         return result;
     }
 
@@ -82,6 +88,9 @@ struct linked_list
         new_node->value = value;
         ++list_size;
 
+        ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ = -1 && tail_ == -1) ||
+                     (head_ >= 0 && tail_ >= 0),
+                     "Wut" );
         return new_node;
     }
 

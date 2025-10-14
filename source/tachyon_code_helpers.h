@@ -168,6 +168,7 @@ using std::vector;
 
 /* namespace tyon
    {
+/*
        FORWARD struct time_stopwatch;
        FORWARD struct time_scope;
 
@@ -197,7 +198,7 @@ using std::vector;
        FORWARD struct simulation_thread_context;
 
        namespace fs = std::filesystem;
-   } */
+*/
 
 
 realNumber operator ""_real(long double num);
