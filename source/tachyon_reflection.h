@@ -4,6 +4,7 @@
 
 namespace reflection
 {
+    using namespace tyon;
 // GNUC means "GNU Cextensions" not "GCC"
 #if (__GNUC___ && !__clang__)
     #define REFLECTION_COMPILER_GCC 1
@@ -49,21 +50,28 @@ namespace reflection
 
 #if defined(__gnu_linux__) || defined(__linux__)
     #define REFLECTION_PLATFORM_LINUX 1
+    constexpr fstring_view build_os_name = "linux";
 #else
     #define REFLECTION_PLATFORM_LINUX 0
 #endif // linux
 
 #if defined(_WIN32)
     #define REFLECTION_PLATFORM_WINDOWS 1
+    constexpr fstring_view build_os_name = "windows";
 #else
     #define REFLECTION_PLATFORM_WINDOWS 0
 #endif // win32
 
 #if defined(__APPLE__) && defined(__MACH__)
     #define REFLECTION_PLATFORM_MAC 1
+    constexpr fstring_view build_os_name = "mac_os";
 #else
     #define REFLECTION_PLATFORM_MAC 0
 #endif // Apple/Mac
+
+#if (!REFLECTION_PLATFORM_LINUX && !REFLECTION_PLATFORM_WINDOWS && !REFLECTION_PLATFORM_MAC)
+    #error "Platform OS not supported or detected correctly
+#endif
 
     constexpr bool compiler_gcc =  REFLECTION_COMPILER_GCC;
     constexpr bool compiler_clang = REFLECTION_COMPILER_CLANG;
@@ -71,6 +79,10 @@ namespace reflection
 
     constexpr bool platform_linux = REFLECTION_PLATFORM_LINUX;
     constexpr bool platform_mac = REFLECTION_PLATFORM_MAC;
+
+    constexpr fstring_view build_git_hash_string = TYON_BUILD_GIT_HASH_STRING;
+    // TODO: Fill in hex part
+    constexpr version build_version = { 0, 1, 0  };
 }
 
 // TYON_BREAK should be valid in release builds

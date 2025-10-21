@@ -107,6 +107,8 @@ using fbyte = u8;
 using usize = u64;
 using isize = i64;
 
+namespace tyon
+{
 // String types
 using fstring = std::basic_string<char>;
 using fstring_view = std::basic_string_view<char>;
@@ -120,7 +122,7 @@ struct version
     u32 patch = 0;
     u8 vcs_hash[40] = {};
 };
-
+}
 // TYON_BREAK should be valid in release builds
 #define TYON_SIGTRAP 5
 

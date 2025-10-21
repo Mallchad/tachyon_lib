@@ -643,7 +643,12 @@ namespace tyon
         }
     }
 
-    PROC logger::write_message( fstring category, fstring message, e_log_entry type ) -> void
+    PROC logger::write_message(
+        fstring category,
+        fstring message,
+        e_log_entry type,
+        std::source_location call_point
+    ) -> void
     {
         PROFILE_SCOPE_FUNCTION();
         std::scoped_lock _lock( write_lock );
@@ -653,6 +658,8 @@ namespace tyon
         entry.category = category;
         entry.message = message,
         entry.timestamp = time_now_utc();
+        // TODO: Add call point
+        // entry.call_point = call_point
 
         if (console_output_enabled || string_output_enabled)
         {
@@ -664,9 +671,24 @@ namespace tyon
                                          category_size :
                                          g_log_largest_category);
             padding.insert( 0, (g_log_largest_category - category_size) + 4, ' ');
-            fstring formatted_message = fmt::format(
-                "[{}][{}] {} \n", nanoseconds, entry.category, entry.message );
-            fmt::print( "{}", formatted_message );
+
+            fstring formatted_message;
+            switch (entry.type)
+            {
+                case e_log_entry::error:
+                    formatted_message = fmt::format(
+                        "[{0}][{1}] {2} @ {3}:{4} {5} \n",
+                        nanoseconds, entry.category, call_point.function_name(),
+                        call_point.file_name(), call_point.line(), call_point.column(),
+                         entry.message );
+                    fmt::print( fmt::emphasis::bold | fmt::fg(fmt::color::red), "{}", message );
+                    break;
+
+                default:
+                    formatted_message = fmt::format(
+                        "[{}][{}] {} \n", nanoseconds, entry.category, entry.message );
+                    fmt::print( "{}", formatted_message );
+            }
 
             if (string_output_enabled)
             {

@@ -17,6 +17,8 @@ namespace tyon
     namespace chrono = std::chrono;
     using namespace std::chrono_literals;
 
+    // >>> Simple Types >>>
+
     /// Has no time period adjustments, is most accurate for time measurements
     using monotonic_time = chrono::time_point< chrono::steady_clock >;
     /// Calender time from system_clock
@@ -32,6 +34,18 @@ namespace tyon
     using time_monotonic = chrono::time_point< chrono::steady_clock >;
     /// Calender time from system_clock
     using time_date = chrono::time_point< chrono::system_clock >;
+
+    enum class e_log_entry
+    {
+        none = 0,
+        any = 1,
+        message = 2,
+        error = 3,
+        binary_primitive,
+        binary_custom
+    };
+
+    // <<< End of Simple Types <<<
 
     // Error reporting type
     using fresult = bool;
@@ -51,11 +65,17 @@ namespace tyon
     FORWARD struct library_context;
 
     template<typename... t_formattable> void
-    FORWARD FUNCTION log( cstring category, t_formattable... messages );
+    FORWARD FUNCTION log(
+        cstring category,
+        std::source_location = std::source_location::current(),
+        t_formattable... messages );
     template<typename... t_formattable> void
     FORWARD FUNCTION log_format_impl( fstring category, t_formattable... messages );
     template<typename... t_formattable> void
     FORWARD FUNCTION log_error_format_impl( cstring category, fstring formatted_message );
+    template <typename... t_formattable> void
+    FORWARD log_error_format( tyon::fstring category, fmt::format_string<t_formattable...> format,
+                              std::source_location call_point, t_formattable&&... vargs );
 
     // -- Globals Variables --
     // make sure to initialize Pointer Types before using
@@ -204,32 +224,63 @@ namespace tyon
 
     // -- Basic Utilities --
 
+    // NOTE: These macros need to begin from the global namesoace ::tyon
+    // otherwise it becomes a resolution error when used internally
+
+    // TODO: Log flush isn't needed anymore
     // #define log_flush() std::cout.flush()
+    #define TYON_LOG_CATEGORY( CATEGORY_, ... ) \
+        log( CATEGORY_, std::source_location::current(), __VA_ARGS__ );
+
     #define TYON_LOG_ERROR( CATEGORY_, MESSAGE_ )                       \
-        log_error_format_impl( (CATEGORY_),                             \
-            fmt::format("{} @ {}:{}: {}", __FUNCTION__, __FILE__, __LINE__, MESSAGE_) );
+        ::tyon::log_error_format_impl( (CATEGORY_),                             \
+            fmt::format("{} @ {}:{}: {}", __FUNCTION__, __FILE__, __LINE__, (MESSAGE_)) );
 
     #define log_flush() fflush( stdout );
-    #define tyon_log( ... ) log( "Tachyon", __VA_ARGS__);
+    // #define tyon_log( ... ) log( "Tachyon", __VA_ARGS__);
+    // #define tyon_logf( format_string, ... ) log_format( "Tachyon", format_string, __VA_ARGS__ );
+    // #define tyon_log_error( message )                                           \
+    //     ::tyon::log_error_format_impl( "Tachyon Error",                         \
+    //         fmt::format("{} @ {}:{}: {}", __FUNCTION__, __FILE__, __LINE__, message) ); \
+    //     log_flush();
+
+    // // Like log_error but shorter name
+    // #define tyon_error( message )                                       \
+    //     ::tyon::log_error_format( "Tachyon Error", "{} @ {}:{}: {}",               \
+    //                       __FUNCTION__, __FILE__, __LINE__, message );  \
+    //     log_flush();
+
+    // #define tyon_errorf( format_string, ... )                   \
+    //     ::tyon::log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
+
+    // #define tyon_variable( var ) log_format( "Tachyon", #var" [ {} ]", var );
+    // #define tyon_logf_error( format_string, ... )                   \
+    //     ::tyon::log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
+    // #define profiler_log( ... ) log( "Tachyon Profiler", __VA_ARGS__);
+
     #define tyon_logf( format_string, ... ) log_format( "Tachyon", format_string, __VA_ARGS__ );
-    #define tyon_log_error( message )                                           \
-        log_error_format_impl( "Tachyon Error",                         \
-            fmt::format("{} @ {}:{}: {}", __FUNCTION__, __FILE__, __LINE__, message) ); \
-        log_flush();
+    #define tyon_log_error( MESSAGE_ )                                      \
+        ::tyon::log_error_format( "Tachyon Error", "{}", e_log_entry::error, \
+            std::source_location::current(), (MESSAGE_) );
 
     // Like log_error but shorter name
-    #define tyon_error( message )                                       \
-        log_error_format( "Tachyon Error", "{} @ {}:{}: {}",               \
-                          __FUNCTION__, __FILE__, __LINE__, message );  \
-        log_flush();
+    #define tyon_error( MESSAGE_ ) tyon_log_error( (MESSAGE_) );
 
-    #define tyon_errorf( format_string, ... )                   \
-        log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
+    #define tyon_errorf( FORMAT_STRING_, ... )                   \
+        ::tyon::log_error_format( "Tachyon Error", (FORMAT_STRING_), \
+            std::source_location::current(), __VA_ARGS__ );
 
     #define tyon_variable( var ) log_format( "Tachyon", #var" [ {} ]", var );
     #define tyon_logf_error( format_string, ... )                   \
-        log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
+        ::tyon::log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
+
+    #define TYON_ERROR_CATEGORY( CATEGORY_, MESSAGE_ )                   \
+        ::tyon::log_error_format( CATEGORY_, "{}",  std::source_location::current(), MESSAGE_  );
+    #define TYON_ERRORF_CATEGORY( CATEGORY_, FORMAT_STRING_,  ... )                   \
+        ::tyon::log_error_format( CATEGORY_, FORMAT_STRING_, std::source_location::current(), \
+                                  __VA_ARGS__ );
     #define profiler_log( ... ) log( "Tachyon Profiler", __VA_ARGS__);
+
 
     #define TYON_UNSUPPORTED()
     #define TYON_NOP() void(0);
@@ -237,18 +288,17 @@ namespace tyon
     #define TYON_TESTING( x ) x;
     #define TYON_TODO( explanation )
 
-    #define log_error_format( CATEGORY_, FORMAT_, ...)                      \
-        log_error_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
+    // #define log_error_format( CATEGORY_, FORMAT_, ...)                      \
+        // ::tyon::log_error_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
 
     /** Make sure condition is true or break and show message
      * It's an assert. okay. */
-    #define ERROR_GUARD( condition, message )                                   \
-        if ( !(condition) )                                                     \
-        {                                                                       \
-            log_error_format( "Error Guard", "{} @ {}:{}: Condition: ({}): {}", \
-                __FUNCTION__, __FILE__, __LINE__, #condition, message );        \
-            log_flush();                                                        \
-            TYON_BREAK();                                                       \
+    #define ERROR_GUARD( condition, message )                           \
+        if ( !(condition) )                                             \
+        {                                                               \
+            tyon_errorf( "Error Guard", "Condition: ({}): {}",          \
+                         #condition, message );                         \
+            TYON_BREAK();                                               \
         };
 
     // #define ERROR_GUARD( condition, message ) \
@@ -262,6 +312,26 @@ namespace tyon
 
     #define ERROR_GUARD_NULL( value ) \
         ERROR_GUARD( value != nullptr, "Null pointer was found where it shouldn't be." );
+
+
+// TODO: Disable all logging for now, remove later
+#define tyon_log( ... )
+#define tyon_logf( format_string, ... )
+#define tyon_log_error( MESSAGE_ )
+
+// Like log_error but shorter name
+#define tyon_error( MESSAGE_ )
+
+#define tyon_errorf( FORMAT_STRING_, ... )
+#define tyon_log_format( FORMAT_STRING_, ... )
+
+
+#define tyon_variable( var )
+#define tyon_logf_error( format_string, ... )
+#define TYON_ERROR_CATEGORY( CATEGORY_, MESSAGE_ )
+#define TYON_ERRORF_CATEGORY( CATEGORY_, FORMAT_STRING_,  ... )
+#define profiler_log( ... )
+
 
     // -- Memory Management Library --
 
@@ -1252,13 +1322,13 @@ namespace tyon
 
     #define TIME_SCOPED( name ) \
         auto TYON_CONCAT(_profile_block_, __LINE__) =                               \
-            time_scope( (name) , "time taken to execute function");                 \
+            ::tyon::time_scope( (name) , "time taken to execute function");         \
         ZoneNamedN( TYON_CONCAT(__tracy, __COUNTER__), (name), true );
 
     // Time the function scope this macro is in and log the result
     #define TIME_SCOPED_FUNCTION() \
         auto TYON_CONCAT(_profile_block_, __LINE__) =                               \
-            time_scope( __FUNCTION__ , "time taken to execute function");           \
+            ::tyon::time_scope( __FUNCTION__ , "time taken to execute function");   \
         ZoneNamed( TYON_CONCAT(__tracy, __COUNTER__), true );
 
     #define f_TIME_SCOPED_ACCUMULATED( NAME, ID ) \
@@ -1269,7 +1339,7 @@ namespace tyon
             fstring("time spent executing in this block across whole runtime") ); } \
             _profile_init = false;                                                  \
         }                                                                           \
-        auto _profile_init_##ID = time_scope( &global->stopwatches.back() );
+        auto _profile_init_##ID = ::tyon::time_scope( &global->stopwatches.back() );
 
     #define TIME_EXPAND_MACRO( ... ) f_TIME_SCOPED_ACCUMULATED( __VA_ARGS__ )
     #define TIME_SCOPED_ACCUMULATED( NAME ) \
@@ -1871,7 +1941,7 @@ namespace tyon
     struct u128
     {
         u8 d[16] = {};
-        constexpr CONSTRUCTOR u128() = default;
+        // constexpr CONSTRUCTOR u128() = default;
     };
     struct u256 { u64 d[4]; };
     struct u512 { u64 d[8]; };
@@ -2393,16 +2463,6 @@ namespace tyon
     bool operator!= ( log_allocator<A>& lhs, log_allocator<B>& rhs)
     { return false; }
 
-    enum class e_log_entry
-    {
-        none = 0,
-        any = 1,
-        message = 2,
-        error = 3,
-        binary_primitive,
-        binary_custom
-    };
-
     struct log_entry
     {
         // using log_string = std::basic_string< char, std::char_traits<char>, log_allocator<char, 0> >;
@@ -2428,10 +2488,26 @@ namespace tyon
         void
         write_error_simple( fstring message );
 
-        void
-        write_message( fstring category, fstring message, e_log_entry type );
+        PROC write_message(
+            fstring category,
+            fstring message,
+            e_log_entry type,
+            std::source_location call_point
+        ) -> void;
     };
 
+
+    template<typename... t_formattable>
+    void
+    FUNCTION log( cstring category, std::source_location, t_formattable... messages )
+    {
+        fstring formatted_message;
+        formatted_message.reserve( 100 );
+        FOLD((formatted_message += fmt::format( "{} ", messages ) ), ...);
+        g_logger->write_message( category, formatted_message, e_log_entry::message, {} );
+    }
+
+    // TODO: Temporary, needs to be removed
     template<typename... t_formattable>
     void
     FUNCTION log( cstring category, t_formattable... messages )
@@ -2439,16 +2515,47 @@ namespace tyon
         fstring formatted_message;
         formatted_message.reserve( 100 );
         FOLD((formatted_message += fmt::format( "{} ", messages ) ), ...);
-        g_logger->write_message( category, formatted_message, e_log_entry::message );
+        g_logger->write_message( category, formatted_message, e_log_entry::message, {} );
     }
 
     #define log_format( CATEGORY_, FORMAT_, ...)                      \
         log_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
+
     template<typename... t_formattable>
     void
     FUNCTION log_format_impl( fstring category, fstring formatted_message )
     {
-        g_logger->write_message( category, formatted_message, e_log_entry::message );
+        // TODO: Need to remove whole function soon
+        g_logger->write_message( category, formatted_message, e_log_entry::message, {} );
+    }
+
+    // NOTE: For some reason fmtlib wants rvalue reference (&&) args or it throws a fit.
+    template <typename... t_formattable>
+    PROC log_error_format(
+        tyon::fstring category,
+        fmt::format_string<t_formattable...> format,
+        std::source_location call_point,
+        t_formattable&&... vargs
+    ) -> void
+    {
+        g_logger->write_message(
+            category, fmt::format( format, vargs... ),
+            e_log_entry::error, call_point
+        );
+    }
+
+    // TODO needs to be removed
+    template <typename... t_formattable>
+    PROC log_error_format(
+        tyon::fstring category,
+        fmt::format_string<t_formattable...> format,
+        t_formattable&&... vargs
+    ) -> void
+    {
+        g_logger->write_message(
+            category, fmt::format( format, vargs... ),
+            e_log_entry::error, {}
+        );
     }
 
     template<typename... t_formattable>
@@ -2517,7 +2624,6 @@ namespace tyon
 
 }
 
-
 // -- String Formatters --
 template <>
 struct fmt::formatter< tyon::vec2_i64 > : formatter<string_view>
@@ -2556,8 +2662,8 @@ struct fmt::formatter< tyon::uid > : formatter<string_view>
             formatted[ left + 16+ (i * 2) ] = hexbytes[ (data[ 8 + i] & 0x0F) ];
             formatted[ right+ 16+ (i * 2) ] = hexbytes[ (data[ 8 + i] & 0xF0) >> 4 ];
         }
-        fstring_view result = formatted;
-        return formatter<string_view>::format( result, context );
+        tyon::fstring_view result = formatted;
+        return formatter<fmt::string_view>::format( result, context );
     }
 };
 

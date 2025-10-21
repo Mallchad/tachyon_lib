@@ -29,6 +29,9 @@
     #include <rpc.h>
     #include <sysinfoapi.h>
     #include <winnt.h>
+    // #include <windef.h>
+    // Basic types
+    // #include "minwindef.h"
 
     // Seriously why. Quit it with the dang macros.
     #undef DrawText
