@@ -439,7 +439,7 @@ namespace tyon
         new_file = fopen( file_string.c_str(), "r" );
         if (new_file == nullptr)
         {
-            log( "File", "Failed to open file: ", target );
+            TYON_LOG( "File", "Failed to open file: ", target );
             return result;
         }
 
@@ -447,7 +447,7 @@ namespace tyon
         filesize = ftell( new_file );
         if (filesize <= 0)
         {
-            log( "File", "WARNING, opened file is zero length" );
+            TYON_LOG( "File", "WARNING, opened file is zero length" );
             fclose( new_file );
             return result;
         }
@@ -457,13 +457,13 @@ namespace tyon
 
         result.memory.data = allocator->allocate_raw( filesize );
         if (result.memory.data == nullptr)
-        { log ( "File", "Failed to allocate memory for read operation", target ); }
+        { TYON_LOG( "File", "Failed to allocate memory for read operation", target ); }
         result.memory.size = filesize;
 
         isize read_size = fread( result.memory.data, sizeof(byte), result.memory.size, new_file );
         ERROR_GUARD( read_size == result.memory.size,
                      "Something is amiss if we read a different amount than we sized for." );
-        log( "File", "Loaded whole file at path: ", target );
+        TYON_LOG( "File", "Loaded whole file at path: ", target );
         fclose( new_file );
         result.file_loaded = true;
 
@@ -486,9 +486,9 @@ namespace tyon
         // Cleanup
         fclose( file_ );
         if (write_ok)
-        { tyon_log( fmt::format( "Wrote binary file '{}'", arg->filename ) ); }
+        { TYON_LOG( fmt::format( "Wrote binary file '{}'", arg->filename ) ); }
         else
-        { log_error_format( "Tachyon", "Failed to write binary file '{}'", arg->filename  ); }
+        { TYON_ERRORF( "Failed to write binary file '{}'", arg->filename  ); }
         ERROR_GUARD( write_ok, "File wrote less than full data or failed" );
 
         return write_ok;
@@ -502,6 +502,7 @@ namespace tyon
         TIME_SCOPED_FUNCTION();
         i32 iteration_limit = 1000;
         fpath self_directory = file_self_directory();
+        g_asset = memory_allocate<asset_machine>( 1 );
         g_asset->search_paths.change_allocation( 20 );
         g_asset->assets.change_allocation( 100 );
 
@@ -611,12 +612,12 @@ namespace tyon
         }
         if (result)
         {
-            log_format( "TYON Asset", "Successfully loaded file {} at path '{}' using loader '{}'",
+            TYON_BASE_ERRORF( "Tachyon Assets", "Successfully loaded file {} at path '{}' using loader '{}'",
                         arg->name, arg->file.filename, arg->loader_name );
         }
         else
         {
-            log_error_format( "TYON Asset", "Failed to load file {} at path '{}' using loader '{}'",
+            TYON_BASE_ERRORF( "Tachyon Assets", "Failed to load file {} at path '{}' using loader '{}'",
                               arg->name, arg->file.filename, arg->loader_name );
         }
         return result;
@@ -724,6 +725,9 @@ namespace tyon
         g_null_read = reinterpret_cast<byte*>( malloc( 1'000'000'000 ) );
         g_null_write = reinterpret_cast<byte*>( malloc( 1'000'000'000 ) );
 
+        // Init optional sub-systems
+        asset_machinery_init();
+
         // Finished!
         arg->initialized = true;
     }
@@ -737,7 +741,7 @@ namespace tyon
         fuint8 first_bits = *reinterpret_cast<fuint8*>( &full_bits );
         bool little_endian = static_cast<bool>( first_bits );
 
-        log(
+        TYON_LOG(
             "Platform",
             (little_endian ? "Platform tested for endianess, came back as little endian" :
              "Platform tested for endianess, came back as big endian")

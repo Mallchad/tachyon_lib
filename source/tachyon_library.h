@@ -73,9 +73,13 @@ namespace tyon
     FORWARD FUNCTION log_format_impl( fstring category, t_formattable... messages );
     template<typename... t_formattable> void
     FORWARD FUNCTION log_error_format_impl( cstring category, fstring formatted_message );
+
     template <typename... t_formattable> void
-    FORWARD log_error_format( tyon::fstring category, fmt::format_string<t_formattable...> format,
-                              std::source_location call_point, t_formattable&&... vargs );
+    FORWARD FUNCTION log_error_format( cstring category, fmt::format_string<t_formattable> format,
+        std::source_location location, t_formattable... data );
+    // template <typename... t_formattable> void
+    // FORWARD log_error_format( tyon::fstring category, fmt::format_string<t_formattable...> format,
+                              // std::source_location call_point, t_formattable&&... vargs );
 
     // -- Globals Variables --
     // make sure to initialize Pointer Types before using
@@ -314,6 +318,7 @@ namespace tyon
         ERROR_GUARD( value != nullptr, "Null pointer was found where it shouldn't be." );
 
 
+    #define TYON_DEFINE_LOG_CATEGORY
 // TODO: Disable all logging for now, remove later
 #define tyon_log( ... )
 #define tyon_logf( format_string, ... )
@@ -2499,27 +2504,68 @@ namespace tyon
 
     template<typename... t_formattable>
     void
-    FUNCTION log( cstring category, std::source_location, t_formattable... messages )
+    FUNCTION log( cstring category, std::source_location location, t_formattable... messages )
     {
         fstring formatted_message;
         formatted_message.reserve( 100 );
         FOLD((formatted_message += fmt::format( "{} ", messages ) ), ...);
-        g_logger->write_message( category, formatted_message, e_log_entry::message, {} );
+        g_logger->write_message( category, formatted_message, e_log_entry::message, location );
     }
 
-    // TODO: Temporary, needs to be removed
+    template <typename... t_formattable>
+    PROC log_format(
+        cstring category,
+        fmt::format_string<t_formattable> format,
+        std::source_location location,
+        t_formattable... data
+    )
+    {
+        fstring message = fmt::format( format, data... );
+        g_logger->write_message( category, message, e_log_entry::message, location );
+    }
+
     template<typename... t_formattable>
     void
-    FUNCTION log( cstring category, t_formattable... messages )
+    FUNCTION log_error( cstring category, std::source_location location, t_formattable... messages )
     {
         fstring formatted_message;
         formatted_message.reserve( 100 );
         FOLD((formatted_message += fmt::format( "{} ", messages ) ), ...);
-        g_logger->write_message( category, formatted_message, e_log_entry::message, {} );
+        g_logger->write_message( category, formatted_message, e_log_entry::error, location );
     }
+
+    template <typename... t_formattable> void
+    FUNCTION log_error_format(
+        cstring category,
+        fmt::format_string<t_formattable> format,
+        std::source_location location,
+        t_formattable... data
+    )
+    {
+        fstring message = fmt::format( format, data... );
+        g_logger->write_message( category, message, e_log_entry::error, location );
+    }
+
+    // Use these macros to do logging, or use it as a base for your own macros
+    // with a predefined category.
+
+    #define TYON_BASE_LOG( CATEGORY_, ... ) \
+        ::tyon::log( CATEGORY_, std::source_location::current(), __VA_ARGS__ )
+    #define TYON_BASE_LOGF( CATEGORY_, FORMAT_, ... ) \
+        ::tyon::log_format( CATEGORY_, FORMAT_, std::source_location::current(), __VA_ARGS__ )
+    #define TYON_BASE_ERROR( CATEGORY_, FORMAT_, ... ) \
+        ::tyon::log_error( CATEGORY_, std::source_location::current(), __VA_ARGS__ )
+    #define TYON_BASE_ERRORF( CATEGORY_, FORMAT_, ... ) \
+        ::tyon::log_error_format( CATEGORY_, FORMAT_, std::source_location::current(), __VA_ARGS__ )
 
     #define log_format( CATEGORY_, FORMAT_, ...)                      \
         log_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
+
+    // Tachyon log category
+    #define TYON_LOG( ... ) TYON_BASE_LOG( "Tachyon", __VA_ARGS__ );
+    #define TYON_LOGF( FORMAT_, ... ) TYON_BASE_LOGF( "Tachyon", FORMAT_, __VA_ARGS__ );
+    #define TYON_ERROR( ... ) TYON_BASE_ERROR( "Tachyon", __VA_ARGS__ );
+    #define TYON_ERRORF( FORMAT_, ... ) TYON_BASE_ERRORF( "Tachyon", FORMAT_, __VA_ARGS__ );
 
     template<typename... t_formattable>
     void
@@ -2529,34 +2575,34 @@ namespace tyon
         g_logger->write_message( category, formatted_message, e_log_entry::message, {} );
     }
 
-    // NOTE: For some reason fmtlib wants rvalue reference (&&) args or it throws a fit.
-    template <typename... t_formattable>
-    PROC log_error_format(
-        tyon::fstring category,
-        fmt::format_string<t_formattable...> format,
-        std::source_location call_point,
-        t_formattable&&... vargs
-    ) -> void
-    {
-        g_logger->write_message(
-            category, fmt::format( format, vargs... ),
-            e_log_entry::error, call_point
-        );
-    }
+    // // NOTE: For some reason fmtlib wants rvalue reference (&&) args or it throws a fit.
+    // template <typename... t_formattable>
+    // PROC log_error_format(
+    //     tyon::fstring category,
+    //     fmt::format_string<t_formattable...> format,
+    //     std::source_location call_point,
+    //     t_formattable&&... vargs
+    // ) -> void
+    // {
+    //     g_logger->write_message(
+    //         category, fmt::format( format, vargs... ),
+    //         e_log_entry::error, call_point
+    //     );
+    // }
 
-    // TODO needs to be removed
-    template <typename... t_formattable>
-    PROC log_error_format(
-        tyon::fstring category,
-        fmt::format_string<t_formattable...> format,
-        t_formattable&&... vargs
-    ) -> void
-    {
-        g_logger->write_message(
-            category, fmt::format( format, vargs... ),
-            e_log_entry::error, {}
-        );
-    }
+    // // TODO needs to be removed
+    // template <typename... t_formattable>
+    // PROC log_error_format(
+    //     tyon::fstring category,
+    //     fmt::format_string<t_formattable...> format,
+    //     t_formattable&&... vargs
+    // ) -> void
+    // {
+    //     g_logger->write_message(
+    //         category, fmt::format( format, vargs... ),
+    //         e_log_entry::error, {}
+    //     );
+    // }
 
     template<typename... t_formattable>
     void

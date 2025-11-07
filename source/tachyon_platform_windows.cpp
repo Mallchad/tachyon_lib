@@ -113,7 +113,7 @@ namespace tyon
             );
         if (fetch_ok == false)
         {
-            log_error_format( "TYON Windows", "Failed to processor information twice." );
+            TYON_BASE_ERROR( "Tachyon Windows", "Failed to processor information twice." );
             return result;
         }
 
@@ -240,7 +240,7 @@ namespace tyon
 
         if (cpu.package_count > 1)
         {
-            tyon_log_error(
+            TYON_BASE_ERROR( "Tachyon Windows",
                 "More than 1 package count is not supported for "
                 "diagnostics yet, system information will probably be incorrect" );
         }
