@@ -613,12 +613,12 @@ namespace tyon
         if (result)
         {
             TYON_BASE_ERRORF( "Tachyon Assets", "Successfully loaded file {} at path '{}' using loader '{}'",
-                        arg->name, arg->file.filename, arg->loader_name );
+                        arg->name, arg->file.filename.string(), arg->loader_name );
         }
         else
         {
             TYON_BASE_ERRORF( "Tachyon Assets", "Failed to load file {} at path '{}' using loader '{}'",
-                              arg->name, arg->file.filename, arg->loader_name );
+                              arg->name, arg->file.filename.string(), arg->loader_name );
         }
         return result;
     }

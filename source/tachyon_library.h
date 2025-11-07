@@ -68,15 +68,16 @@ namespace tyon
     FORWARD FUNCTION log(
         cstring category,
         std::source_location = std::source_location::current(),
-        t_formattable... messages );
+        t_formattable&&... messages );
     template<typename... t_formattable> void
     FORWARD FUNCTION log_format_impl( fstring category, t_formattable... messages );
     template<typename... t_formattable> void
     FORWARD FUNCTION log_error_format_impl( cstring category, fstring formatted_message );
 
     template <typename... t_formattable> void
-    FORWARD FUNCTION log_error_format( cstring category, fmt::format_string<t_formattable> format,
-        std::source_location location, t_formattable... data );
+    FORWARD FUNCTION log_error_format( cstring category, const fmt::format_string<t_formattable...> format,
+        std::source_location location, t_formattable&&... data );
+
     // template <typename... t_formattable> void
     // FORWARD log_error_format( tyon::fstring category, fmt::format_string<t_formattable...> format,
                               // std::source_location call_point, t_formattable&&... vargs );
@@ -2504,7 +2505,7 @@ namespace tyon
 
     template<typename... t_formattable>
     void
-    FUNCTION log( cstring category, std::source_location location, t_formattable... messages )
+    FUNCTION log( cstring category, std::source_location location, t_formattable&&... messages )
     {
         fstring formatted_message;
         formatted_message.reserve( 100 );
@@ -2537,12 +2538,12 @@ namespace tyon
     template <typename... t_formattable> void
     FUNCTION log_error_format(
         cstring category,
-        fmt::format_string<t_formattable> format,
+        const fmt::format_string<t_formattable...> format,
         std::source_location location,
-        t_formattable... data
+        t_formattable&&... data
     )
     {
-        fstring message = fmt::format( format, data... );
+        fstring message = fmt::format( format, std::forward<t_formattable>(data)... );
         g_logger->write_message( category, message, e_log_entry::error, location );
     }
 
