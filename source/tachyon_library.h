@@ -74,6 +74,9 @@ namespace tyon
     template<typename... t_formattable> void
     FORWARD FUNCTION log_error_format_impl( cstring category, fstring formatted_message );
 
+    template<typename... t_formattable> void
+    FORWARD FUNCTION log_error( cstring category, std::source_location location,
+                                t_formattable... messages );
     template <typename... t_formattable> void
     FORWARD FUNCTION log_error_format( cstring category, const fmt::format_string<t_formattable...> format,
         std::source_location location, t_formattable&&... data );
@@ -234,12 +237,6 @@ namespace tyon
 
     // TODO: Log flush isn't needed anymore
     // #define log_flush() std::cout.flush()
-    #define TYON_LOG_CATEGORY( CATEGORY_, ... ) \
-        log( CATEGORY_, std::source_location::current(), __VA_ARGS__ );
-
-    #define TYON_LOG_ERROR( CATEGORY_, MESSAGE_ )                       \
-        ::tyon::log_error_format_impl( (CATEGORY_),                             \
-            fmt::format("{} @ {}:{}: {}", __FUNCTION__, __FILE__, __LINE__, (MESSAGE_)) );
 
     #define log_flush() fflush( stdout );
     // #define tyon_log( ... ) log( "Tachyon", __VA_ARGS__);
@@ -263,28 +260,28 @@ namespace tyon
     //     ::tyon::log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
     // #define profiler_log( ... ) log( "Tachyon Profiler", __VA_ARGS__);
 
-    #define tyon_logf( format_string, ... ) log_format( "Tachyon", format_string, __VA_ARGS__ );
-    #define tyon_log_error( MESSAGE_ )                                      \
-        ::tyon::log_error_format( "Tachyon Error", "{}", e_log_entry::error, \
-            std::source_location::current(), (MESSAGE_) );
+    // #define tyon_logf( format_string, ... ) log_format( "Tachyon", format_string, __VA_ARGS__ );
+    // #define tyon_log_error( MESSAGE_ )                                      \
+    //     ::tyon::log_error_format( "Tachyon Error", "{}", e_log_entry::error, \
+    //         std::source_location::current(), (MESSAGE_) );
 
-    // Like log_error but shorter name
-    #define tyon_error( MESSAGE_ ) tyon_log_error( (MESSAGE_) );
+    // // Like log_error but shorter name
+    // #define tyon_error( MESSAGE_ ) tyon_log_error( (MESSAGE_) );
 
-    #define tyon_errorf( FORMAT_STRING_, ... )                   \
-        ::tyon::log_error_format( "Tachyon Error", (FORMAT_STRING_), \
-            std::source_location::current(), __VA_ARGS__ );
+    // #define tyon_errorf( FORMAT_STRING_, ... )                   \
+    //     ::tyon::log_error_format( "Tachyon Error", (FORMAT_STRING_), \
+    //         std::source_location::current(), __VA_ARGS__ );
 
-    #define tyon_variable( var ) log_format( "Tachyon", #var" [ {} ]", var );
-    #define tyon_logf_error( format_string, ... )                   \
-        ::tyon::log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
+    // #define tyon_variable( var ) log_format( "Tachyon", #var" [ {} ]", var );
+    // #define tyon_logf_error( format_string, ... )                   \
+    //     ::tyon::log_error_format( "Tachyon Error", format_string, __VA_ARGS__ );
 
-    #define TYON_ERROR_CATEGORY( CATEGORY_, MESSAGE_ )                   \
-        ::tyon::log_error_format( CATEGORY_, "{}",  std::source_location::current(), MESSAGE_  );
-    #define TYON_ERRORF_CATEGORY( CATEGORY_, FORMAT_STRING_,  ... )                   \
-        ::tyon::log_error_format( CATEGORY_, FORMAT_STRING_, std::source_location::current(), \
-                                  __VA_ARGS__ );
-    #define profiler_log( ... ) log( "Tachyon Profiler", __VA_ARGS__);
+    // #define TYON_ERROR_CATEGORY( CATEGORY_, MESSAGE_ )                   \
+    //     ::tyon::log_error_format( CATEGORY_, "{}",  std::source_location::current(), MESSAGE_  );
+    // #define TYON_ERRORF_CATEGORY( CATEGORY_, FORMAT_STRING_,  ... )                   \
+    //     ::tyon::log_error_format( CATEGORY_, FORMAT_STRING_, std::source_location::current(), \
+    //                               __VA_ARGS__ );
+    // #define profiler_log( ... ) log( "Tachyon Profiler", __VA_ARGS__);
 
 
     #define TYON_UNSUPPORTED()
@@ -293,15 +290,30 @@ namespace tyon
     #define TYON_TESTING( x ) x;
     #define TYON_TODO( explanation )
 
-    // #define log_error_format( CATEGORY_, FORMAT_, ...)                      \
-        // ::tyon::log_error_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
+    // Use these macros to do logging, or use it as a base for your own macros
+    // with a predefined category.
+
+    #define TYON_BASE_LOG( CATEGORY_, ... ) \
+        ::tyon::log( CATEGORY_, std::source_location::current(), __VA_ARGS__ )
+    #define TYON_BASE_LOGF( CATEGORY_, FORMAT_, ... ) \
+        ::tyon::log_format( CATEGORY_, FORMAT_, std::source_location::current(), __VA_ARGS__ )
+    #define TYON_BASE_ERROR( CATEGORY_, ... ) \
+        ::tyon::log_error( CATEGORY_, std::source_location::current(), __VA_ARGS__ )
+    #define TYON_BASE_ERRORF( CATEGORY_, FORMAT_, ... ) \
+        ::tyon::log_error_format( CATEGORY_, FORMAT_, std::source_location::current(), __VA_ARGS__ )
+
+    // Tachyon log category
+    #define TYON_LOG( ... ) TYON_BASE_LOG( "Tachyon", __VA_ARGS__ );
+    #define TYON_LOGF( FORMAT_, ... ) TYON_BASE_LOGF( "Tachyon", FORMAT_, __VA_ARGS__ );
+    #define TYON_ERROR( ... ) TYON_BASE_ERROR( "Tachyon", __VA_ARGS__ );
+    #define TYON_ERRORF( FORMAT_, ... ) TYON_BASE_ERRORF( "Tachyon", FORMAT_, __VA_ARGS__ );
 
     /** Make sure condition is true or break and show message
      * It's an assert. okay. */
     #define ERROR_GUARD( condition, message )                           \
         if ( !(condition) )                                             \
         {                                                               \
-            tyon_errorf( "Error Guard", "Condition: ({}): {}",          \
+            TYON_ERRORF( "Error Guard", "Condition: ({}): {}",          \
                          #condition, message );                         \
             TYON_BREAK();                                               \
         };
@@ -321,22 +333,22 @@ namespace tyon
 
     #define TYON_DEFINE_LOG_CATEGORY
 // TODO: Disable all logging for now, remove later
-#define tyon_log( ... )
-#define tyon_logf( format_string, ... )
-#define tyon_log_error( MESSAGE_ )
+// #define tyon_log( ... )
+// #define tyon_logf( format_string, ... )
+// #define tyon_log_error( MESSAGE_ )
 
-// Like log_error but shorter name
-#define tyon_error( MESSAGE_ )
+// // Like log_error but shorter name
+// #define tyon_error( MESSAGE_ )
 
-#define tyon_errorf( FORMAT_STRING_, ... )
-#define tyon_log_format( FORMAT_STRING_, ... )
+// #define tyon_errorf( FORMAT_STRING_, ... )
+// #define tyon_log_format( FORMAT_STRING_, ... )
 
 
-#define tyon_variable( var )
-#define tyon_logf_error( format_string, ... )
-#define TYON_ERROR_CATEGORY( CATEGORY_, MESSAGE_ )
-#define TYON_ERRORF_CATEGORY( CATEGORY_, FORMAT_STRING_,  ... )
-#define profiler_log( ... )
+// #define tyon_variable( var )
+// #define tyon_logf_error( format_string, ... )
+// #define TYON_ERROR_CATEGORY( CATEGORY_, MESSAGE_ )
+// #define TYON_ERRORF_CATEGORY( CATEGORY_, FORMAT_STRING_,  ... )
+// #define profiler_log( ... )
 
 
     // -- Memory Management Library --
@@ -2138,7 +2150,7 @@ namespace tyon
             static t_pixel stub_pixel;
             if (data == nullptr)
             {
-                tyon_log_error( "Image has no associated storage" );
+                TYON_ERROR( "Image has no associated storage" );
                 return stub_pixel;
             }
             return data[ std::clamp<isize>( i, 0, size_pixels() -1 ) ];
@@ -2516,12 +2528,12 @@ namespace tyon
     template <typename... t_formattable>
     PROC log_format(
         cstring category,
-        fmt::format_string<t_formattable> format,
+        fmt::format_string<t_formattable...> format,
         std::source_location location,
-        t_formattable... data
+        t_formattable&&... data
     )
     {
-        fstring message = fmt::format( format, data... );
+        fstring message = fmt::format( format, std::forward<t_formattable>(data)... );
         g_logger->write_message( category, message, e_log_entry::message, location );
     }
 
@@ -2546,27 +2558,6 @@ namespace tyon
         fstring message = fmt::format( format, std::forward<t_formattable>(data)... );
         g_logger->write_message( category, message, e_log_entry::error, location );
     }
-
-    // Use these macros to do logging, or use it as a base for your own macros
-    // with a predefined category.
-
-    #define TYON_BASE_LOG( CATEGORY_, ... ) \
-        ::tyon::log( CATEGORY_, std::source_location::current(), __VA_ARGS__ )
-    #define TYON_BASE_LOGF( CATEGORY_, FORMAT_, ... ) \
-        ::tyon::log_format( CATEGORY_, FORMAT_, std::source_location::current(), __VA_ARGS__ )
-    #define TYON_BASE_ERROR( CATEGORY_, FORMAT_, ... ) \
-        ::tyon::log_error( CATEGORY_, std::source_location::current(), __VA_ARGS__ )
-    #define TYON_BASE_ERRORF( CATEGORY_, FORMAT_, ... ) \
-        ::tyon::log_error_format( CATEGORY_, FORMAT_, std::source_location::current(), __VA_ARGS__ )
-
-    #define log_format( CATEGORY_, FORMAT_, ...)                      \
-        log_format_impl( (CATEGORY_), fmt::format( (FORMAT_), __VA_ARGS__ ) );
-
-    // Tachyon log category
-    #define TYON_LOG( ... ) TYON_BASE_LOG( "Tachyon", __VA_ARGS__ );
-    #define TYON_LOGF( FORMAT_, ... ) TYON_BASE_LOGF( "Tachyon", FORMAT_, __VA_ARGS__ );
-    #define TYON_ERROR( ... ) TYON_BASE_ERROR( "Tachyon", __VA_ARGS__ );
-    #define TYON_ERRORF( FORMAT_, ... ) TYON_BASE_ERRORF( "Tachyon", FORMAT_, __VA_ARGS__ );
 
     template<typename... t_formattable>
     void

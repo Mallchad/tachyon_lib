@@ -62,7 +62,7 @@ namespace tyon
                 close( fd );
             }
         }
-        tyon_logf( "Write file '{}' occupying {} logical bytes", arg->filename, arg->memory.size );
+        TYON_LOGF( "Write file '{}' occupying {} logical bytes", arg->filename, arg->memory.size );
         return true;
     }
 
@@ -80,9 +80,9 @@ namespace tyon
         // Cleanup
         close( fd );
         if (write_ok)
-        { tyon_log( fmt::format( "Wrote binary file '{}'", arg->filename ) ); }
+        { TYON_LOG( fmt::format( "Wrote binary file '{}'", arg->filename ) ); }
         else
-        { log_error_format( "Tachyon", "Failed to write binary file '{}'", arg->filename  ); }
+        { TYON_LOG( "Failed to write binary file '{}'", arg->filename  ); }
         ERROR_GUARD( write_ok, "File wrote less than full data or failed" );
 
 
@@ -111,7 +111,7 @@ namespace tyon
         pthread_setname_np( pthread_self(), name.c_str() );
         if ((name.size() + 1) >= 16)
         {
-            tyon_log_error(
+            TYON_ERROR(
                 "pthread doesn't support names large than 16 including the null terminator" );
             return false;
         }

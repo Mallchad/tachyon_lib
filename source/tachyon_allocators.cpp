@@ -5,7 +5,7 @@ namespace tyon
 
 CONSTRUCTOR memory_heap_allocator::memory_heap_allocator()
 {
-        tyon_log( "New heap block" );
+        TYON_LOG( "New heap block" );
         buffer* block = &blocks.push_tail( {} );
         block->data = malloc( 400_MiB );
         block->size = 400_MiB;
@@ -17,7 +17,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
     bool add_block = (block->head_size + bytes + alignment > block->size);
     if (add_block)
     {
-        tyon_log( "New heap block" );
+        TYON_LOG( "New heap block" );
         block = &blocks.push_tail( {} );
         block->data = malloc( 400_MiB );
         block->size = 400_MiB;
@@ -39,13 +39,13 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
     memory_unpoison( result, bytes );
     block->head_size += used_bytes + 100
 ;
-    tyon_logf( "bytes alignment block head size {} {} {} {}",
+    TYON_LOGF( "bytes alignment block head size {} {} {} {}",
                bytes, alignment, block->size, block->head_size );
     if (result == nullptr)
     {
-        tyon_log( "is nullptr");
+        TYON_LOG( "is nullptr");
     }
-    tyon_logf( "Saved heap pointer {}", (void*)entry->data );
+    TYON_LOGF( "Saved heap pointer {}", (void*)entry->data );
     ERROR_GUARD( result != nullptr, "What happened???" );
     ERROR_GUARD( entry->data == (void*)result, "Should be equal" );
 
@@ -71,8 +71,8 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
             { match = true; break; }
         }
         if (match == false) {
-            tyon_error( "Serious allocation failiure reallocating memory" );
-            tyon_errorf( "Could not find entry associated with addres: {} bytes: {}",
+            TYON_ERROR( "Serious allocation failiure reallocating memory" );
+            TYON_ERRORF( "Could not find entry associated with addres: {} bytes: {}",
                          reference, bytes );
             return nullptr;
         }
@@ -93,7 +93,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
 
     PROC memory_heap_allocator::deallocate( void* address ) -> void
     {
-        tyon_logf( "Deleted heap pointer {}", (void*)address );
+        TYON_LOGF( "Deleted heap pointer {}", (void*)address );
         auto iter = used.indexer_ranged( 0, used.nodes.size() );
 
         ERROR_GUARD( iter.do_iteration, "Christ what has gone wrong" );
@@ -106,7 +106,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
             { match = true; break; }
         }
         if (match == false)
-        {   tyon_errorf( "Could not find entry associated with addres: {}", address );
+        {   TYON_ERRORF( "Could not find entry associated with addres: {}", address );
             return;
         }
 
@@ -132,8 +132,8 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         raw_pointer article_1 = allocator.allocate_raw( 100, 4 );
         raw_pointer good_ptr = allocator.allocate_relocate( article_1, 800 );
         raw_pointer bad_ptr = allocator.allocate_relocate( (void*)0x1234124, 400 );
-        tyon_logf( "good_ptr: ", good_ptr != nullptr );
-        tyon_logf( "bad_ptr: ", good_ptr != nullptr );
+        TYON_LOGF( "good_ptr: ", good_ptr != nullptr );
+        TYON_LOGF( "bad_ptr: ", good_ptr != nullptr );
 
         linked_list<int> list;
         list.push_tail( 1 );
@@ -157,11 +157,11 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         ERROR_GUARD( step.do_iteration, "Failed indexer range check" );
         for (; step.do_iteration; step.forward() )
         {
-            tyon_logf( "Node index: {} value: {}", step.index, step.value->value );
+            TYON_LOGF( "Node index: {} value: {}", step.index, step.value->value );
         }
         do
         {
-            tyon_logf( "Node index: {} value: {}", iter.index, iter.value->value );
+            TYON_LOGF( "Node index: {} value: {}", iter.index, iter.value->value );
         } while( iter.forward() );
     }
 

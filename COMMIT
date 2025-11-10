@@ -1,0 +1,4 @@
+Fixed: Extra leftover parameter in 'TYON_BASE_ERROR' macro
+
+Fixed: Accidentily using '.' syntax instead of '->' for node list
+Fixed: Unexpanded parameter pack in 'log_format'

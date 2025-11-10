@@ -161,7 +161,7 @@ struct linked_list
         {
             do_iteration = (1+ index <= range_max);
             if (do_iteration && value->next < 0)
-            {   tyon_error( "Container must be broken if the next node is negative" ); }
+            {   TYON_ERROR( "Container must be broken if the next node is negative" ); }
             value = &context->nodes[ value->next ];
             index += 1;
             return do_iteration;
@@ -172,7 +172,7 @@ struct linked_list
         {
             do_iteration = (index - 1 <= range_max);
             if (do_iteration && value->prev < 0)
-            {   tyon_error( "Container must be broken if the prev node is negative" ); }
+            {   TYON_ERROR( "Container must be broken if the prev node is negative" ); }
             value = &context->nodes[ value->prev ];
             index -= 1;
             do_iteration = (index >= range_min);
@@ -180,7 +180,7 @@ struct linked_list
         }
 
         PROC operator == ( indexer& rhs ) -> bool
-        {   return this->value.value == rhs.value; }
+        {   return this->value->value == rhs.value; }
 
     };
 
