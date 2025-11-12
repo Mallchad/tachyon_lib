@@ -823,8 +823,7 @@ namespace tyon
         change_allocation_raw( isize count )
         {
             i_memory_allocator* allocator = (data.allocator ? data.allocator : g_allocator);
-            T* new_storage = reinterpret_cast<T*>(
-                allocator->allocate_raw( count * sizeof(T), alignof(T) ) );
+            T* new_storage = allocator->allocate_raw( count * sizeof(T), alignof(T) );
             ERROR_GUARD( new_storage != nullptr, "Allocation failed" );
             if (data)
             {
@@ -918,7 +917,7 @@ namespace tyon
         T
         FUNCTION pop_head()
         {
-            if (bounded && (head_size = 0)) { return false; }
+            if (bounded && (head_size == 0)) { return false; }
             T result = data[ head++ ];
             --head_size;
             return result;
@@ -927,7 +926,7 @@ namespace tyon
         T
         FUNCTION pop_tail( T item )
         {
-            if (bounded && (head_size = 0)) { return false; }
+            if (bounded && (head_size == 0)) { return false; }
             T result = data[ head + head_size - 1 ];
             --head_size;
             return result;

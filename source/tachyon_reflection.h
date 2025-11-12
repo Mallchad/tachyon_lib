@@ -41,10 +41,18 @@ namespace reflection
     constexpr fstring_view compiler_name = "mingw";
     constexpr version compiler_version = {};
     #else
-    #define REFLECTION_COMPILER_MINGW 0
+#define REFLECTION_COMPILER_MINGW 0
 #endif // mingw
 
-#if (!REFLECTION_COMPILER_GCC && !REFLECTION_COMPILER_CLANG && !REFLECTION_COMPILER_MSVC && !REFLECTION_COMPILER_MINGW)
+#if (__NVCC__)
+    #define REFLECTION_COMPILER_CUDA 1
+    constexpr fstring_view compiler_name = "nvcc";
+    constexpr version compiler_version = {};
+#else
+    #define REFLECTION_COMPILER_CUDA 0
+#endif // __NVCC__
+
+#if (!REFLECTION_COMPILER_GCC && !REFLECTION_COMPILER_CLANG && !REFLECTION_COMPILER_MSVC && !REFLECTION_COMPILER_MINGW && !REFLECTION_COMPILER_CUDA)
     # error "Platform Compiler not supported or detected incorrectly"
 #endif // All platforms
 
@@ -70,7 +78,7 @@ namespace reflection
 #endif // Apple/Mac
 
 #if (!REFLECTION_PLATFORM_LINUX && !REFLECTION_PLATFORM_WINDOWS && !REFLECTION_PLATFORM_MAC)
-    #error "Platform OS not supported or detected correctly
+    #error "Platform OS not supported or detected correctly"
 #endif
 
     constexpr bool compiler_gcc =  REFLECTION_COMPILER_GCC;

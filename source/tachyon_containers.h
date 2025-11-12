@@ -120,7 +120,7 @@ struct linked_list
         *arg = {};
         nodes.head_size--;
         list_size--;
-        ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ = -1 && tail_ == -1) ||
+        ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ == -1 && tail_ == -1) ||
                      (head_ >= 0 && tail_ >= 0),
                      "Wut" );
     }
@@ -129,7 +129,7 @@ struct linked_list
     PROC operator [] ( isize arg ) -> monad<t_node*>
     {
         monad<t_node*> result;
-        t_node* x_node = head_;
+        t_node* x_node = &nodes[ head_ ];
         if ( head_ < 0 || arg > list_size)
         {   result.error = true;  return result; }
 
