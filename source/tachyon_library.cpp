@@ -500,18 +500,25 @@ namespace tyon
     asset_machinery_init()
     {
         TIME_SCOPED_FUNCTION();
-        i32 iteration_limit = 1000;
         fpath self_directory = file_self_directory();
         g_asset = memory_allocate<asset_machine>( 1 );
         g_asset->search_paths.change_allocation( 20 );
         g_asset->assets.change_allocation( 100 );
 
         g_asset->search_paths.push_tail( self_directory );
+        asset_enumerate_files();
+    }
 
+    PROC asset_enumerate_files() -> void
+    {
         fpath x_path;
         fpath x_filename;
         fs::directory_entry x_entry;
-        for (i32 i_search=0; i_search < g_asset->search_paths.head_size; ++i_search)
+        // TODO: Should really be known max_iterations
+        i32 iteration_limit = 1000;
+        i32 i_search = 0;
+
+        for (; i_search < g_asset->search_paths.head_size; ++i_search)
         {
             x_path = g_asset->search_paths[i_search];
             if (fs::is_directory( x_path ) == false) { continue; }
@@ -521,6 +528,19 @@ namespace tyon
                 if (iterator == fs::end( iterator)) { break; }
                 x_entry = *iterator;
                 x_filename = x_entry;
+
+                // Reload or skip if pre-existing asset exists
+                search_result<asset> lookup = g_asset->assets.linear_search( [=]( asset& arg )
+                {   return arg.file.filename == x_filename; }
+                );
+                if (lookup.match_found)
+                {
+                    // TODO: Do asset reloading logic
+                    vmec_logf( "Skipping already existing asset for load '{}'",
+                               lookup.match->name );
+                    continue;
+                }
+
                 if (x_entry.is_regular_file())
                 {
                     asset new_asset;
@@ -530,6 +550,11 @@ namespace tyon
                 }
                 iterator++;
             }
+        }
+
+        if (i_search >= 1000)
+        {   vmec_log_error(
+                "Exceeded asset system file limit whilst enumerating files from search paths" );
         }
     }
 
@@ -546,7 +571,12 @@ namespace tyon
                 { result = x_asset; break; }
             }
         }
-        ERROR_GUARD( result, "Failed to load asset" );
+        if (result == nullptr)
+        {
+            vmec_logf_error( "Failed to load asset: {}", filename );
+            return nullptr;
+        }
+
         bool new_asset = (result == nullptr);
         if (new_asset)
         {
@@ -606,6 +636,7 @@ namespace tyon
     asset_execute_loader( asset* arg )
     {
         bool result = false;
+        if (arg == nullptr) { return false; }
         if (arg->loaded == false)
         {
             result = arg->loader( arg );

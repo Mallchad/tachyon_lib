@@ -1027,8 +1027,9 @@ namespace tyon
         // -- End of std::vector compat
 
         // Search from 0 to 'size'
+        template <typename t_single_comparison>
         search_result<T>
-        FUNCTION linear_search( generic_procedure<bool(T&)> comparator )
+        FUNCTION linear_search( t_single_comparison comparator )
         {
             search_result<T> result;
             for (i64 i=0; i < size_; ++i)
@@ -2214,6 +2215,7 @@ namespace tyon
         asset_function loader = &asset_function_stub;
         asset_function unloader = &asset_function_stub;
         fstring loader_name;
+        time_date time_loaded;
         bool loaded = false;
     };
 
@@ -2227,6 +2229,8 @@ namespace tyon
 
     void
     asset_machinery_init();
+
+    PROC asset_enumerate_files() -> void;
 
     asset*
     asset_search( fstring filename, e_asset type );
