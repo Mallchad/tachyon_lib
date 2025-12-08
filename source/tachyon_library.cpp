@@ -713,7 +713,7 @@ namespace tyon
                         nanoseconds, entry.category, call_point.function_name(),
                         call_point.file_name(), call_point.line(), call_point.column(),
                          entry.message );
-                    fmt::print( fmt::emphasis::bold | fmt::fg(fmt::color::red), "{}", message );
+                    fmt::print( fmt::emphasis::bold | fmt::fg(fmt::color::red), "{}", formatted_message );
                     break;
 
                 default:
