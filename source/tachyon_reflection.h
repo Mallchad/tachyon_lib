@@ -5,6 +5,15 @@
 namespace reflection
 {
     using namespace tyon;
+
+#ifndef TYON_BUILD_GIT_HASH_STRING
+    #pragma warning "No git gash provided"
+    #if TYON_AGGRESSIVE_DEBUGGING
+        #pragma error "No git gash provided"
+    #endif TYON_AGGRESSIVE_DEBUGGING
+    #define TYON_BUILD_GIT_HASH_STRING "unknown"
+#endif // TYON_BUILD_GIT_HASH_STRING
+
 // GNUC means "GNU Cextensions" not "GCC"
 #if (__GNUC___ && !__clang__)
     #define REFLECTION_COMPILER_GCC 1
@@ -25,14 +34,29 @@ namespace reflection
     constexpr version clang_version = {};
 #endif // clang
 
+// nVIDIA CUDA SDK
+#if (__NVCC__)
+    #define REFLECTION_COMPILER_CUDA 1
+    constexpr fstring_view compiler_name = "nvcc";
+    constexpr version compiler_version = {};
+#else
+    #define REFLECTION_COMPILER_CUDA 0
+#endif // __NVCC__
+
+
 // Microsoft Visual C++ Compiler Collection
-#if (_MSC_FULL_VER)
+
+// Quirk for Clang or CUDA running under MSVC
+#if (_MSC_FULL_VER && !REFLECTION_COMPILER_CLANG  && !REFLECTION_COMPILER_CUDA)
+    constexpr fstring_view compiler_name = "msvc";
+    constexpr version compiler_version = { _MSC_FULL_VER, 0, 0 };;
+#endif
+// Safe, fine under hybrid build environments
+#if (_MSC_FULL_VER && !REFLECTION_COMPILER_CLANG)
     #define REFLECTION_COMPILER_MSVC 1
     constexpr version msvc_version = { _MSC_FULL_VER, 0, 0 };
-    constexpr fstring_view compiler_name = "msvc";
-    constexpr version compiler_version = msvc_version;
 #else
-    #define REFLECTION_COMPILER_MSVC 0
+#define REFLECTION_COMPILER_MSVC 0
     constexpr version msvc_version = {};
 #endif // MSVC
 
@@ -43,14 +67,6 @@ namespace reflection
     #else
 #define REFLECTION_COMPILER_MINGW 0
 #endif // mingw
-
-#if (__NVCC__)
-    #define REFLECTION_COMPILER_CUDA 1
-    constexpr fstring_view compiler_name = "nvcc";
-    constexpr version compiler_version = {};
-#else
-    #define REFLECTION_COMPILER_CUDA 0
-#endif // __NVCC__
 
 #if (!REFLECTION_COMPILER_GCC && !REFLECTION_COMPILER_CLANG && !REFLECTION_COMPILER_MSVC && !REFLECTION_COMPILER_MINGW && !REFLECTION_COMPILER_CUDA)
     # error "Platform Compiler not supported or detected incorrectly"
@@ -88,7 +104,7 @@ namespace reflection
     constexpr bool platform_linux = REFLECTION_PLATFORM_LINUX;
     constexpr bool platform_mac = REFLECTION_PLATFORM_MAC;
 
-    constexpr fstring_view build_git_hash_string = TYON_BUILD_GIT_HASH_STRING;
+    constexpr tyon::fstring_view build_git_hash_string = TYON_BUILD_GIT_HASH_STRING;
     // TODO: Fill in hex part
     constexpr version build_version = { 0, 1, 0  };
 }
