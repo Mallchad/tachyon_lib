@@ -136,7 +136,7 @@ struct linked_list
         for (isize i=0; i < arg; ++i)
         {
             ERROR_GUARD( x_node->next, "Broken link is indicative of a logic issue" );
-            x_node = x_node->next;
+            x_node = &nodes[ x_node->next ];
         }
         return result;
     }
