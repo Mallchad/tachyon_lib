@@ -340,7 +340,8 @@ namespace tyon
 
         char buffer[64];
         snprintf( buffer, 64, "[%3.0lu %3.0lu %3.0lu ns]", milliseconds, microseconds, nanoseconds );
-        profiler_log( buffer, "[" + name + "]", description );
+        TYON_BASE_LOGF( "Tachyon Profiler", "{} [{}] {}",
+                        buffer, name, description );
         log_flush();
     }
 
@@ -386,7 +387,8 @@ namespace tyon
             snprintf(
                 buffer, 64, "[%lu s %3.0lu %3.0lu %3.0lu ns]",
                 seconds, miliseconds, microseconds, nanoseconds );
-            profiler_log( buffer, "[" + name + "]", description );
+            TYON_BASE_LOGF( "Tachyon Profiler", "{} [{}] {}",
+                            buffer, name, description );
         }
     }
 
@@ -536,7 +538,7 @@ namespace tyon
                 if (lookup.match_found)
                 {
                     // TODO: Do asset reloading logic
-                    vmec_logf( "Skipping already existing asset for load '{}'",
+                    TYON_LOGF( "Skipping already existing asset for load '{}'",
                                lookup.match->name );
                     continue;
                 }
@@ -552,9 +554,11 @@ namespace tyon
             }
         }
 
-        if (i_search >= 1000)
-        {   vmec_log_error(
-                "Exceeded asset system file limit whilst enumerating files from search paths" );
+        i32 asset_search_limit = 1000;
+        if (i_search >= asset_search_limit)
+        {   TYON_ERRORF(
+                "Exceeded asset system file limit {} whilst enumerating files from search paths",
+                asset_search_limit);
         }
     }
 
@@ -573,7 +577,7 @@ namespace tyon
         }
         if (result == nullptr)
         {
-            vmec_logf_error( "Failed to load asset: {}", filename );
+            TYON_ERRORF( "Failed to load asset: {}", filename );
             return nullptr;
         }
 

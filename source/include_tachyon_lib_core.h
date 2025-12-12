@@ -57,6 +57,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <source_location>
 #include <thread>
 #include <utility>
 #include <vector>
