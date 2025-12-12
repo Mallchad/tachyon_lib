@@ -306,15 +306,16 @@ namespace tyon
     #define TYON_LOG( ... ) TYON_BASE_LOG( "Tachyon", __VA_ARGS__ );
     #define TYON_LOGF( FORMAT_, ... ) TYON_BASE_LOGF( "Tachyon", FORMAT_, __VA_ARGS__ );
     #define TYON_ERROR( ... ) TYON_BASE_ERROR( "Tachyon", __VA_ARGS__ );
-    #define TYON_ERRORF( FORMAT_, ... ) TYON_BASE_ERRORF( "Tachyon", FORMAT_, __VA_ARGS__ );
+    #define TYON_ERRORF( FORMAT_, ... ) TYON_BASE_ERRORF( "Tachyon Error", FORMAT_, __VA_ARGS__ );
 
     /** Make sure condition is true or break and show message
      * It's an assert. okay. */
     #define ERROR_GUARD( condition, message )                           \
         if ( !(condition) )                                             \
         {                                                               \
-            TYON_ERRORF( "Error Guard", "Condition: ({}): {}",          \
-                         #condition, message );                         \
+            TYON_BASE_ERRORF(                                           \
+            "Error Guard", "Condition: ({0}) \n\tTested Value: {1} \n\tMessage: {2}", \
+            #condition, bool(condition), (message) );                   \
             TYON_BREAK();                                               \
         };
 
