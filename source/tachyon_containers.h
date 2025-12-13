@@ -47,12 +47,15 @@ struct linked_list
             tail_ = head_;
         }
         new_node->prev = tail_;
-        tail()->next = new_node->index;
         tail_ = new_node->index;
 
         // Make sure 'prev' of first node doesn't point to anything
         if (no_head)
         {   new_node->prev = -1;
+        }
+        bool prev_exists = (new_node->prev >= 0);
+        if (prev_exists)
+        {   nodes[ new_node->prev ].next = new_node->index;
         }
 
         ++list_size;
@@ -77,7 +80,7 @@ struct linked_list
 
         ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ = -1 && tail_ == -1) ||
                      (head_ >= 0 && tail_ >= 0),
-                     "Wut" );
+                     "Probably a bug if these tests fail" );
         return result;
     }
 
@@ -141,6 +144,7 @@ struct linked_list
         ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ == -1 && tail_ == -1) ||
                      (head_ >= 0 && tail_ >= 0),
                      "Wut" );
+        TYON_LOG( "remove list_size", list_size );
     }
 
     /** LOOKING links in node order from head to tail */
@@ -180,11 +184,11 @@ struct linked_list
         {
             bool next_valid = (value->next < 0);
             do_iteration = (index <= range_max);
-            if (do_iteration && )
+            if (do_iteration && next_valid)
             {   TYON_ERROR( "Container must be broken if the next node is negative" );
                 TYON_BREAK();
             }
-            if (do_iteration)
+            if (next_valid)
             {   value = &context->nodes[ value->next ];
             }
             index += 1;
