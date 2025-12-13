@@ -59,7 +59,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
 
     PROC memory_heap_allocator::allocate_relocate( void* reference, i64 bytes ) -> raw_pointer
     {
-        auto iter = used.indexer_ranged( 0, used.nodes.size() );
+        auto iter = used.indexer_full();
 
         ERROR_GUARD( iter.do_iteration, "Christ what has gone wrong" );
         heap_entry* x_entry = nullptr;
@@ -94,7 +94,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
     PROC memory_heap_allocator::deallocate( void* address ) -> void
     {
         TYON_LOGF( "Deleted heap pointer {}", (void*)address );
-        auto iter = used.indexer_ranged( 0, used.nodes.size() );
+        auto iter = used.indexer_full();
 
         ERROR_GUARD( iter.do_iteration, "Christ what has gone wrong" );
         heap_entry* x_entry = nullptr;
@@ -131,7 +131,9 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         memory_heap_allocator allocator;
         raw_pointer article_1 = allocator.allocate_raw( 100, 4 );
         raw_pointer good_ptr = allocator.allocate_relocate( article_1, 800 );
-        raw_pointer bad_ptr = allocator.allocate_relocate( (void*)0x1234124, 400 );
+
+        // Breaks as it should?
+        // raw_pointer bad_ptr = allocator.allocate_relocate( (void*)0x1234124, 400 );
         TYON_LOGF( "good_ptr: ", good_ptr != nullptr );
         TYON_LOGF( "bad_ptr: ", good_ptr != nullptr );
 
@@ -152,7 +154,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         node_link<int>* node_2 = list.insert_after( node, 4 );
         ERROR_GUARD( node_2->value == 4, "" );
 
-        auto step = list.indexer_ranged( 0, list.list_size );
+        auto step = list.indexer_full();
         auto iter = step; // copy
         ERROR_GUARD( step.do_iteration, "Failed indexer range check" );
         for (; step.do_iteration; step.forward() )

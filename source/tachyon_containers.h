@@ -84,7 +84,7 @@ struct linked_list
     PROC
     insert_after( t_node* target_node, T value ) -> t_node*
     {
-        ERROR_GUARD( (target_node >= nodes.address(0)) && (target_node <= nodes.tail_address()),
+        ERROR_GUARD( (target_node >= nodes.address(0)) && (target_node <= nodes.address( nodes.size_ )),
                      "A node from outside this container has been used as an argument" );
         t_node* new_node = &nodes.push_tail( {} );
         // Set index before proceeding
@@ -106,7 +106,7 @@ struct linked_list
 
     PROC remove_node( t_node* arg ) -> void
     {
-        ERROR_GUARD( (arg >= nodes.address(0)) && (arg <= nodes.tail_address()),
+        ERROR_GUARD( (arg >= nodes.address(0)) && (arg <= nodes.address( nodes.size_ )),
                      "A node from outside this container has been used as an argument" );
         bool prev_valid = (arg->prev >= 0);
         bool next_valid = (arg->next >= 0);
@@ -178,8 +178,9 @@ struct linked_list
         /** Returns true if this iteration should be used */
         PROC forward() -> fresult
         {
-            do_iteration = (1+ index <= range_max);
-            if (do_iteration && value->next < 0)
+            bool next_valid = (value->next < 0);
+            do_iteration = (index <= range_max);
+            if (do_iteration && )
             {   TYON_ERROR( "Container must be broken if the next node is negative" );
                 TYON_BREAK();
             }
