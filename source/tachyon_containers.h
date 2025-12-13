@@ -7,10 +7,10 @@ namespace tyon
 template <typename T>
 struct node_link
 {
-    i64 index;
-    i64 prev;
-    i64 next;
-    T value;
+    i64 index = -1;
+    i64 prev = -1;
+    i64 next = -1;
+    T value {};
 };
 
 template <typename T>
@@ -19,8 +19,11 @@ struct linked_list
     using t_self = linked_list<T>;
     using t_node = node_link<T>;
     array< t_node > nodes;
+    // The index of the first node in the list
     i64 head_ = -1;
+    // The index of the last node in the list
     i64 tail_ = -1;
+    // The length of the list from head to tail
     isize list_size = 0;
 
     PROC resize( isize count )
@@ -38,6 +41,7 @@ struct linked_list
         new_node->value = arg;
 
         bool no_tail = (this->tail_ < 0);
+        bool no_head = (this->head_ < 0);
         if (no_tail)
         {   head_ = new_node->index;
             tail_ = head_;
@@ -46,8 +50,13 @@ struct linked_list
         tail()->next = new_node->index;
         tail_ = new_node->index;
 
+        // Make sure 'prev' of first node doesn't point to anything
+        if (no_head)
+        {   new_node->prev = -1;
+        }
+
         ++list_size;
-                ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ = -1 && tail_ == -1) ||
+        ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ = -1 && tail_ == -1) ||
                      (head_ >= 0 && tail_ >= 0),
                      "Wut" );
         return new_node;
@@ -80,7 +89,7 @@ struct linked_list
         t_node* new_node = &nodes.push_tail( {} );
         // Set index before proceeding
         new_node->index = list_size;
-        if (target_node->next)
+        if (target_node->next >= 0)
         {   new_node->next = target_node->next;
         }
         new_node->prev = target_node->index;
@@ -99,25 +108,34 @@ struct linked_list
     {
         ERROR_GUARD( (arg >= nodes.address(0)) && (arg <= nodes.tail_address()),
                      "A node from outside this container has been used as an argument" );
-        t_node* prev = nullptr;
-        if (arg->prev && arg->next)
+        bool prev_valid = (arg->prev >= 0);
+        bool next_valid = (arg->next >= 0);
+        i32 next_of = arg->next;
+        i32 prev_of = arg->prev;
+        if (prev_valid && next_valid)
         {   // pass old references to prev and next
-            nodes[ arg->prev ].next = arg->next;
-            nodes[ arg->next ].prev = arg->prev;
+            // 1 - 2 - 3
+            // 1 next   <-prev 3
+            // 1 next->   prev 3
+            nodes[ arg->prev ].next = next_of;
+            nodes[ arg->next ].prev = prev_of;
         }
-        else if (arg->prev)
+        else if (prev_valid)
         {   // Only prev, no next node, nullify that reference and make it the tail
-            arg->prev = -1;
             tail_ = arg->prev;
+            nodes[ arg->prev ].next = -1;
         }
-        else if (arg->next)
+        else if (next_valid)
         {   // Only next, no prev node, nullify that reference and make it the head
-            arg->next = -1;
-            head_ = arg->next;
+            head_ = next_of;
+            nodes[ next_of ].prev = -1;
         }
 
         // Clear node to made node detected as empty
         *arg = {};
+        arg->prev = -1;
+        arg->next = -1;
+
         nodes.head_size--;
         list_size--;
         ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ == -1 && tail_ == -1) ||
@@ -135,9 +153,10 @@ struct linked_list
 
         for (isize i=0; i < arg; ++i)
         {
-            ERROR_GUARD( x_node->next, "Broken link is indicative of a logic issue" );
+            ERROR_GUARD( x_node->next >= 0, "Broken link is indicative of a logic issue" );
             x_node = &nodes[ x_node->next ];
         }
+        result.value = x_node;
         return result;
     }
 
@@ -161,8 +180,12 @@ struct linked_list
         {
             do_iteration = (1+ index <= range_max);
             if (do_iteration && value->next < 0)
-            {   TYON_ERROR( "Container must be broken if the next node is negative" ); }
-            value = &context->nodes[ value->next ];
+            {   TYON_ERROR( "Container must be broken if the next node is negative" );
+                TYON_BREAK();
+            }
+            if (do_iteration)
+            {   value = &context->nodes[ value->next ];
+            }
             index += 1;
             return do_iteration;
         }
@@ -170,12 +193,15 @@ struct linked_list
         /** Returns true if this iteration should be used */
         PROC backward() -> fresult
         {
-            do_iteration = (index - 1 <= range_max);
+            do_iteration = (index - 1 >= range_min);
             if (do_iteration && value->prev < 0)
-            {   TYON_ERROR( "Container must be broken if the prev node is negative" ); }
-            value = &context->nodes[ value->prev ];
+            {   TYON_ERROR( "Container must be broken if the prev node is negative" );
+                TYON_BREAK();
+            }
+            if (do_iteration)
+            {   value = &context->nodes[ value->prev ];
+            }
             index -= 1;
-            do_iteration = (index >= range_min);
             return do_iteration;
         }
 
@@ -184,13 +210,15 @@ struct linked_list
 
     };
 
-    /** Uses exact inclusive range */
+    /** Uses exact inclusive range
+
+        returns an invalid iterator on invalid range */
     PROC indexer_ranged( isize min = 0, isize max = 0 ) -> indexer
     {
         indexer result;
         // Flag an error is max is outsize of 'list_size' or 'head' is nullptr
         // Uses inclusive max
-        if (max > list_size || head_ < 0) { return result; }
+        if (min < 0 || max < 0 || max > list_size || min > max || head_ < 0) { return result; }
 
         result = indexer {
             .index = min,
@@ -201,6 +229,14 @@ struct linked_list
             .do_iteration = true
         };
         return result;
+    }
+
+    /** index the full range of the container from head to tail
+
+        returns an invalid iterator on invalid range */
+    PROC indexer_full() -> indexer
+    {
+        return indexer_ranged( 0, list_size -1 );
     }
 
 };
