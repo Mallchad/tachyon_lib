@@ -959,14 +959,14 @@ namespace tyon
             return data + std::clamp<i64>( i, 0, size_ );
         }
 
-        t_self
+        t_self&
         COPY_ASSIGNMENT operator =( t_self rhs )
         {
-            rhs.change_allocation( this->size_ );
-            rhs.head_size = this->size_;
-            for (i32 i=0; i < this->size_; ++i )
+            this->change_allocation( rhs.size_ );
+            this->head_size = rhs.size_;
+            for (i64 i=0; i < rhs.head_size; ++i )
             {
-                rhs.data[i] = data[i];
+                data[i] = rhs.data[i];
             }
             return *this;
         }
