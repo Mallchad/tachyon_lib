@@ -22,6 +22,7 @@ namespace tyon
 
     library_context* g_library = nullptr;
     logger* g_logger = nullptr;
+    logger* g_switch_logger = nullptr;
     asset g_asset_stub = {};
     asset_machine* g_asset = nullptr;
 
@@ -688,6 +689,8 @@ namespace tyon
     {
         PROFILE_SCOPE_FUNCTION();
         std::scoped_lock _lock( write_lock );
+        // Prevent deadlocking from recursive calls
+        std::swap( g_logger, g_switch_logger );
 
         log_entry& entry = entries.push_tail( {} );
         entry.type = type;
@@ -736,6 +739,7 @@ namespace tyon
                 fflush( log_file );
             }
         }
+        std::swap( g_logger, g_switch_logger );
     }
 
     void
@@ -753,6 +757,7 @@ namespace tyon
         g_allocator_lock = &arg->global_allocator_lock;
         // g_taint_allocator_lock = &arg->taint_allocator_lock;
         g_logger = &arg->default_logger;
+        g_switch_logger = &arg->switch_logger;
 
         // Using logging, needs to run after logging setup
         g_little_endian = test_little_endian();

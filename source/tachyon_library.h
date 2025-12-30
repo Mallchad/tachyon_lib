@@ -102,6 +102,8 @@ namespace tyon
 
     extern library_context* g_library;
     extern logger* g_logger;
+    // Prevent deadlocking from recursive calls
+    extern logger* g_switch_logger;
     extern asset g_asset_stub;
     extern asset_machine* g_asset;
 
@@ -774,8 +776,8 @@ namespace tyon
 
         CONSTRUCTOR array( std::initializer_list<T> arg )
         {
-            this->size_ = this->head_size = arg.size();
-            this->change_allocation( this->size_ );
+            this->change_allocation( arg.size() );
+            head_size = arg.size();
             isize i = 0;
             for (auto x : arg ) { data[i] = x; ++i; }
             ERROR_GUARD( i <= this->size_,
@@ -817,6 +819,9 @@ namespace tyon
             }
             else
             { return false; }
+            // ERROR_GUARD( size_ > 100'000'000'000 || size_ < 0, "Bogus data" );
+            // ERROR_GUARD( head_size > 100'000'000'000 || head_size < 0, "Bogus data" );
+            // ERROR_GUARD( head > 100'000'000'000 || head < 0, "Bogus data" );
             return true;
         }
 
@@ -2657,6 +2662,7 @@ namespace tyon
         // Temporary. Needs to be removed when we have a proper global allocator
         std::mutex taint_allocator_lock;
         logger default_logger;
+        logger switch_logger;
         raw_pointer null_read;
         raw_pointer null_write;
     };
