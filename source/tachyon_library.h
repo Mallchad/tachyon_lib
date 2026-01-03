@@ -1032,6 +1032,14 @@ namespace tyon
         }
         // -- End of std::vector compat
 
+        template <typename t_proc>
+        PROC map_procedure( t_proc&& arg ) -> void
+        {
+            for (i64 i=0; i < size(); ++i)
+            {   arg( data[i] );
+            }
+        }
+
         // Search from 0 to 'size'
         template <typename t_single_comparison>
         search_result<T>
