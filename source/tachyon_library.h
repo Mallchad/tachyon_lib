@@ -2518,6 +2518,7 @@ namespace tyon
         bool string_output_enabled = true;
 
         std::mutex write_lock;
+        fstring log_filename = "latest.log";
         FILE* log_file = nullptr;
 
         void

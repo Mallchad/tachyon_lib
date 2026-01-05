@@ -668,7 +668,7 @@ namespace tyon
 
         // Write to log file if possible
         if (log_file == nullptr)
-        { log_file = fopen( "latest.log", "w" ); }
+        { log_file = fopen( this->log_filename.c_str(), "w" ); }
         if (log_file)
         { fwrite( message.data(), 1, message.size(), log_file ); }
 
@@ -733,7 +733,7 @@ namespace tyon
             {
                 // Write to log file if possible
                 if (log_file == nullptr)
-                { log_file = fopen( "latest.log", "w" ); }
+                { log_file = fopen( this->log_filename.c_str(), "w" ); }
                 if (log_file)
                 { fwrite( formatted_message.data(), 1, formatted_message.size(), log_file ); }
                 fflush( log_file );
@@ -748,8 +748,10 @@ namespace tyon
         TIME_SCOPED_FUNCTION();
         if (arg->initialized)
         {
-            printf( "library has already been initialized but 'library_context_init'"
-                    "was called again" );
+            // TODO Should append this to the defualt logger at some point for pre-init messages
+            fmt::print(
+                "[Tachyon Pre-Init]    library has already"
+                " been initialized but 'library_context_init' was called again" );
             TYON_BREAK();
         }
         g_program_epoch = time_now();
@@ -758,6 +760,11 @@ namespace tyon
         // g_taint_allocator_lock = &arg->taint_allocator_lock;
         g_logger = &arg->default_logger;
         g_switch_logger = &arg->switch_logger;
+
+        // Canonicalize and log filename so its static and never changes with working directory
+        fstring absolute_logfile = fs::canonical( arg->default_logger.log_filename );
+        arg->default_logger.log_filename = absolute_logfile;
+        TYON_LOGF( "Default log file Path '{}' \n", absolute_logfile );
 
         // Using logging, needs to run after logging setup
         g_little_endian = test_little_endian();
