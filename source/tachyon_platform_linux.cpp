@@ -89,6 +89,19 @@ namespace tyon
         return write_ok;
     }
 
+    PROC file_home_directory() -> fstring
+    {
+        fstring env_name = "HOME";
+        char* home_path = getenv( env_name.c_str() );
+        if (home_path == nullptr)
+        {   TYON_BASE_ERROR(
+                "Tachyon Linux", "Error reading home home directory environment variable" );
+            return {};
+        }
+        fstring result = fs::canonical( home_path ).string();
+        return result;
+    }
+
     /* uuid v4 */
     u128
     uuid_generate()

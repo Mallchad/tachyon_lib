@@ -775,6 +775,10 @@ namespace tyon
         // Init optional sub-systems
         asset_machinery_init();
 
+        // SECTION: Random Information Logging
+        fstring home_dir = file_home_directory();
+        TYON_LOGF( "Home directory path: {}", home_dir );
+
         // Finished!
         arg->initialized = true;
     }
@@ -788,9 +792,9 @@ namespace tyon
         fuint8 first_bits = *reinterpret_cast<fuint8*>( &full_bits );
         bool little_endian = static_cast<bool>( first_bits );
 
-        TYON_LOG(
-            "Platform",
-            (little_endian ? "Platform tested for endianess, came back as little endian" :
+        TYON_BASE_LOG(
+            "Tachyon Platform",
+            (little_endian ? "Memory tested for endianess, came back as little endian" :
              "Platform tested for endianess, came back as big endian")
             );
         return little_endian;

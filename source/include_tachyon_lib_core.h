@@ -51,6 +51,7 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <cerrno>
 #include <filesystem>
 // Disabled iostreams in favour of fmt (which redirects to 'vprint' but uses type safe operations
 // #include <iostream>
@@ -93,6 +94,8 @@
 #include "tachyon_library.h"
 #include "tachyon_containers.h"
 #include "tachyon_allocators.h"
+
+#include "tachyon_platform_common.h"
 
 #if (REFLECTION_PLATFORM_LINUX)
     #include "tachyon_platform_linux.h"
