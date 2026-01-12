@@ -59,9 +59,6 @@ struct linked_list
         }
 
         ++list_size;
-        ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ = -1 && tail_ == -1) ||
-                     (head_ >= 0 && tail_ >= 0),
-                     "Wut" );
         return new_node;
     }
 

@@ -356,7 +356,7 @@ namespace tyon
 
     // -- Memory Management Library --
 
-    constexpr isize
+    isize
     binary_padding( isize padding, isize size );
 
     isize
