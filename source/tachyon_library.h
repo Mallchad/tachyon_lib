@@ -1416,7 +1416,10 @@ namespace tyon
             : id(_id), uuid() { }
         constexpr COPY_CONSTRUCTOR uid( const uid& arg )
             : id(arg.id), uuid(arg.uuid) { }
-        operator i64();
+        explicit operator i64();
+
+        PROC operator ==( uid rhs ) -> bool;
+
         PROC valid() -> bool;
     };
 

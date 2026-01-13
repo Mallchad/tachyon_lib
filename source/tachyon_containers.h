@@ -151,6 +151,18 @@ struct array
                      "Index overran initializer list, memory is likely corrupted" );
     }
 
+    CONSTRUCTOR array( std::vector<T>& arg )
+    {
+        this->change_allocation( arg.size() );
+        head_size = arg.size();
+        isize i = 0;
+        for (auto x : arg )
+        {   data[i] = x; ++i;
+        }
+        ERROR_GUARD( i <= this->size_,
+                     "Index overran initializer list, memory is likely corrupted" );
+    }
+
     bool
     change_allocation( i_memory_allocator* allocator, isize count )
     {
