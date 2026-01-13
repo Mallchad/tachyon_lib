@@ -4,6 +4,530 @@
 namespace tyon
 {
 
+template <typename t_any>
+struct pointer final
+{
+    using t_self = pointer<t_any>;
+    t_any* data = 0x0;
+    /** This denotes the allocator the memory belongs to. If it belongs to
+        an allocator it can arbitrarily relocate the data pointer, so don't
+        copy it to a raw pointer. Pointers managed this was are trivially
+        serializable 0x0. allocator means system memory */
+    i_memory_allocator* allocator = 0x0;
+    t_self* next = nullptr;
+    /** This is the primary manager for the underlying object and will propagate
+        changes correctly where required */
+    bool manager = false;
+    /** When true this will call the destructor of the managed resource when done */
+    bool scoped_resource = false;
+    /** If another pointer is copied to the current pointer it is considered
+        weakly shared, and is at the mercy any reallocaitons and destruction the
+        other pointer. If the pointer changed it will be reflected in weakly
+        shared pointers */
+    bool weakly_shared = false;
+    /** If a raw pointer absolutely needs access to a smart pointer, like
+        through sysaclls, it will have to be bound in-place, so it shouldn't realloc or
+        be destroyed for as long as possible, such pointers are marked as borrowed */
+    bool borrowed = false;
+
+    TYON_FORCEINLINE t_any&
+    operator *() { return (*data); }
+    TYON_FORCEINLINE t_any&
+    operator []( isize i ) { return data[i]; }
+
+    TYON_FORCEINLINE
+    CONSTRUCTOR pointer( std::nullptr_t rhs )
+    {
+        this->data = rhs;
+        this->next = nullptr;
+        this->allocator = 0x0;
+        this->weakly_shared = false;
+
+        propagate_data();
+    }
+
+    template <typename t_other>
+    TYON_FORCEINLINE t_self&
+    operator =( pointer<t_other>& rhs )
+    {
+        this->data = reinterpret_cast<t_any*>( rhs.data );
+        this->allocator = reinterpret_cast<t_any*>( allocator );
+        this->weakly_shared = true;
+        int share_cap = 100;
+
+        this->next = rhs.next;
+        rhs.next = this;
+        propagate_data();
+        return *this;
+    }
+
+    TYON_FORCEINLINE t_self&
+    operator =( t_any* rhs )
+    {
+        this->data = rhs;
+        this->next = nullptr;
+        this->allocator = 0x0;
+        this->weakly_shared = false;
+
+        propagate_data();
+        return *this;
+    }
+
+    CONVERSION operator t_any*()
+    { return data; };
+
+    /** Destroys scoped resources if necessary
+        If the pointer needs to be invalidated for any reason this should be
+        done manually before the smart pointer goes out of scope. With unscoped
+        resources weak pointers remain valid until the external memory manager
+        cleans it up */
+    DESTRUCTOR ~pointer()
+    {
+        if (scoped_resource) { delete data; data = nullptr; propagate_data(); }
+    }
+
+    void
+    FUNCTION propagate_data()
+    {
+        if (manager == false) { return; }
+        t_self* x_ptr = next;
+
+        int share_cap = 100;
+        for (int i=0; i<share_cap; ++i)
+        {
+            if (x_ptr == nullptr) { break; }
+            x_ptr = x_ptr->next;
+            x_ptr->data = this->data;
+            x_ptr->allocator = allocator;
+        }
+    }
+};
+
+template <typename T>
+struct search_result
+{
+    T* match = nullptr;
+    i64 index = -1;
+    bool match_found = false;
+};
+
+template <typename t_key, typename t_value>
+struct generic_search_result
+{
+    t_value* match = nullptr;
+    array<t_value*> matches = nullptr;
+    t_key key = {};
+    bool match_found = false;
+};
+
+template <typename T>
+struct array
+{
+    using t_self = array<T>;
+    pointer<T> data = nullptr;
+    isize size_ = 0;
+    isize head = 0;
+    isize head_size = 0;
+    bool bounded = true;
+    // Enforce RAII
+    bool autofree = true;
+    /** Only do operations on the active array portion, ie head to
+        tail. This makes memory management manual, DON'T use this if you
+        have no idea how you're managing memory.
+
+        TODO: Not implemented fully yet*/
+    bool active_range = true;
+
+    /** Default Constructor */
+    CONSTRUCTOR array() {}
+
+    CONSTRUCTOR array( std::initializer_list<T> arg )
+    {
+        this->change_allocation( arg.size() );
+        head_size = arg.size();
+        isize i = 0;
+        for (auto x : arg ) { data[i] = x; ++i; }
+        ERROR_GUARD( i <= this->size_,
+                     "Index overran initializer list, memory is likely corrupted" );
+    }
+
+    bool
+    change_allocation( i_memory_allocator* allocator, isize count )
+    {
+        data.allocator = allocator;
+        return change_allocation( count );
+    }
+
+    /** Reallocates data into new storage and default constructs objects
+
+        it uses the storage allocator, or 'g_allocator' if none is provided
+    */
+    bool
+    change_allocation( isize count )
+    {
+        i_memory_allocator* allocator = (data.allocator ? data.allocator : g_allocator);
+        T* new_storage = allocator->allocate_raw( count * sizeof(T), alignof(T) );
+        ERROR_GUARD( new_storage != nullptr, "Allocation failed" );
+        new(new_storage) T[count] {};
+        if (data)
+        {
+            for (i32 i=0; i < std::min( size_, count ); ++i )
+            {
+                new_storage[i] = std::move( data[i] );
+            }
+            allocator->deallocate( data );
+        }
+        if (new_storage)
+        {
+            data = new_storage;
+            size_ = count;
+            head = std::min( head, count );
+            head_size = std::min( head_size, count );
+        }
+        else
+        { return false; }
+        // ERROR_GUARD( size_ > 100'000'000'000 || size_ < 0, "Bogus data" );
+        // ERROR_GUARD( head_size > 100'000'000'000 || head_size < 0, "Bogus data" );
+        // ERROR_GUARD( head > 100'000'000'000 || head < 0, "Bogus data" );
+        return true;
+    }
+
+    bool
+    change_allocation_raw( isize count )
+    {
+        i_memory_allocator* allocator = (data.allocator ? data.allocator : g_allocator);
+        T* new_storage = allocator->allocate_raw( count * sizeof(T), alignof(T) );
+        ERROR_GUARD( new_storage != nullptr, "Allocation failed" );
+        if (data)
+        {
+            memory_copy( new_storage, data.data, std::min( size_, count ) );
+            allocator->deallocate( data );
+        }
+        if (new_storage)
+        {
+            data = new_storage;
+            size_ = count;
+            head = std::min( head, count );
+            head_size = std::min( head_size, count );
+        }
+        else
+        { return false; }
+        return true;
+    }
+
+    bool
+    FUNCTION allocate( i_memory_allocator* allocator, isize count )
+    {
+        // BROKEN
+        data = allocator->allocate_raw( count * sizeof(T) );
+        size_ = count;
+        head_size = std::min( head_size, count );
+        return (data != nullptr);
+    }
+
+    template<typename t_allocator>
+    bool
+    FUNCTION deallocate( t_allocator* allocator )
+    {
+        allocator->deallocate( data );
+        size_ = 0;
+        head_size = 0;
+        head = 0;
+
+        return true;
+    }
+
+    /// Pushes an new before the 'head' index and decrements the 'head'
+    bool
+    FUNCTION push_head( T item )
+    {
+        if (bounded && (head <= 0)) { return false; }
+        data[ --head ] = item;
+        ++head_size;
+        return true;
+    }
+
+    /// Pushes a new item at off the tail (head + head_size) and increments 'head_size'
+    T&
+    FUNCTION push_tail( T& item )
+    {
+        if (bounded && (head + head_size >= size_))
+        {
+            // Greedy, 2x allocation
+            bool resize_ok = change_allocation( std::max<isize>(size_, 1) * 2 );
+            ERROR_GUARD( resize_ok, "Serious error has occured if a resize failed" );
+        }
+        i64 index = head + (head_size++);
+        data[ index ] = item;
+        return data[ index ];
+    }
+
+    T&
+    FUNCTION push_tail( T&& item )
+    {
+        if (bounded && (head + head_size >= size_))
+        {
+            // Greedy, 2x allocation
+            bool resize_ok = change_allocation( std::max<isize>(size_, 1) * 2 );
+            ERROR_GUARD( resize_ok, "Serious error has occured if a resize failed" );
+        }
+        i64 index = head + (head_size++);
+        data[ index ] = item;
+        return data[ index ];
+    }
+
+    /// Pushes a new item at off the tail (head + head_size) and increments 'head_size'
+    bool
+    FUNCTION push_tail_unbounded( T item )
+    {
+        ERROR_GUARD(head + head_size < size_, "Tried to push outside of allocated capacity" );
+        if (bounded && (head + head_size >= size_))
+        { return false; }
+        data[ head + (head_size++) ] = item;
+        return true;
+    }
+
+    T
+    FUNCTION pop_head()
+    {
+        if (bounded && (head_size == 0)) { return false; }
+        T result = data[ head++ ];
+        --head_size;
+        return result;
+    }
+
+    T
+    FUNCTION pop_tail( T item )
+    {
+        if (bounded && (head_size == 0)) { return false; }
+        T result = data[ head + head_size - 1 ];
+        --head_size;
+        return result;
+    }
+
+    T&
+    FUNCTION tail()
+    { return data[ head+head_size -1 ]; }
+
+    T*
+    tail_address()
+    { return (data + head+head_size -1); }
+
+    T&
+    operator []( isize i )
+    {
+        ERROR_GUARD( (i >= 0) || (i < size_), "Tried to access index ouside of bounds" );
+        return data[std::clamp<i64>( i, 0, size_ )];
+    }
+
+    PROC address( isize i ) -> T*
+    {
+        ERROR_GUARD( (i >= 0) || (i < size_), "Tried to access index ouside of bounds" );
+        return data + std::clamp<i64>( i, 0, size_ );
+    }
+
+    t_self&
+    COPY_ASSIGNMENT operator =( t_self rhs )
+    {
+        this->change_allocation( rhs.size_ );
+        this->head_size = rhs.size_;
+        for (i64 i=0; i < rhs.head_size; ++i )
+        {
+            data[i] = rhs.data[i];
+        }
+        return *this;
+    }
+
+    /// Set memory of array to read only and employ data integrity checks
+    void
+    FUNCTION protect()
+    {
+        // Crash
+        TYON_BREAK();
+    }
+
+    /** Zero from 0 to 'head_size' memory and set head and tail to zero. */
+    void
+    reset()
+    {
+        // Default init old
+        new(data) T[head_size]{};
+        head_size = 0;
+    }
+
+    void
+    clear()
+    {
+        // Default init old
+        new(data) T[size_]{};
+    }
+
+    // std::vector compat
+    void
+    FUNCTION push_back( T& item )
+    {
+        push_tail( item );
+    }
+
+    void
+    FUNCTION push_back( T&& item )
+    {
+        push_tail( std::move( item ) );
+    }
+
+    PROC resize( usize count )
+    {
+        change_allocation( isize(count) );
+        head_size = count;
+    }
+
+    void
+    FUNCTION reserve( usize count )
+    {
+        change_allocation( isize(count) );
+    }
+
+    usize
+    FUNCTION size()
+    {
+        return head_size;
+    }
+
+    PROC back() -> T&
+    {
+        this->tail();
+    }
+    // -- End of std::vector compat
+
+    template <typename t_proc>
+    PROC map_procedure( t_proc&& arg ) -> void
+    {
+        for (i64 i=0; i < size(); ++i)
+        {   arg( data[i] );
+        }
+    }
+
+    // Search from 0 to 'size'
+    template <typename t_single_comparison>
+    search_result<T>
+    FUNCTION linear_search( t_single_comparison comparator )
+    {
+        search_result<T> result;
+        for (i64 i=0; i < size_; ++i)
+        {
+            if (comparator( data[i] ))
+            {
+                result.match = &(data[i]);
+                result.index = i;
+                result.match_found = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    // Search from 0 to 'size'
+    search_result<T>
+    FUNCTION linear_search_value( T comparison )
+    {
+        search_result<T> result;
+        for (i64 i=0; i < size_; ++i)
+        {
+            if (comparison ==data[i])
+            {
+                result.value = &(data[i]);
+                result.index = i;
+                result.match_found = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    // Search from head to tail
+    search_result<T>
+    FUNCTION linear_search_head( generic_procedure<bool(T&)> comparator )
+    {
+        search_result<T> result;
+        for (i64 i=head; i < head_size; ++i)
+        {
+            if (comparator( data[i] ))
+            {
+                result.value = &(data[i]);
+                result.index = i;
+                result.match_found = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    // Search from head to tail
+    search_result<T>
+    FUNCTION linear_search_head_value( T comparison )
+    {
+        search_result<T> result;
+        for (i64 i=head; i < head_size; ++i)
+        {
+            if (comparison == data[i])
+            {
+                result.value = &(data[i]);
+                result.index = i;
+                result.match_found = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    void
+    cleanup()
+    {
+        i64 start_i = (active_range ? head : 0);
+        i64 end_i = (active_range ? size_ : (head + head_size));
+        for (i64 i=start_i; i < end_i; ++i )
+        { this->data[i].~T(); }
+    }
+
+    DESTRUCTOR ~array()
+    {
+        if (this->autofree) { this->cleanup(); }
+    }
+
+    struct stl_iterator
+    {
+        using iterator_category = std::bidirectional_iterator_tag;
+        using difference_type   = i64;
+        using value_type        = T;
+        using pointer           = T*;  // or also value_type*
+        using reference         = T&;  // or also value_type&
+
+        array<value_type>* context = nullptr;
+        pointer data = nullptr;
+        i64 offset = 0;
+
+        reference operator *() { return *(data +offset); }
+        pointer operator->() { return (data +offset); }
+        stl_iterator& operator++() { ++offset; return *this; }
+        stl_iterator& operator++(int)
+        {
+            stl_iterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+        friend bool operator==( stl_iterator& rhs, stl_iterator& lhs )
+        { return rhs.data == lhs.data; }
+
+        /** True iterator if has no reached passed tail index. End iterators
+         * are invalid to dereference */
+        operator bool() { return (offset < context->head_size); }
+    };
+
+    stl_iterator begin() { return stl_iterator{ this, data.data, 0 }; }
+    stl_iterator end() { return stl_iterator{ this, data.data, head_size }; }
+};
+
+
 template <typename T>
 struct node_link
 {
@@ -242,5 +766,87 @@ struct linked_list
     }
 
 };
+
+template <typename T>
+struct dynamic_span
+{
+    T* data;
+    i64 size;
+};
+
+struct string
+{
+    i64 size = 0;
+    array< dynamic_span<char> > parts;
+
+    inline i64 parts_size()
+    { return parts.head_size; }
+
+    string&
+    append( fstring arg )
+    {
+        dynamic_span<char> message;
+        message.size = arg.size();
+        message.data = memory_allocate<char>( message.size + 1);
+        parts.push_tail( message );
+        memory_copy_raw( message.data, arg.data(), message.size );
+        size += message.size;
+
+        return *this;
+    }
+
+    string&
+    operator += ( fstring rhs )
+    {
+        this->append( rhs );
+        return *this;
+    }
+
+    operator fstring()
+    {
+        PROFILE_SCOPE_FUNCTION();
+        fstring result;
+        result.reserve( size );
+        dynamic_span<char> x_part;
+        for (i64 i=0; i < parts.head_size; ++i)
+        {
+            x_part = parts[i];
+            result.append( x_part.data, x_part.size );
+        }
+        return result;
+    }
+};
+
+template <typename T>
+struct ntree_node
+{
+    // uid id;
+    ntree_node* parent;
+    array< ntree_node<T>*> children;
+    T value;
+};
+
+template <typename T>
+struct n_tree
+{
+    using node = ntree_node<T>;
+    node* data;
+    isize size;
+    // The absolute parent of all, might be imaginary
+    node* root_node;
+    // Where this particular tree starts from, doesn't change anything, just convenience
+    node* start_node;
+    i32 max_depth;
+    i32 max_breadth;
+
+    DESTRUCTOR ~n_tree()
+    {
+        for (i32 i=0; i < this->size; ++i)
+        {
+            // this->data[i].children.deallocate();
+        }
+    }
+};
+
 
 }

@@ -89,12 +89,18 @@
  * The other 'tyon' files haven't been updated correctly to work this way so it's being left for now
  */
 
+/* NOTE: DO NOT TOUCH the order on these includes, their order is baked by
+   dependency resolution order. */
 #include "tachyon_code_helpers.h"
 #include "tachyon_reflection.h"
 #include "tachyon_library.h"
 #include "tachyon_containers.h"
+#include "tachyon_resources.h"
+#include "tachyon_internals.h"
+#include "tachyon_assets.h"
 #include "tachyon_allocators.h"
 
+/** SECTION: Platform Specific Includes. */
 #include "tachyon_platform_common.h"
 
 #if (REFLECTION_PLATFORM_LINUX)

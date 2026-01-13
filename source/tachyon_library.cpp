@@ -661,6 +661,17 @@ namespace tyon
 
     // -- Logging --
 
+    PROC logger_write_message(
+        logger* context,
+        fstring category,
+        fstring message,
+        e_log_entry type,
+        std::source_location call_point
+    ) -> void
+    {
+        context->write_message( category, message, type, call_point );
+    }
+
     void
     logger::write_error_simple( fstring message )
     {
