@@ -4,7 +4,6 @@
 
 namespace reflection
 {
-    using namespace tyon;
 
 #ifndef TYON_BUILD_GIT_HASH_STRING
     #warning "No git gash provided"
@@ -17,28 +16,28 @@ namespace reflection
 // GNUC means "GNU Cextensions" not "GCC"
 #if (__GNUC___ && !__clang__)
     #define REFLECTION_COMPILER_GCC 1
-    constexpr version gcc_version = { __GNUC__, __GNU_MINOR__, __GNU_PATCHLEVEL__};
-    constexpr cstring compiler_name = "gcc";
-    constexpr version compiler_version = gcc_version;
+    constexpr tyon::version gcc_version = { __GNUC__, __GNU_MINOR__, __GNU_PATCHLEVEL__};
+    constexpr tyon::cstring compiler_name = "gcc";
+    constexpr tyon::version compiler_version = gcc_version;
 #else
     #define REFLECTION_COMPILER_GCC 0
-    constexpr version gcc_version = {};
+    constexpr tyon::version gcc_version = {};
 #endif // GCC
 #if (__clang__)
     #define REFLECTION_COMPILER_CLANG 1
-    constexpr version clang_version = { __clang_major__, __clang_minor__, __clang_patchlevel__ };
-    constexpr fstring_view compiler_name = "clang";
-    constexpr version compiler_version = clang_version;
+    constexpr tyon::version clang_version = { __clang_major__, __clang_minor__, __clang_patchlevel__ };
+    constexpr tyon::fstring_view compiler_name = "clang";
+    constexpr tyon::version compiler_version = clang_version;
 #else
     #define REFLECTION_COMPILER_CLANG 0
-    constexpr version clang_version = {};
+    constexpr tyon::version clang_version = {};
 #endif // clang
 
 // nVIDIA CUDA SDK
 #if (__NVCC__)
     #define REFLECTION_COMPILER_CUDA 1
-    constexpr fstring_view compiler_name = "nvcc";
-    constexpr version compiler_version = {};
+    constexpr tyon::fstring_view compiler_name = "nvcc";
+    constexpr tyon::version compiler_version = {};
 #else
     #define REFLECTION_COMPILER_CUDA 0
 #endif // __NVCC__
@@ -48,22 +47,22 @@ namespace reflection
 
 // Quirk for Clang or CUDA running under MSVC
 #if (_MSC_FULL_VER && !REFLECTION_COMPILER_CLANG  && !REFLECTION_COMPILER_CUDA)
-    constexpr fstring_view compiler_name = "msvc";
-    constexpr version compiler_version = { _MSC_FULL_VER, 0, 0 };;
+    constexpr tyon::fstring_view compiler_name = "msvc";
+    constexpr tyon::version compiler_version = { _MSC_FULL_VER, 0, 0 };;
 #endif
 // Safe, fine under hybrid build environments
 #if (_MSC_FULL_VER && !REFLECTION_COMPILER_CLANG)
     #define REFLECTION_COMPILER_MSVC 1
-    constexpr version msvc_version = { _MSC_FULL_VER, 0, 0 };
+    constexpr tyon::version msvc_version = { _MSC_FULL_VER, 0, 0 };
 #else
 #define REFLECTION_COMPILER_MSVC 0
-    constexpr version msvc_version = {};
+    constexpr tyon::version msvc_version = {};
 #endif // MSVC
 
 #if (__MINGW32__)
     #define REFLECTION_COMPILER_MINGW 1
-    constexpr fstring_view compiler_name = "mingw";
-    constexpr version compiler_version = {};
+    constexpr tyon::fstring_view compiler_name = "mingw";
+    constexpr tyon::version compiler_version = {};
     #else
 #define REFLECTION_COMPILER_MINGW 0
 #endif // mingw
@@ -74,21 +73,21 @@ namespace reflection
 
 #if defined(__gnu_linux__) || defined(__linux__)
     #define REFLECTION_PLATFORM_LINUX 1
-    constexpr fstring_view build_os_name = "linux";
+    constexpr tyon::fstring_view build_os_name = "linux";
 #else
     #define REFLECTION_PLATFORM_LINUX 0
 #endif // linux
 
 #if defined(_WIN32)
     #define REFLECTION_PLATFORM_WINDOWS 1
-    constexpr fstring_view build_os_name = "windows";
+    constexpr tyon::fstring_view build_os_name = "windows";
 #else
     #define REFLECTION_PLATFORM_WINDOWS 0
 #endif // win32
 
 #if defined(__APPLE__) && defined(__MACH__)
     #define REFLECTION_PLATFORM_MAC 1
-    constexpr fstring_view build_os_name = "mac_os";
+    constexpr tyon::fstring_view build_os_name = "mac_os";
 #else
     #define REFLECTION_PLATFORM_MAC 0
 #endif // Apple/Mac
@@ -106,7 +105,7 @@ namespace reflection
 
     constexpr tyon::fstring_view build_git_hash_string = TYON_BUILD_GIT_HASH_STRING;
     // TODO: Fill in hex part
-    constexpr version build_version = { 0, 1, 0  };
+    constexpr tyon::version build_version = { 0, 1, 0  };
 }
 
 // TYON_BREAK should be valid in release builds

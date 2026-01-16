@@ -70,6 +70,9 @@
 #define INTERNAL static
 #define GLOBAL static
 
+namespace tyon
+{
+
 // -- Redirectable typedefs --
 using fint8   = int8_t;
 using fint16  = int16_t;
@@ -107,8 +110,6 @@ using fbyte = u8;
 using usize = u64;
 using isize = i64;
 
-namespace tyon
-{
 // String types
 using fstring = std::basic_string<char>;
 using fstring_view = std::basic_string_view<char>;
@@ -122,7 +123,7 @@ struct version
     u32 patch = 0;
     u8 vcs_hash[40] = {};
 };
-}
+
 // TYON_BREAK should be valid in release builds
 #define TYON_SIGTRAP 5
 
@@ -155,5 +156,6 @@ struct version
 /// Use this macro or std::invoke
 #define INVOKE_MEMBER(object, function, ...) ((object).*(function))(__VA_ARGS__)
 
+}
 // -- End of Code Helpers
 // *************************

@@ -1292,7 +1292,7 @@ namespace tyon
     template <typename t_proc = procedure<>>
     struct delegate
     {
-        vector<t_proc> procedures;
+        std::vector<t_proc> procedures;
 
         void
         register_procedure( t_proc proc )
@@ -1356,6 +1356,8 @@ namespace tyon
     struct u2048 { u64 d[32]; };
     struct u4096 { u64 d[64]; };
 
+    namespace literals
+    {
     /** Literal that provides a number with a single zero-indexed bit position set as 1 */
     constexpr u32
     operator ""_bit( literal_integer arg )
@@ -1403,6 +1405,11 @@ namespace tyon
     inline i64
     operator ""_TB( literal_integer arg )
     { return arg * std::pow( 10, 12 ); }
+
+    }
+
+    // NOTE: Include literals in this namespace only
+    using namespace literals;
 
     struct uid
     {
@@ -1670,6 +1677,7 @@ struct fmt::formatter< tyon::uid > : formatter<string_view>
 {
     auto format( tyon::uid arg, format_context& context ) const -> format_context::iterator
     {
+        using namespace tyon;
         // TYON_BREAK();
         tyon::uid tmp = arg;
         i64 a = (u64)(tmp.uuid.d[0]);
