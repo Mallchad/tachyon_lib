@@ -121,6 +121,8 @@ namespace tyon
     fresult
     file_open( file* arg );
 
+    PROC file_set_working_directory( fstring arg ) -> void;
+
     u128
     uuid_generate();
 
@@ -128,4 +130,5 @@ namespace tyon
     system_info_fetch();
 
     PROC file_home_directory() -> fstring;
+
 }
