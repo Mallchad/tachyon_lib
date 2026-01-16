@@ -8,12 +8,12 @@ template <typename t_any>
 struct pointer final
 {
     using t_self = pointer<t_any>;
-    t_any* data = 0x0;
+    t_any* data = nullptr;
     /** This denotes the allocator the memory belongs to. If it belongs to
         an allocator it can arbitrarily relocate the data pointer, so don't
         copy it to a raw pointer. Pointers managed this was are trivially
         serializable 0x0. allocator means system memory */
-    i_memory_allocator* allocator = 0x0;
+    i_memory_allocator* allocator = nullptr;
     t_self* next = nullptr;
     /** This is the primary manager for the underlying object and will propagate
         changes correctly where required */
@@ -40,7 +40,7 @@ struct pointer final
     {
         this->data = rhs;
         this->next = nullptr;
-        this->allocator = 0x0;
+        this->allocator = nullptr;
         this->weakly_shared = false;
 
         propagate_data();
@@ -66,7 +66,7 @@ struct pointer final
     {
         this->data = rhs;
         this->next = nullptr;
-        this->allocator = 0x0;
+        this->allocator = nullptr;
         this->weakly_shared = false;
 
         propagate_data();

@@ -1680,7 +1680,6 @@ struct fmt::formatter< tyon::uid > : formatter<string_view>
         using namespace tyon;
         // TYON_BREAK();
         tyon::uid tmp = arg;
-        i64 a = (u64)(tmp.uuid.d[0]);
         tyon::raw_pointer data = &arg.uuid;
         char hexbytes[] = "0123456789abcdefZZZZZZ";
         char formatted[40] {};
