@@ -31,6 +31,12 @@ namespace tyon
     file_write_binary( file* arg )
     { return file_write_binary_stdlib( arg ); }
 
+    PROC file_home_directory() -> fstring
+    {
+        TYON_ERROR( "File home directory not implimented on Windows yet" );
+        return "";
+    }
+
     u128
     uuid_generate()
     {
