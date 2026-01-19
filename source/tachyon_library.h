@@ -793,11 +793,16 @@ namespace tyon
     {
         using t_signature = t_return( t_args... );
         using t_function =  t_return( t_args... );
-        using t_function_ptr = t_function*;
+        using t_function_ptr = t_return(*)( t_args... );
+        // using t_function_ptr = t_function*;
         using t_self = typed_procedure<t_function>;
 
         t_function* data= nullptr;
         bool enabled = false;
+
+        COPY_CONSTRUCTOR typed_procedure( t_function_ptr rhs )
+        {   data = rhs;
+        }
 
         t_self&
         COPY_ASSIGNMENT operator= ( t_function_ptr rhs )
@@ -865,6 +870,10 @@ namespace tyon
         operator () ( t_args... args )
         { invoke( std::forward<t_args>(args)... ); }
     };
+
+    /** Magic type deduction guide for auto-determining type from constructor/copy expression */
+    template <typename t_return, typename... t_args>
+    typed_procedure( t_return(*foo)( t_args... ) ) -> typed_procedure<t_return(t_args...)>;
 
     template<typename t_signature>
     struct generic_procedure;
