@@ -801,7 +801,7 @@ namespace tyon
         bool enabled = false;
 
         COPY_CONSTRUCTOR typed_procedure( t_function_ptr rhs )
-        {   data = rhs;
+        {   assign(rhs);
         }
 
         t_self&
