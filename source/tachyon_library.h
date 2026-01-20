@@ -529,6 +529,9 @@ namespace tyon
         return std::memcmp( &a, &b, sizeof(T) );
     }
 
+    bool
+    FUNCTION memory_same_raw( void* a, void* b, i64 bytes );
+
     template <typename T>
     bool
     FUNCTION memory_same( T& a, T& b )

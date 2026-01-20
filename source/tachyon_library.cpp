@@ -58,6 +58,12 @@ namespace tyon
         memcpy( dest, src, bytes );
     }
 
+	bool
+    FUNCTION memory_same_raw( void* a, void* b, i64 bytes )
+    {
+        return std::memcmp( a, b, bytes ) == 0;
+    }
+
     void
     memory_poison( void* address, isize size )
     {
