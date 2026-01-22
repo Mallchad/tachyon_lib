@@ -785,8 +785,13 @@ namespace tyon
         g_switch_logger = &arg->switch_logger;
 
         // Canonicalize and log filename so its static and never changes with working directory
-        fstring absolute_logfile = fs::canonical( arg->default_logger.log_filename ).string();
-        arg->default_logger.log_filename = absolute_logfile;
+        // NOTE: Throws error when file doesn't exist yet so we use directories instead
+        fstring parent_logfile = "../" + arg->default_logger.log_filename;
+        FILE* tmp_file = fopen( parent_logfile.c_str(), "w" );
+        if (tmp_file)
+        {   fclose( tmp_file );
+        }
+        fstring absolute_logfile = fs::canonical( parent_logfile ).string();
         TYON_LOGF( "Default log file Path '{}' \n", absolute_logfile );
 
         // Using logging, needs to run after logging setup
