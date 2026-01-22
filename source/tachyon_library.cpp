@@ -786,13 +786,12 @@ namespace tyon
 
         // Canonicalize and log filename so its static and never changes with working directory
         // NOTE: Throws error when file doesn't exist yet so we use directories instead
-        fstring parent_logfile = "../" + arg->default_logger.log_filename;
-        FILE* tmp_file = fopen( parent_logfile.c_str(), "w" );
+        FILE* tmp_file = fopen( arg->default_logger.log_filename.c_str(), "w" );
         if (tmp_file)
         {   fclose( tmp_file );
+            fstring absolute_logfile = fs::canonical( arg->default_logger.log_filename ).string();
+            TYON_LOGF( "Default log file Path '{}' \n", absolute_logfile );
         }
-        fstring absolute_logfile = fs::canonical( parent_logfile ).string();
-        TYON_LOGF( "Default log file Path '{}' \n", absolute_logfile );
 
         // Using logging, needs to run after logging setup
         g_little_endian = test_little_endian();
