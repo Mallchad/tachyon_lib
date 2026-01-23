@@ -43,6 +43,11 @@ namespace tyon
             O_CREAT - create file if it doesn't exist already
             0664 - provide octal rw-rw---- permissions. read/write for group and owner*/
         i32 fd = open( filename.c_str(), O_CREAT | O_RDWR | O_DIRECT | O_DSYNC, 0664 );
+        if (fd == -1)
+        {   TYON_ERRORF( "Failde to open file for writing '{}'", arg->filename.string() );
+            return false;
+        }
+
         u32 prot_flags = (PROT_READ | PROT_WRITE);
         // MAP_SHARED is mandatory for file writes.
         u32 map_flags = (MAP_SHARED | MAP_POPULATE);
@@ -52,15 +57,25 @@ namespace tyon
             PROFILE_SCOPE( "File Map All" );
             // Can't get effective error vlaues from ftruncate for some reason
             i32 resize_ok = ftruncate( fd, arg->memory.size );
-            ERROR_GUARD( resize_ok >= 0, "mmap will get crashy if this fails somehow" );
+            if (resize_ok != 0)
+            {   TYON_ERRORF( "Failed to resize file when trying to write file data '{}'",
+                            arg->filename.string() );
+                close( fd );
+                return false;
+            }
             void *address = mmap( nullptr, map_size, prot_flags, map_flags, fd, 0x0 );
+            if (address != reinterpret_cast<void*>(-1))
             {
                 PROFILE_SCOPE( "File Map Copy" );
-                ERROR_GUARD(reinterpret_cast<void*>(-1), "generic mmap failiure" );
                 memory_copy_raw( address, arg->memory.data, arg->memory.size );
                 munmap( address, map_size );
-                close( fd );
             }
+            else 
+            {   TYON_ERRORF( "Failed to map file for reading '{}'", arg->filename.string() );
+                close( fd );
+                return false;
+            }
+            close( fd );
         }
         TYON_LOGF( "Write file '{}' occupying {} logical bytes", arg->filename, arg->memory.size );
         return true;
