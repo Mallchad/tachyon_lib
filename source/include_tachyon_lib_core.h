@@ -79,7 +79,9 @@
 #include "../external/fmt/include/fmt/color.h"
 #include "../external/fmt/include/fmt/std.h"
 
+#ifdef TRACY_ENABLE
 #include "Tracy.hpp"
+#endif // TRACY_ENABLE
 
 /** -- Project Local --
  * We put all defines here in a namespace not to stop namespace resolution,
