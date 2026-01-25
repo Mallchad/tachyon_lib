@@ -859,26 +859,16 @@ namespace tyon
         bool quote_arg = false;
         bool speech_arg = false;
         bool string_arg = false;
-        bool empty_string_arg = false;
+        bool empty_string_arg = (arg.size() == 0);
         bool assignment_flag = false;
 
         if (arg.size() >= 2)
         {
             double_dash_flag = (arg[0] == '-' && arg[1] == '-');
             //NOTE: Don't try to look for speech marks in a string, the commandline remoevs them.
-            empty_string_arg = (string_arg && arg.size() == 2);
             assignment_flag = (arg.back() == ':' || arg.back() == '=');
-            string_arg = (assignment_flag == false);
         }
         result.requires_value = assignment_flag;
-        if (string_arg)
-        {   normalized = (empty_string_arg ? ""  :
-                          arg.substr( 1, arg.size() - 1 ));
-            result.name = normalized;
-            result.value = normalized;
-            result.is_value = true;
-            return result;
-        }
 
         i32 offset = 0;
         if (double_dash_flag)
@@ -905,8 +895,12 @@ namespace tyon
             {   float_flag = true;
             }
         }
-        result.name = normalized;
-        if (numeric_flag)
+        if (double_dash_flag)
+        {
+            result.name = normalized;
+            return result;
+        }
+        else if (numeric_flag)
         {
             result.is_value = true;
             if (float_flag)
@@ -917,6 +911,13 @@ namespace tyon
             {   result.value.integer_ = string_to_i64( normalized ).value;
                 result.value.type = e_primitive::integer_;
             }
+        }
+        else // String Value
+        {   normalized = (empty_string_arg ? ""  :
+                          arg.substr( 1, arg.size() - 1 ));
+            result.value = normalized;
+            result.is_value = true;
+            return result;
         }
 
         return result;
@@ -949,7 +950,8 @@ namespace tyon
                                 x_next.original, x_argument.original );
                     continue;
                 }
-                TYON_LOGF( "    '{}' | Value Argument", x_next.original );
+                TYON_LOGF( "    '{}' | Value Argument Type {}",
+                           x_next.original, string_cast( x_next.value.type ) );
                 x_argument.original_value = x_next.original;
                 x_argument.value = x_next.value;
                 ++i; // Skip one iteration
@@ -973,6 +975,22 @@ namespace tyon
              "Platform tested for endianess, came back as big endian")
             );
         return little_endian;
+    }
+
+    PROC string_cast( e_primitive arg ) -> fstring
+    {
+        switch (arg)
+        {
+            case e_primitive::none:       return "e_primitive::none";
+            case e_primitive::any:        return "e_primitive::any";
+            case e_primitive::integer_:   return "e_primitive::integer_";
+            case e_primitive::float_:     return "e_primitive::float_";
+            case e_primitive::boolean_:   return "e_primitive::boolean_";
+            case e_primitive::character_: return "e_primitive::character_";
+            case e_primitive::byte_:      return "e_primitive::byte_";
+            case e_primitive::pointer_:   return "e_primitive::pointer_";
+            case e_primitive::string_:    return "e_primitive::string_";
+        }
     }
 
     CONSTRUCTOR dynamic_primitive::dynamic_primitive()

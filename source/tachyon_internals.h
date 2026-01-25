@@ -89,6 +89,8 @@ struct logger
         string_    = 8
     };
 
+    PROC string_cast( e_primitive arg ) -> fstring;
+
     struct dynamic_primitive
     {   union
         {   i64 integer_;
