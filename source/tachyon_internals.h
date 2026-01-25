@@ -76,6 +76,61 @@ struct logger
     ) -> void;
 };
 
+    enum class e_primitive : u8
+    {
+        none       = 0,
+        any        = 1,
+        integer_   = 2,
+        float_     = 3,
+        boolean_   = 4,
+        character_ = 5,
+        byte_      = 6,
+        pointer_   = 7,
+        string_    = 8
+    };
+
+    struct dynamic_primitive
+    {   union
+        {   i64 integer_;
+            f64 float_;
+            bool boolean_;
+            char character_;
+            byte byte_;
+            raw_pointer pointer_;
+            fstring string_;
+        };
+        e_primitive type;
+
+        CONSTRUCTOR dynamic_primitive();
+
+        CONSTRUCTOR dynamic_primitive( const dynamic_primitive& arg );
+
+        PROC operator= ( const dynamic_primitive& rhs ) -> dynamic_primitive&;
+
+        PROC operator= ( const fstring& rhs ) -> dynamic_primitive&;
+
+        PROC operator= ( int rhs ) -> dynamic_primitive&;
+
+        PROC clean_old() -> void;
+
+        DESTRUCTOR ~dynamic_primitive();
+
+    };
+
+    struct cmdline_argument
+    {
+        fstring original;
+        fstring original_value;
+        fstring name;
+        dynamic_primitive value;
+        bool requires_value = false;
+        bool is_value = false;
+    };
+
+    PROC string_to_i64( fstring arg ) -> monad<i64>;
+    PROC string_to_f64( fstring arg ) -> monad<f64>;
+    PROC string_cmdline_parse( fstring arg ) -> cmdline_argument;
+
     // Needs to be the very last thing because it contains everything
     struct library_context
     {
@@ -90,9 +145,12 @@ struct logger
         logger switch_logger;
         raw_pointer null_read;
         raw_pointer null_write;
+        array<cmdline_argument> cmdline_arguments;
     };
 
     void
     library_context_init( library_context* arg );
+
+    PROC library_process_cmdline_args( int argc, char** argv ) -> void;
 
 }

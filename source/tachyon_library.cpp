@@ -777,6 +777,7 @@ namespace tyon
                 " been initialized but 'library_context_init' was called again" );
             TYON_BREAK();
         }
+        g_library = arg;
         g_program_epoch = time_now();
         g_allocator = &arg->global_allocator;
         g_allocator_lock = &arg->global_allocator_lock;
@@ -810,6 +811,153 @@ namespace tyon
         arg->initialized = true;
     }
 
+    PROC string_to_i64( fstring arg ) -> monad<i64>
+    {
+        monad<i64> result;
+        try
+        {   result.value = std::stoll( arg );
+        }
+        catch (std::invalid_argument& e)
+        {   TYON_ERROR( "std::invalid_argument, no conversion could be performed", e.what() );
+            result.error = true;
+        }  catch (std::out_of_range& e)
+        {   TYON_ERROR( "std::out_of_range, value exceeds range of container", e.what() );
+            result.error = true;
+        }
+        return result;
+    }
+
+    PROC string_to_f64( fstring arg ) -> monad<f64>
+    {
+        monad<f64> result;
+        try
+        {   result.value = std::stod( arg );
+        }
+        catch (std::invalid_argument& e)
+        {   TYON_ERROR( "std::invalid_argument, no conversion could be performed", e.what() );
+            result.error = true;
+        }  catch (std::out_of_range& e)
+        {   TYON_ERROR( "std::out_of_range, value exceeds range of container", e.what() );
+            result.error = true;
+        }
+        return result;
+    }
+
+    PROC string_cmdline_parse( fstring arg ) -> cmdline_argument
+    {
+        cmdline_argument result;
+        result.original = arg;
+        fstring normalized;
+        normalized.reserve( arg.size() );
+
+        if (arg.empty())
+        {   TYON_ERROR( "Empty string passed" );
+            return result;
+        }
+
+        bool double_dash_flag = false;
+        bool quote_arg = false;
+        bool speech_arg = false;
+        bool string_arg = false;
+        bool empty_string_arg = false;
+        bool assignment_flag = false;
+
+        if (arg.size() >= 2)
+        {
+            double_dash_flag = (arg[0] == '-' && arg[1] == '-');
+            //NOTE: Don't try to look for speech marks in a string, the commandline remoevs them.
+            empty_string_arg = (string_arg && arg.size() == 2);
+            assignment_flag = (arg.back() == ':' || arg.back() == '=');
+            string_arg = (assignment_flag == false);
+        }
+        result.requires_value = assignment_flag;
+        if (string_arg)
+        {   normalized = (empty_string_arg ? ""  :
+                          arg.substr( 1, arg.size() - 1 ));
+            result.name = normalized;
+            result.value = normalized;
+            result.is_value = true;
+            return result;
+        }
+
+        i32 offset = 0;
+        if (double_dash_flag)
+        {   offset = 2;
+        }
+
+        bool numeric_flag = true;
+        bool float_flag = false;
+        char x_char = 0;
+        normalized.resize( arg.size() - offset );
+        for (i32 i=0; i < arg.size() - offset; ++i)
+        {
+            x_char = arg[ offset + i ];
+            x_char = std::tolower( x_char );
+            normalized[i] = x_char;
+
+            bool float_char = (x_char == 'e' || x_char == 'E');
+            bool sign_char = (x_char == '-' || x_char == '+');
+            bool numeric_char = (std::isdigit( x_char ) || sign_char || float_char);
+            if (numeric_char == false)
+            {   numeric_flag = false;
+            }
+            if (float_char)
+            {   float_flag = true;
+            }
+        }
+        result.name = normalized;
+        if (numeric_flag)
+        {
+            result.is_value = true;
+            if (float_flag)
+            {   result.value.float_ = string_to_f64( normalized ).value;
+                result.value.type = e_primitive::float_;
+            }
+            else
+            {   result.value.integer_ = string_to_i64( normalized ).value;
+                result.value.type = e_primitive::integer_;
+            }
+        }
+
+        return result;
+    }
+
+    PROC library_process_cmdline_args( int argc, char** argv ) -> void
+    {
+        i32 arg_limit = 100;
+        if (argc > arg_limit)
+        {   TYON_ERROR( "More cmdline options provided than allowed" );
+        }
+        else
+        {   arg_limit = argc;
+        }
+
+        fstring x_arg;
+        x_arg.reserve( 100 );
+        TYON_LOG( "Processing command line arguments" );
+        for (i32 i=0; i < arg_limit; ++i)
+        {
+            x_arg = argv[i];
+            cmdline_argument x_argument = string_cmdline_parse( x_arg );
+            TYON_LOGF( "    '{}'", x_argument.original );
+            bool next_in_range = (1+ i < arg_limit);
+            if (x_argument.requires_value && next_in_range)
+            {   cmdline_argument x_next = string_cmdline_parse( argv[1+ i] );
+
+                if (x_argument.requires_value && x_next.is_value == false)
+                {   TYON_ERRORF( "Expected arugment '{}' to be a value following '{}'",
+                                x_next.original, x_argument.original );
+                    continue;
+                }
+                TYON_LOGF( "    '{}' | Value Argument", x_next.original );
+                x_argument.original_value = x_next.original;
+                x_argument.value = x_next.value;
+                ++i; // Skip one iteration
+            }
+            g_library->cmdline_arguments.push_tail( x_argument );
+        }
+    }
+
     // -- Platform Library --
 
     fresult
@@ -827,6 +975,55 @@ namespace tyon
         return little_endian;
     }
 
+    CONSTRUCTOR dynamic_primitive::dynamic_primitive()
+    {   memory_zero_raw( this, sizeof(dynamic_primitive));
+    }
+
+    CONSTRUCTOR dynamic_primitive::dynamic_primitive( const dynamic_primitive& arg )
+    {
+        memory_zero_raw( this, sizeof(dynamic_primitive));
+        memory_copy<const dynamic_primitive>( this, &arg, 1 );
+    }
+
+    PROC dynamic_primitive::operator= ( const dynamic_primitive& rhs ) -> dynamic_primitive&
+    {
+        clean_old();
+
+        if (rhs.type == e_primitive::string_)
+        {   new(&string_) fstring { rhs.string_ },
+            type = e_primitive::string_;
+        }
+        else
+        {   memory_copy<const dynamic_primitive>( this, &rhs, 1 );
+        }
+        return *this;
+    }
+
+    PROC dynamic_primitive::operator= ( const fstring& rhs ) -> dynamic_primitive&
+    {
+        if (type == e_primitive::string_)
+        {   string_ = rhs;
+        }
+        else
+        {   clean_old();
+            new(&string_) fstring { rhs },
+            type = e_primitive::string_;
+        }
+        return *this;
+    }
+
+    DESTRUCTOR dynamic_primitive::~dynamic_primitive()
+    {
+        clean_old();
+    }
+
+    PROC dynamic_primitive::clean_old() -> void
+    {
+        if (type == e_primitive::string_)
+        {   string_.~fstring();
+        }
+        memory_zero( this, 1 );
+    }
 
 }
 
@@ -867,5 +1064,6 @@ namespace tyon
 //     // g_taint_allocator_lock.unlock();
 //     free( ptr );
 // }
+
 
 #endif // REFLECTION_ADDRESS_SANITIZER
