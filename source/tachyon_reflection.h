@@ -13,12 +13,22 @@ namespace reflection
     #define TYON_BUILD_GIT_HASH_STRING "unknown"
 #endif // TYON_BUILD_GIT_HASH_STRING
 
+#if (__MINGW32__)
+    #define REFLECTION_COMPILER_MINGW 1
+    constexpr tyon::fstring_view compiler_name = "mingw_gcc";
+    constexpr tyon::version compiler_version = {};
+#else
+    #define REFLECTION_COMPILER_MINGW 0
+#endif // mingw
+
 // GNUC means "GNU Cextensions" not "GCC"
 #if (__GNUC__ && !__clang__)
     #define REFLECTION_COMPILER_GCC 1
     constexpr tyon::version gcc_version = { __GNUC__, __GNU_MINOR__, __GNU_PATCHLEVEL__};
-    constexpr tyon::cstring compiler_name = "gcc";
-    constexpr tyon::version compiler_version = gcc_version;
+    #if (!REFLECTION_COMPILER_MINGW)
+        constexpr tyon::cstring compiler_name = "gcc";
+        constexpr tyon::version compiler_version = gcc_version;
+    #endif
 #else
     #define REFLECTION_COMPILER_GCC 0
     constexpr tyon::version gcc_version = {};
@@ -58,14 +68,6 @@ namespace reflection
 #define REFLECTION_COMPILER_MSVC 0
     constexpr tyon::version msvc_version = {};
 #endif // MSVC
-
-#if (__MINGW32__)
-    #define REFLECTION_COMPILER_MINGW 1
-    constexpr tyon::fstring_view compiler_name = "mingw";
-    constexpr tyon::version compiler_version = {};
-    #else
-#define REFLECTION_COMPILER_MINGW 0
-#endif // mingw
 
 #if (!REFLECTION_COMPILER_GCC && !REFLECTION_COMPILER_CLANG && !REFLECTION_COMPILER_MSVC && !REFLECTION_COMPILER_MINGW && !REFLECTION_COMPILER_CUDA)
     # error "Platform Compiler not supported or detected incorrectly"
