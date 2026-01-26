@@ -4,7 +4,7 @@ using namespace tyon;
 // extern vector<typed_procedure<void()>> g_tests_list;
 
 void
-linked_list()
+test_linked_list()
 {
     linked_list<i32> push;
     push.push_tail( 1 );
@@ -35,3 +35,5 @@ linked_list()
     }
 
 }
+
+namespace { auto _ = g_tests_list.push_tail( tyon::typed_procedure<void()>{test_linked_list}); }

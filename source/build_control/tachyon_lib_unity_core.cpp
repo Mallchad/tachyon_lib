@@ -7,3 +7,4 @@
 #include "../tachyon_platform_windows.cpp"
 #include "../tachyon_containers.cpp"
 #include "../tachyon_allocators.cpp"
+#include "../../external/fmt/src/format.cc"

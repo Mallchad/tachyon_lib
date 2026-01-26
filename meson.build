@@ -6,8 +6,8 @@ project(
 
 cmake = import( 'cmake' )
 
-include_dirs = include_directories( 'source' )
-libraries = []
+include_dirs = include_directories( 'source', 'external/fmt/include' )
+libraries = [  ]
 
 if host_machine.system() == 'linux'
   message( 'Platform: Linux' )
@@ -17,6 +17,7 @@ endif
 executable(
   'tachyon_lib_tests_core',
   'source/tests/tachyon_lib_tests_core.cpp',
+  # 'external/fmt/src/format.cc',
   include_directories : include_dirs,
   dependencies: libraries
 
@@ -26,6 +27,7 @@ executable(
 executable(
   'tachyon_lib_tests_linked_list',
   'source/tests/tachyon_lib_tests_core.cpp',
+  # 'external/fmt/src/format.cc',
   include_directories : include_dirs,
   dependencies: libraries
 )
