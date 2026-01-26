@@ -188,6 +188,7 @@ namespace tyon
             }
         }
 
+#if (!REFLECTION_COMPILER_MINGW)
         struct cpuid_return
         {
             i32 a;
@@ -243,6 +244,7 @@ namespace tyon
         }
         brand_string[63] = 0;
         cpu.name = brand_string;
+#endif REFLECTION_COMPILER_MINGW
 
         if (cpu.package_count > 1)
         {
