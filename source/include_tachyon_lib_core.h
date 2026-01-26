@@ -68,11 +68,14 @@
  */
 // fmtlib
 // Causing exceptions on formatting code is just bad. don't do it.
+#define FMT_USE_EXCEPTIONS 0
+
+// Slow to compile?
 #define FMT_HEADER_ONLY 1
+
 // #define FMT_USE_CONSTEXPR 1
 // #define FMT_USE_CONSTEVAL 0
 // #define FMT_ENFORCE_COMPILE_STRING 1
-#define FMT_USE_EXCEPTIONS 0
 // #define FMT_DISABLE_CONSTEVAL 1
 
 #include "../external/fmt/include/fmt/format.h"
