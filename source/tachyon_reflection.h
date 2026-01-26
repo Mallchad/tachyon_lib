@@ -24,8 +24,11 @@ namespace reflection
 // GNUC means "GNU Cextensions" not "GCC"
 #if (__GNUC__ && !__clang__)
     #define REFLECTION_COMPILER_GCC 1
-    constexpr tyon::version gcc_version = { __GNUC__, __GNU_MINOR__, __GNU_PATCHLEVEL__};
-    #if (!REFLECTION_COMPILER_MINGW)
+    #if (REFLECTION_COMPILER_MINGW)
+    // MinGW gcc doesn't support extra version granularity
+        constexpr tyon::version gcc_version = { __GNUC__ };
+    #else
+        constexpr tyon::version gcc_version = { __GNUC__, __GNU_MINOR__, __GNU_PATCHLEVEL__};
         constexpr tyon::cstring compiler_name = "gcc";
         constexpr tyon::version compiler_version = gcc_version;
     #endif
