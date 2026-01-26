@@ -242,6 +242,11 @@ namespace tyon
         inline bool
         operator == ( std::nullptr_t rhs )
         { return data == nullptr; }
+
+        /* Allow comparison to nullptr like 'void*' */
+        inline bool
+        operator != ( std::nullptr_t rhs )
+        { return data != nullptr; }
     };
 
     // -- Math Constants --
