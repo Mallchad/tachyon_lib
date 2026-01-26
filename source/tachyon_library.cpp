@@ -678,7 +678,7 @@ namespace tyon
         fstring category,
         fstring message,
         e_log_entry type,
-        std::source_location call_point
+        tyon::source_location call_point
     ) -> void
     {
         context->write_message( category, message, type, call_point );
@@ -707,7 +707,7 @@ namespace tyon
         fstring category,
         fstring message,
         e_log_entry type,
-        std::source_location call_point
+        tyon::source_location call_point
     ) -> void
     {
         PROFILE_SCOPE_FUNCTION();

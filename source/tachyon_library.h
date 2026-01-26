@@ -64,22 +64,42 @@ namespace tyon
     FORWARD struct string;
     FORWARD struct library_context;
 
+    struct source_location
+    {
+        i64 line_n = 0;
+        i64 column_n = 0;
+        cstring filename;
+        cstring function_signature;
+
+        constexpr PROC line() -> i64 { return line_n; }
+        constexpr PROC column() -> i64 { return column_n; }
+        constexpr PROC file_name() -> cstring { return filename; }
+        constexpr PROC function_name() -> cstring { return function_signature; }
+    };
+
+#ifdef __GNUC__
+    #define TYON_SOURCE_LOCATION() ::tyon::source_location { __LINE__, 0, __FILE__, __PRETTY_FUNCTION__ }
+#else
+    #define TYON_SOURCE_LOCATION() ::tyon::source_location { __LINE__, 0, __FILE__, __func__ }
+#endif // __GNUC__
+
+
     template<typename... t_formattable> void
     FORWARD FUNCTION log(
         cstring category,
-        std::source_location = std::source_location::current(),
+        tyon::source_location = TYON_SOURCE_LOCATION(),
         t_formattable&&... messages );
 
     template<typename... t_formattable> void
-    FORWARD FUNCTION log_error( cstring category, std::source_location location,
+    FORWARD FUNCTION log_error( cstring category, tyon::source_location location,
                                 t_formattable... messages );
     template <typename... t_formattable> void
     FORWARD FUNCTION log_error_format( cstring category, const fmt::format_string<t_formattable...> format,
-        std::source_location location, t_formattable&&... data );
+        tyon::source_location location, t_formattable&&... data );
 
     // template <typename... t_formattable> void
     // FORWARD log_error_format( tyon::fstring category, fmt::format_string<t_formattable...> format,
-                              // std::source_location call_point, t_formattable&&... vargs );
+                              // tyon::source_location call_point, t_formattable&&... vargs );
 
     // -- Globals Variables --
     // make sure to initialize Pointer Types before using
@@ -249,13 +269,13 @@ namespace tyon
     // with a predefined category.
 
     #define TYON_BASE_LOG( CATEGORY_, ... ) \
-        ::tyon::log( CATEGORY_, std::source_location::current(), __VA_ARGS__ )
+        ::tyon::log( CATEGORY_, TYON_SOURCE_LOCATION(), __VA_ARGS__ )
     #define TYON_BASE_LOGF( CATEGORY_, FORMAT_, ... ) \
-        ::tyon::log_format( CATEGORY_, FORMAT_, std::source_location::current(), __VA_ARGS__ )
+        ::tyon::log_format( CATEGORY_, FORMAT_, TYON_SOURCE_LOCATION(), __VA_ARGS__ )
     #define TYON_BASE_ERROR( CATEGORY_, ... ) \
-        ::tyon::log_error( CATEGORY_, std::source_location::current(), __VA_ARGS__ )
+        ::tyon::log_error( CATEGORY_, TYON_SOURCE_LOCATION(), __VA_ARGS__ )
     #define TYON_BASE_ERRORF( CATEGORY_, FORMAT_, ... ) \
-        ::tyon::log_error_format( CATEGORY_, FORMAT_, std::source_location::current(), __VA_ARGS__ )
+        ::tyon::log_error_format( CATEGORY_, FORMAT_, TYON_SOURCE_LOCATION(), __VA_ARGS__ )
 
     // Tachyon log category
     #define TYON_LOG( ... ) TYON_BASE_LOG( "Tachyon", __VA_ARGS__ );
@@ -1634,12 +1654,12 @@ namespace tyon
         fstring category,
         fstring message,
         e_log_entry type,
-        std::source_location call_point
+        tyon::source_location call_point
     ) -> void;
 
     template<typename... t_formattable>
     void
-    FUNCTION log( cstring category, std::source_location location, t_formattable&&... messages )
+    FUNCTION log( cstring category, tyon::source_location location, t_formattable&&... messages )
     {
         fstring formatted_message;
         formatted_message.reserve( 100 );
@@ -1651,7 +1671,7 @@ namespace tyon
     PROC log_format(
         cstring category,
         fmt::format_string<t_formattable...> format,
-        std::source_location location,
+        tyon::source_location location,
         t_formattable&&... data
     )
     {
@@ -1661,7 +1681,7 @@ namespace tyon
 
     template<typename... t_formattable>
     void
-    FUNCTION log_error( cstring category, std::source_location location, t_formattable... messages )
+    FUNCTION log_error( cstring category, tyon::source_location location, t_formattable... messages )
     {
         fstring formatted_message;
         formatted_message.reserve( 100 );
@@ -1673,7 +1693,7 @@ namespace tyon
     FUNCTION log_error_format(
         cstring category,
         const fmt::format_string<t_formattable...> format,
-        std::source_location location,
+        tyon::source_location location,
         t_formattable&&... data
     )
     {
