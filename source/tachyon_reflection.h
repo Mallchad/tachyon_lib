@@ -14,7 +14,7 @@ namespace reflection
 #endif // TYON_BUILD_GIT_HASH_STRING
 
 // GNUC means "GNU Cextensions" not "GCC"
-#if (__GNUC___ && !__clang__)
+#if (__GNUC__ && !__clang__)
     #define REFLECTION_COMPILER_GCC 1
     constexpr tyon::version gcc_version = { __GNUC__, __GNU_MINOR__, __GNU_PATCHLEVEL__};
     constexpr tyon::cstring compiler_name = "gcc";
