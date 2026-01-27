@@ -33,8 +33,15 @@ namespace tyon
 
     PROC file_home_directory() -> fstring
     {
-        TYON_ERROR( "File home directory not implimented on Windows yet" );
-        return "";
+        fstring env_name = "USERPROFILE";
+        char* home_path = getenv( env_name.c_str() );
+        if (home_path == nullptr)
+        {   TYON_BASE_ERROR(
+                "Tachyon Windows", "Error reading home home directory environment variable" );
+            return {};
+        }
+        fstring result = fs::canonical( home_path ).string();
+        return result;
     }
 
     u128

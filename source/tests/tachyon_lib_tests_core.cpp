@@ -21,4 +21,6 @@ main( int argc, char** argv )
     }
     test_linked_list();
     // TYON_BREAK();
+
+    TYON_LOG( "Program ended" );
 }
