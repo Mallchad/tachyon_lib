@@ -9,6 +9,7 @@ cmake = import( 'cmake' )
 include_dirs = include_directories( 'source', 'external/fmt/include' )
 libraries = [  ]
 
+cpp = meson.get_compiler('cpp')
 system_name = host_machine.system()
 if system_name == 'linux'
   message( 'Platform: Linux' )
