@@ -101,6 +101,7 @@
 #include "tachyon_reflection.h"
 #include "tachyon_library.h"
 #include "tachyon_containers.h"
+#include "tachyon_math.h"
 #include "tachyon_resources.h"
 #include "tachyon_internals.h"
 #include "tachyon_assets.h"
