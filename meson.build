@@ -42,12 +42,12 @@ test1 = executable(
 
 if tyon_cuda_on
 # Broken
-test2 = executable(
-  'tachyon_lib_tests_cuda_meson',
-  'source/tests/tachyon_lib_tests_cuda.cu',
-  include_directories : cuda_includes,
-  dependencies: cuda_dependency
-)
+# test2 = executable(
+#   'tachyon_lib_tests_cuda_meson',
+#   'source/tests/tachyon_lib_tests_cuda.cu',
+#   include_directories : cuda_includes,
+#   dependencies: cuda_dependency
+# )
 
 # command structure used
 # clear ; nvcc .\source\tests\tachyon_lib_tests_cuda.cu -std=c++20 -I .\external\fmt\include\ -lrpcrt4 -g
