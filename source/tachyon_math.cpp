@@ -126,5 +126,8 @@ namespace tyon
     CONSTRUCTOR v3_f32::v3_f32( f64 arg ) {}
 
     TYON_CUDA_SHARED
-    PROC operator*( v3_f32 lhs, v3_f32 rhs ) -> v3_f32 {}
+    PROC operator*( v3_f32 lhs, v3_f32 rhs ) -> v3_f32
+    {
+        return {};
+    }
 }

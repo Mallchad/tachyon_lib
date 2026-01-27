@@ -59,12 +59,19 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <string_view>
 
 // TODO: C++ 20 only. We don't use this right now but we can in future
 // #include <source_location>
 #include <thread>
 #include <utility>
 #include <vector>
+
+/* NOTE: DO NOT TOUCH the order on these includes, their order is baked by
+   dependency resolution order. */
+#include "tachyon_code_helpers.h"
+#include "tachyon_reflection.h"
+
 
 /** -- Vendored Dependencies
  */
@@ -79,6 +86,10 @@
 // #define FMT_USE_CONSTEVAL 0
 // #define FMT_ENFORCE_COMPILE_STRING 1
 // #define FMT_DISABLE_CONSTEVAL 1
+#if (REFLECTION_COMPILER_CUDA)
+    #define FMT_UNICODE 0
+    #pragma warning "Unicode not supported on CUDA compiler so can't use FMT_UNICODE"
+#endif // REFLECTION_COMPILER_CUDA
 
 #include "../external/fmt/include/fmt/format.h"
 #include "../external/fmt/include/fmt/color.h"
@@ -88,6 +99,7 @@
 #include "Tracy.hpp"
 #endif // TRACY_ENABLE
 
+
 /** -- Project Local --
  * We put all defines here in a namespace not to stop namespace resolution,
  * but rather to allow name conflict resolution.
@@ -96,11 +108,8 @@
  *
  * The other 'tyon' files haven't been updated correctly to work this way so it's being left for now
  */
-
 /* NOTE: DO NOT TOUCH the order on these includes, their order is baked by
    dependency resolution order. */
-#include "tachyon_code_helpers.h"
-#include "tachyon_reflection.h"
 #include "tachyon_library.h"
 #include "tachyon_containers.h"
 #include "tachyon_math.h"

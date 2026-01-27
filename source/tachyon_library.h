@@ -118,14 +118,14 @@ namespace tyon
 #ifdef __GNUC__
     #define TYON_SOURCE_LOCATION() ::tyon::source_location { __LINE__, 0, __FILE__, __PRETTY_FUNCTION__ }
 #else
-    #define TYON_SOURCE_LOCATION() ::tyon::source_location { __LINE__, 0, __FILE__, __func__ }
+    #define TYON_SOURCE_LOCATION() source_location()
 #endif // __GNUC__
 
 
     template<typename... t_formattable> void
     FORWARD FUNCTION log(
         cstring category,
-        tyon::source_location = TYON_SOURCE_LOCATION(),
+        tyon::source_location,
         t_formattable&&... messages );
 
     template<typename... t_formattable> void
