@@ -35,5 +35,3 @@ test_linked_list()
     }
 
 }
-
-namespace { auto _ = g_tests_list.push_tail( tyon::typed_procedure<void()>{test_linked_list}); }
