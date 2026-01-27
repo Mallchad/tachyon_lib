@@ -127,6 +127,7 @@ struct version
 // TYON_BREAK should be valid in release builds
 #define TYON_SIGTRAP 5
 
+#if TYON_HELPER_STANDALONE
 #if (REFLECTION_COMPILER_CLANG)
     #define FORCEINLINE __attribute__((always_inline))
     #define TYON_FORCEINLINE __attribute__((always_inline))
@@ -150,6 +151,14 @@ struct version
     #define TYON_PREFETCH_CACHELINE( address ) ERROR_PREFETCH_NOT_DEFINED
 #endif // compiler
 
+#if REFLECTION_COMPILER_CUDA
+    #define VMEC_CUDA_SHARED __device__ __host__
+    #define VMEC_CUDA_KERNEL __global__
+#else
+    #define VMEC_CUDA_SHARED
+    #define VMEC_CUDA_KERNEL
+#endif
+#endif // TYON_PREFETCH_CACHELINE
 
 
 /// Call a member function pointer, this is insane to remember, don't do it manually.

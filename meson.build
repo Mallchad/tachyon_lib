@@ -1,7 +1,7 @@
 
 
 project(
-    'tachyon_lib', 'cpp'
+    'tachyon_lib', 'cpp', 'cuda'
 )
 
 cmake = import( 'cmake' )
@@ -35,7 +35,7 @@ executable(
 if tyon_cuda_on
 executable(
   'tachyon_lib_tests_cuda',
-  'source/tests/tachyon_lib_tests_core.cpp',
+  'source/tests/tachyon_lib_tests_cuda.cu',
   include_directories : cuda_includes,
   dependencies: libraries
 )

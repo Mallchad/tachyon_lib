@@ -11,6 +11,40 @@
 // #include <thread>
 // #include <mutex>
 
+// TYON_BREAK should be valid in release builds
+#define TYON_SIGTRAP 5
+
+#if (REFLECTION_COMPILER_CLANG)
+    /* #define FORCEINLINE __attribute__((always_inline)) */
+    #define TYON_FORCEINLINE __attribute__((always_inline))
+    #define TYON_BREAK() __builtin_debugtrap();
+    #define TYON_PREFETCH_CACHELINE( address ) __builtin_prefetch( address );
+#elif (REFLECTION_COMPILER_GCC)
+    /* #define FORCEINLINE __attribute__((always_inline)) */
+    #define TYON_FORCEINLINE __attribute__((always_inline))
+    #define TYON_BREAK() raise(TYON_SIGTRAP);
+    #define TYON_PREFETCH_CACHELINE( address ) __builtin_prefetch( address );
+
+#elif (REFLECTION_COMPILER_MSVC)
+    /* #define FORCEINLINE __forceinline */
+    #define TYON_FORCEINLINE __forceinline
+    #define TYON_BREAK() __debugbreak();
+    #define TYON_PREFETCH_CACHELINE( address ) PrefetchCacheLine( PF_TEMPORAL_LEVEL_1, (address) );
+#else
+    /* #define FORCEINLINE */
+    #define TYON_FORCEINLINE
+    #define TYON_BREAK() raise(TYON_SIGTRAP);
+    #define TYON_PREFETCH_CACHELINE( address ) ERROR_PREFETCH_NOT_DEFINED
+#endif // compiler
+
+#if REFLECTION_COMPILER_CUDA
+    #define VMEC_CUDA_SHARED __device__ __host__
+    #define VMEC_CUDA_KERNEL __global__
+#else
+    #define VMEC_CUDA_SHARED
+    #define VMEC_CUDA_KERNEL
+#endif
+
 namespace tyon
 {
     // Alias namespace
