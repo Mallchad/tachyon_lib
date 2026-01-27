@@ -1,0 +1,55 @@
+[1769473402106676000][Tachyon] Default log file Path 'C:\Users\erikh\source\repos\tachyon_engine\external\tachyon_lib\latest.log' 
+ 
+[1769473402106983000][Tachyon Platform] Memory tested for endianess, came back as little endian  
+[1769473402116515000][Tachyon] 
+	Location: tyon::fstring tyon::file_home_directory() @ ../source/tests/../build_control/../tachyon_platform_windows.cpp:36:0 
+	File home directory not implimented on Windows yet  
+[1769473402116661000][Tachyon] Home directory path:  
+[1769473402116723000][Tachyon] Testing push to linked-list  
+[1769473402116819000][Tachyon] 1  
+[1769473402116891000][Tachyon] 1  
+[1769473402116953000][Tachyon] 1  
+[1769473402117017000][Tachyon] 1  
+[1769473402117068000][Tachyon] 1  
+[1769473402117304000][Tachyon] 1  
+[1769473402117369000][Tachyon] 1  
+[1769473402117415000][Tachyon] 1  
+[1769473402117461000][Tachyon] 1  
+[1769473402117501000][Tachyon] 1  
+[1769473402117557000][Tachyon] 1  
+[1769473402117608000][Tachyon] remove list_size 9  
+[1769473402117646000][Tachyon] remove list_size 8  
+[1769473402117684000][Tachyon] 1 3 5  
+[1769473402117739000][Tachyon] 1  
+[1769473402117792000][Tachyon] 1  
+[1769473402117840000][Tachyon] 1  
+[1769473402117888000][Tachyon] 1  
+[1769473402117940000][Tachyon] 1  
+[1769473402117992000][Tachyon] 1  
+[1769473402118041000][Tachyon] 1  
+[1769473402118117000][Tachyon] 1  
+[1769473402118168000][Tachyon] 1  
+[1769473402118219000][Tachyon] Testing push to linked-list  
+[1769473402118265000][Tachyon] 1  
+[1769473402118305000][Tachyon] 1  
+[1769473402118348000][Tachyon] 1  
+[1769473402118404000][Tachyon] 1  
+[1769473402118447000][Tachyon] 1  
+[1769473402118490000][Tachyon] 1  
+[1769473402118542000][Tachyon] 1  
+[1769473402118597000][Tachyon] 1  
+[1769473402118642000][Tachyon] 1  
+[1769473402118690000][Tachyon] 1  
+[1769473402118739000][Tachyon] 1  
+[1769473402118784000][Tachyon] remove list_size 9  
+[1769473402118838000][Tachyon] remove list_size 8  
+[1769473402118893000][Tachyon] 1 3 5  
+[1769473402118930000][Tachyon] 1  
+[1769473402118964000][Tachyon] 1  
+[1769473402118995000][Tachyon] 1  
+[1769473402119040000][Tachyon] 1  
+[1769473402119080000][Tachyon] 1  
+[1769473402119124000][Tachyon] 1  
+[1769473402119164000][Tachyon] 1  
+[1769473402119213000][Tachyon] 1  
+[1769473402119260000][Tachyon] 1  
