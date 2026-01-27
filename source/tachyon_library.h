@@ -38,9 +38,13 @@
 #endif // compiler
 
 #if REFLECTION_COMPILER_CUDA
+    #define TYON_CUDA_DEVICE __device__
+    #define TYON_CUDA_HOST __host__
     #define TYON_CUDA_SHARED __device__ __host__
     #define TYON_CUDA_KERNEL __global__
 #else
+    #define TYON_CUDA_DEVICE
+    #define TYON_CUDA_HOST
     #define TYON_CUDA_SHARED
     #define TYON_CUDA_KERNEL
 #endif
