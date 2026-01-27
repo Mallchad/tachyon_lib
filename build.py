@@ -91,8 +91,47 @@ for x_name in vars( args ).items():
 
 dry_run = args.dry_run
 
+build_label = "shipping"
+root_dir = script_dir_absolute
+build_dir = f"{root_dir}/build"
+install_dir = f"{root_dir}/../tachyon_artifacts/package/{build_label}"
+dev_install_dir = f"{root_dir}/../tachyonc_artifacts/dev_package/{build_label}"
+extra_install_dir = f"{root_dir}/../tachyonO_artifacts/dev_package/{build_label}_openusd"
+extra_build_dir = f"{build_dir}/extra/"
+
+if args.alt_build:
+    build_dir = f"{root_dir}/transient/build/{build_label}"
+
+# Canonicalize all paths
+root_dir = os.path.realpath( root_dir )
+build_dir = os.path.realpath( build_dir )
+install_dir = os.path.realpath( install_dir )
+extra_install_dir = os.path.realpath( extra_install_dir )
+extra_build_dir = os.path.realpath( extra_build_dir )
+
+if args.clean:
+    vmec_log( f"Cleaning build directory {build_dir}" )
+    try:
+        if os.path.isdir( build_dir ):
+            shutil.rmtree( build_dir, onerror = rmtree_remove_readonly )
+        else:
+            vmec_log( "Build directory already empty." )
+    except Exception as err:
+        vmec_log(f"""Exception occured whilst removing build directory.
+        Type: {type(err).__name__}
+        Message: {err}
+
+        You should check if you have any files or executables in tbhe directy
+        '{build_dir}' still open and close them Bailing script.""" )
+        sys.exit( 1 )
+
+# Main Program
+
+build_dir_empty = os.path.isdir( build_dir )
+if args.clean or build_dir_empty:
+    execute( "meson setup build" )
 if args.configure:
-        execute( "meson setup build" )
+    execute( "meson setup build --reconfigure" )
 
 execute( "meson compile -C build" )
 

@@ -2,7 +2,7 @@
 
 project(
     'tachyon_lib', 'cpp', 'cuda',
-     default_options : ['c_std=c11', 'cpp_std=c++17']
+     default_options : ['c_std=c11_std=c++20']
 )
 
 cmake = import( 'cmake' )
