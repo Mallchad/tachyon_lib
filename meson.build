@@ -7,6 +7,7 @@ project(
 cmake = import( 'cmake' )
 
 include_dirs = include_directories( 'source', 'external/fmt/include' )
+cuda_includes = include_directories( 'source', 'external/fmt/include', 'source/cuda' )
 libraries = [  ]
 
 cpp = meson.get_compiler('cpp')
@@ -19,6 +20,9 @@ elif system_name == 'windows'
     libraries += cpp.find_library('rpcrt4', required: true)
 endif
 
+cuda = import('unstable-cuda')
+tyon_cuda_on = true
+
 executable(
   'tachyon_lib_tests_core',
   'source/tests/tachyon_lib_tests_core.cpp',
@@ -27,6 +31,15 @@ executable(
   dependencies: libraries
 
 )
+
+if tyon_cuda_on
+executable(
+  'tachyon_lib_tests_cuda',
+  'source/tests/tachyon_lib_tests_core.cpp',
+  include_directories : cuda_includes,
+  dependencies: libraries
+)
+endif
 
 # Need to fill out
 executable(
