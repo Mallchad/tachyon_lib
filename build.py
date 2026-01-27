@@ -69,4 +69,4 @@ execute( "meson setup build" )
 
 execute( "meson compile -C build" )
 
-execute( "meson test -C build" )
+execute( "meson test -C build --verbose" )
