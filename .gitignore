@@ -1,5 +1,9 @@
 
-*
+# Blacklist root
+/*
 
-!source
-!scripts
+# Whitelist folders
+!source/
+!scripts/
+!source/**
+!scripts/**
