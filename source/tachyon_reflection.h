@@ -6,7 +6,7 @@ namespace reflection
 {
 
 #ifndef TYON_BUILD_GIT_HASH_STRING
-    #warning "No git gash provided"
+    #pragma warning "No git gash provided"
     #if TYON_AGGRESSIVE_DEBUGGING
         #error "No git gash provided"
     #endif TYON_AGGRESSIVE_DEBUGGING
