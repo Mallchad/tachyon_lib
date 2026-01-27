@@ -23,7 +23,7 @@ endif
 cuda = import('unstable-cuda')
 tyon_cuda_on = true
 
-executable(
+test1 = executable(
   'tachyon_lib_tests_core',
   'source/tests/tachyon_lib_tests_core.cpp',
   # 'external/fmt/src/format.cc',
@@ -33,7 +33,7 @@ executable(
 )
 
 if tyon_cuda_on
-executable(
+test2 = executable(
   'tachyon_lib_tests_cuda',
   'source/tests/tachyon_lib_tests_cuda.cu',
   include_directories : cuda_includes,
@@ -42,10 +42,14 @@ executable(
 endif
 
 # Need to fill out
-executable(
+test3 =executable(
   'tachyon_lib_tests_linked_list',
   'source/tests/tachyon_lib_tests_core.cpp',
   # 'external/fmt/src/format.cc',
   include_directories : include_dirs,
   dependencies: libraries
 )
+
+test( 'tachyon_lib_tests_all', test1 )
+test( 'tachyon_lib_tests_all', test2 )
+test( 'tachyon_lib_tests_all', test3 )

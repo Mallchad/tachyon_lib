@@ -68,3 +68,5 @@ def rmtree_remove_readonly( func, path, _ ):
 execute( "meson setup build" )
 
 execute( "meson compile -C build" )
+
+execute( "meson test -C build" )
