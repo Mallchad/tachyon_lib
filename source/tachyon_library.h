@@ -38,11 +38,11 @@
 #endif // compiler
 
 #if REFLECTION_COMPILER_CUDA
-    #define VMEC_CUDA_SHARED __device__ __host__
-    #define VMEC_CUDA_KERNEL __global__
+    #define TYON_CUDA_SHARED __device__ __host__
+    #define TYON_CUDA_KERNEL __global__
 #else
-    #define VMEC_CUDA_SHARED
-    #define VMEC_CUDA_KERNEL
+    #define TYON_CUDA_SHARED
+    #define TYON_CUDA_KERNEL
 #endif
 
 namespace tyon

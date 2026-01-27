@@ -118,13 +118,13 @@ namespace tyon
 
 
     /** Vector 3 type **/
-    VMEC_CUDA_SHARED
+    TYON_CUDA_SHARED
     CONSTRUCTOR v3_f32::v3_f32( f32 arg ) : x(arg), y(arg), z(arg) {}
-    VMEC_CUDA_SHARED
+    TYON_CUDA_SHARED
     CONSTRUCTOR v3_f32::v3_f32( f32 x, f32 y, f32 z ) {}
-    VMEC_CUDA_SHARED
+    TYON_CUDA_SHARED
     CONSTRUCTOR v3_f32::v3_f32( f64 arg ) {}
 
-    VMEC_CUDA_SHARED
+    TYON_CUDA_SHARED
     PROC operator*( v3_f32 lhs, v3_f32 rhs ) -> v3_f32 {}
 }

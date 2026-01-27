@@ -22,6 +22,10 @@ endif
 
 cuda = import('unstable-cuda')
 tyon_cuda_on = true
+dep = dependency(
+  'cuda', version : '>=10',
+  # modules : ['cublas']
+)
 
 test1 = executable(
   'tachyon_lib_tests_core',

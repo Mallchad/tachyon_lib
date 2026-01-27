@@ -72,11 +72,11 @@ namespace tyon
             f32 d[3];
         };
 
-        VMEC_CUDA_SHARED
+        TYON_CUDA_SHARED
         CONSTRUCTOR v3_f32( f32 arg = 0 );
-        VMEC_CUDA_SHARED
+        TYON_CUDA_SHARED
         CONSTRUCTOR v3_f32( f32 x, f32 y, f32 z );
-        VMEC_CUDA_SHARED
+        TYON_CUDA_SHARED
         explicit CONSTRUCTOR v3_f32( f64 arg );
         /* explicit CONSTRUCTOR v3_f32( v2_f32 ); */
     };
@@ -87,7 +87,7 @@ namespace tyon
      * This is cross product idk why
      */
 
-    VMEC_CUDA_SHARED
+    TYON_CUDA_SHARED
     PROC operator*( v3_f32 lhs, v3_f32 rhs ) -> v3_f32;
 
 }
