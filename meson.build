@@ -9,9 +9,13 @@ cmake = import( 'cmake' )
 include_dirs = include_directories( 'source', 'external/fmt/include' )
 libraries = [  ]
 
-if host_machine.system() == 'linux'
+system_name = host_machine.system()
+if system_name == 'linux'
   message( 'Platform: Linux' )
   libraries += dependency('uuid')
+elif system_name == 'windows'
+    message( 'Platform: Windows' )
+    libraries += dependency('rpcrt4')
 endif
 
 executable(
