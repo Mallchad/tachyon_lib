@@ -15,7 +15,7 @@ if system_name == 'linux'
   libraries += dependency('uuid')
 elif system_name == 'windows'
     message( 'Platform: Windows' )
-    libraries += dependency('rpcrt4')
+    libraries += cpp.find_library('rpcrt4', required: true)
 endif
 
 executable(
