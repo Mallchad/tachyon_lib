@@ -65,8 +65,38 @@ def rmtree_remove_readonly( func, path, _ ):
     os.chmod( path, stat.S_IWRITE )
     func( path )
 
-execute( "meson setup build" )
+options = argparse.ArgumentParser()
+options.add_argument( "--build-dir", action="store" )
+options.add_argument( "--build-type", action="store" )
+options.add_argument( "--build-label", action="store" )
+options.add_argument( "--alt-build", action="store_true",
+                      help="Move build directory to uniquely named transient/build directories" )
+options.add_argument( "--dry-run" )
+options.add_argument( "--clean", action="store_true")
+options.add_argument( "--debug", action="store_true" )
+# options.add_argument( "--ninja", action="store_true" )
+# options.add_argument( "--nmake", action="store_true" )
+# options.add_argument( "--no-submodule-sync", action="store_true" )
+options.add_argument( "--no-build", action="store_true" )
+# options.add_argument( "--no-configure", action="store_true" )
+options.add_argument( "--configure", action="store_true" )
+options.add_argument( "--test-no-output", action="store_true" )
+# options.add_argument( "--no-package", action="store_true" )
+# options.add_argument( "--package-only", action="store_true" )
+
+args = options.parse_args()
+vmec_log( "Command Line Arguments: " )
+for x_name in vars( args ).items():
+    vmec_log( f"    {x_name[0]}    :    {x_name[1]}" )
+
+dry_run = args.dry_run
+
+if args.configure:
+        execute( "meson setup build" )
 
 execute( "meson compile -C build" )
 
-execute( "meson test -C build --verbose" )
+if args.test_no_output:
+    execute( "meson test -C build" )
+else:
+    execute( "meson test -C build --verbose" )

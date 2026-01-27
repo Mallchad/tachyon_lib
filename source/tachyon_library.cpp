@@ -546,7 +546,7 @@ namespace tyon
 
                 // Reload or skip if pre-existing asset exists
                 search_result<asset> lookup = g_asset->assets.linear_search( [=]( asset& arg )
-                {   return arg.file.filename == x_filename; }
+                {   return arg.file_.filename == x_filename; }
                 );
                 if (lookup.match_found)
                 {
@@ -559,7 +559,7 @@ namespace tyon
                 if (x_entry.is_regular_file())
                 {
                     asset new_asset;
-                    new_asset.file.filename = x_filename;
+                    new_asset.file_.filename = x_filename;
                     new_asset.name = x_filename.filename().string();
                     g_asset->assets.push_tail( new_asset );
                 }
@@ -599,7 +599,7 @@ namespace tyon
         {
             g_asset->assets.push_back( asset{} );
             result = g_asset->assets.tail_address();
-            result->file.filename = filename;
+            result->file_.filename = filename;
             result->name = filename;
         }
 
@@ -661,12 +661,12 @@ namespace tyon
         if (result)
         {
             TYON_BASE_ERRORF( "Tachyon Assets", "Successfully loaded file {} at path '{}' using loader '{}'",
-                        arg->name, arg->file.filename.string(), arg->loader_name );
+                        arg->name, arg->file_.filename.string(), arg->loader_name );
         }
         else
         {
             TYON_BASE_ERRORF( "Tachyon Assets", "Failed to load file {} at path '{}' using loader '{}'",
-                              arg->name, arg->file.filename.string(), arg->loader_name );
+                              arg->name, arg->file_.filename.string(), arg->loader_name );
         }
         return result;
     }

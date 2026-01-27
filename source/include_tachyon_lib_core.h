@@ -59,7 +59,9 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <source_location>
+
+// TODO: C++ 20 only. We don't use this right now but we can in future
+// #include <source_location>
 #include <thread>
 #include <utility>
 #include <vector>

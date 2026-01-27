@@ -29,7 +29,7 @@ namespace tyon
         // File/Asset type
         e_asset type = asset_type::none;
         fstring name;
-        file file;
+        file file_;
         void* data = nullptr;
         asset_function loader = &asset_function_stub;
         asset_function unloader = &asset_function_stub;
