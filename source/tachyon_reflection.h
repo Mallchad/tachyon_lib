@@ -21,10 +21,21 @@ namespace reflection
     #define REFLECTION_COMPILER_MINGW 0
 #endif // mingw
 
+#if (__clang__)
+    #define REFLECTION_COMPILER_CLANG 1
+    constexpr tyon::version clang_version = { __clang_major__, __clang_minor__, __clang_patchlevel__ };
+    constexpr tyon::fstring_view compiler_name = "clang";
+    constexpr tyon::version compiler_version = clang_version;
+#else
+    #define REFLECTION_COMPILER_CLANG 0
+    constexpr tyon::version clang_version = {};
+#endif // clang
+
 // GNUC means "GNU Cextensions" not "GCC"
-#if (__GNUC__ && !__clang__)
+#if (__GNUC__ && (!REFLECTION_COMPILER_CLANG))
     #define REFLECTION_COMPILER_GCC 1
-    #if (REFLECTION_COMPILER_MINGW)
+    // It's quite tricky to detect true standard GCC but if this is defined we can assume its GCC
+    #if (!__GNU_PATCHLEVEL__)
     // MinGW gcc doesn't support extra version granularity
         constexpr tyon::version gcc_version = { __GNUC__ };
     #else
@@ -36,15 +47,6 @@ namespace reflection
     #define REFLECTION_COMPILER_GCC 0
     constexpr tyon::version gcc_version = {};
 #endif // GCC
-#if (__clang__)
-    #define REFLECTION_COMPILER_CLANG 1
-    constexpr tyon::version clang_version = { __clang_major__, __clang_minor__, __clang_patchlevel__ };
-    constexpr tyon::fstring_view compiler_name = "clang";
-    constexpr tyon::version compiler_version = clang_version;
-#else
-    #define REFLECTION_COMPILER_CLANG 0
-    constexpr tyon::version clang_version = {};
-#endif // clang
 
 // nVIDIA CUDA SDK
 #if (__NVCC__)
