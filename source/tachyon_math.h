@@ -37,6 +37,204 @@ namespace tyon
 
 
 
+        // Vectors 
+        struct v2_f32
+        {
+            f32 x;
+            f32 y;
+            
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v2_f32();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v2_f32( f32 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v2_f32( f32 x, f32 y);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR v2_f32( f64 arg );
+        };
+
+        struct v2_f64
+        {
+            f64 x;
+            f64 y; 
+        
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v2_f64();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v2_f64( f64 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v2_f64( f64 x, f64 y);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR v2_f64( f32 arg );
+        };
+
+        struct v3_f32
+        {
+            f32 x;
+            f32 y;
+            f32 z; 
+        
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v3_f32();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v3_f32( f32 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v3_f32( f32 x, f32 y, f32 z);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR v3_f32( f64 arg );
+        };
+
+        struct v3_f64
+        {
+            f64 x;
+            f64 y; 
+            f64 z;
+        
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v3_f64();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v3_f64( f64 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v3_f64( f64 x, f64 y, f64 z);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR v3_f64( f32 arg );
+        };
+
+        struct v4_f32
+        {
+            f32 x;
+            f32 y;
+            f32 z; 
+            f32 w;
+        
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v4_f32();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v4_f32( f32 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v4_f32( f32 x, f32 y, f32 z, f32 w);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR v4_f32( f64 arg );
+        };
+
+        struct v4_f64
+        {
+            f64 x;
+            f64 y;
+            f64 z; 
+            f64 w;
+        
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v4_f64();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v4_f64( f64 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR v4_f64( f64 x, f64 y, f64 z, f64 w);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR v4_f64( f32 arg );
+        };
+
+
+
+        // Matrices
+        struct matrix2_f32
+        {
+            f32 m11; f32 m12;
+            f32 m21; f32 m22;
+
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix2_f32();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix2_f32( f32 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix2_f32( f32 m11, f32 m12, f32 m21, f32 m22);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR matrix2_f32( f64 arg );
+        };
+
+        struct matrix2_f64
+        {
+            f64 m11; f64 m12;
+            f64 m21; f64 m22;
+
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix2_f64();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix2_f64( f64 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix2_f64( f64 m11, f64 m12, f64 m21, f64 m22);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR matrix2_f64( f32 arg );
+        };
+
+        struct matrix3_f32
+        {
+            f32 m11; f32 m12; f32 m13;
+            f32 m21; f32 m22; f32 m23;
+            f32 m31; f32 m32; f32 m33;
+
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix3_f32();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix3_f32( f32 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix3_f32( f32 m11, f32 m12, f32 m13, f32 m21, f32 m22, f32 m23, f32 m31, f32 m32, f32 m33);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR matrix3_f32( f64 arg );
+        };
+
+        struct matrix3_f64
+        {
+            f64 m11; f64 m12; f64 m13;
+            f64 m21; f64 m22; f64 m23;
+            f64 m31; f64 m32; f64 m33;
+
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix3_f64();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix3_f64( f32 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix3_f64( f32 m11, f32 m12, f32 m13, f32 m21, f32 m22, f32 m23, f32 m31, f32 m32, f32 m33);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR matrix3_f64( f64 arg );
+        };
+
+        struct matrix4_f32
+        {
+            f32 m11; f32 m12; f32 m13; f32 m14;
+            f32 m21; f32 m22; f32 m23; f32 m24;
+            f32 m31; f32 m32; f32 m33; f32 m34;
+            f32 m41; f32 m42; f32 m43; f32 m44;
+
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix4_f32();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix4_f32( f32 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix4_f32( f32 m11, f32 m12, f32 m13, f32 m14, f32 m21, f32 m22, f32 m23, f32 m24, f32 m31, f32 m32, f32 m33, f32 m34, f32 m41, f32 m42, f32 m43, f32 m44);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR matrix4_f32( f64 arg );
+        };
+
+        struct matrix4_f64
+        {
+            f64 m11; f64 m12; f64 m13; f64 m14;
+            f64 m21; f64 m22; f64 m23; f64 m24;
+            f64 m31; f64 m32; f64 m33; f64 m34;
+            f64 m41; f64 m42; f64 m43; f64 m44;
+
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix4_f64();
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix4_f64( f64 arg );
+            TYON_CUDA_SHARED
+            CONSTRUCTOR matrix4_f64( f64 m11, f64 m12, f64 m13, f64 m14, f64 m21, f64 m22, f64 m23, f64 m24, f64 m31, f64 m32, f64 m33, f64 m34, f64 m41, f64 m42, f64 m43, f64 m44);
+            TYON_CUDA_SHARED
+            explicit CONSTRUCTOR matrix4_f64( f32 arg );
+        };
+
+
+
     /** Operators */
         // Complex numbers
             // Addition
@@ -79,6 +277,391 @@ namespace tyon
 
             TYON_CUDA_SHARED
             PROC operator-(const c64& z0) -> c64;
+
+
+
+        // Vector-Vector
+            // Addition
+            TYON_CUDA_SHARED
+            PROC operator+(const v2_f32& v0, const v2_f32& v1) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const v2_f64& v0, const v2_f64& v1) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const v3_f32& v0, const v3_f32& v1) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const v3_f64& v0, const v3_f64& v1) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const v4_f32& v0, const v4_f32& v1) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const v4_f64& v0, const v4_f64& v1) -> v4_f64;
+
+            // Subtraction
+            TYON_CUDA_SHARED
+            PROC operator-(const v2_f32& v0, const v2_f32& v1) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const v2_f64& v0, const v2_f64& v1) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const v3_f32& v0, const v3_f32& v1) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const v3_f64& v0, const v3_f64& v1) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const v4_f32& v0, const v4_f32& v1) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const v4_f64& v0, const v4_f64& v1) -> v4_f64;
+
+            // Multiplication
+            TYON_CUDA_SHARED
+            PROC operator*(const v2_f32& v0, const v2_f32& v1) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v2_f64& v0, const v2_f64& v1) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v3_f32& v0, const v3_f32& v1) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v3_f64& v0, const v3_f64& v1) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v4_f32& v0, const v4_f32& v1) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v4_f64& v0, const v4_f64& v1) -> v4_f64;
+
+            // Division
+            TYON_CUDA_SHARED
+            PROC operator/(const v2_f32& v0, const v2_f32& v1) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const v2_f64& v0, const v2_f64& v1) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const v3_f32& v0, const v3_f32& v1) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const v3_f64& v0, const v3_f64& v1) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const v4_f32& v0, const v4_f32& v1) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const v4_f64& v0, const v4_f64& v1) -> v4_f64;
+
+            // Inverse
+            TYON_CUDA_SHARED
+            PROC operator-(const v2_f32& v) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const v2_f64& v) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const v3_f32& v) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const v3_f64& v) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const v4_f32& v) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const v4_f64& v) -> v4_f64;
+
+
+
+        // Vector-scalar
+            // Multiplication
+            TYON_CUDA_SHARED
+            PROC operator*(const v2_f32& v0, const f32 s0) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v2_f64& v0, const f64 s0) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f32 s0, const v2_f32& v0) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f64 s0, const v2_f64& v0) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v3_f32& v0, const f32 s0) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v3_f64& v0, const f64 s0) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f32 s0, const v3_f32& v0) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f64 s0, const v3_f64& v0) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v4_f32& v0, const f32 s0) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v4_f64& v0, const f64 s0) -> v4_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f32 s0, const v4_f32& v0) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f64 s0, const v4_f64& v0) -> v4_f64;
+
+            // Division
+            TYON_CUDA_SHARED
+            PROC operator/(const v2_f32& v0, const f32 s0) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const v2_f64& v0, const f64 s0) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const f32 s0, const v2_f32& v0) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const f64 s0, const v2_f64& v0) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const v3_f32& v0, const f32 s0) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const v3_f64& v0, const f64 s0) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const f32 s0, const v3_f32& v0) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const f64 s0, const v3_f64& v0) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const v4_f32& v0, const f32 s0) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const v4_f64& v0, const f64 s0) -> v4_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const f32 s0, const v4_f32& v0) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator/(const f64 s0, const v4_f64& v0) -> v4_f64;
+
+
+
+        // Vector-Matrix
+            TYON_CUDA_SHARED
+            PROC operator*(const v2_f32& v0, const matrix2_f32& m0) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix2_f32& m0, const v2_f32& v0) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v2_f64& v0, const matrix2_f64& m0) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix2_f64& m0, const v2_f64& v0) -> v2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v3_f32& v0, const matrix3_f32& m0) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix3_f32& m0, const v3_f32& v0) -> v3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v3_f64& v0, const matrix3_f64& m0) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix3_f64& m0, const v3_f64& v0) -> v3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v4_f32& v0, const matrix4_f32& m0) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix4_f32& m0, const v4_f32& v0) -> v4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const v4_f64& v0, const matrix4_f64& m0) -> v4_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix4_f64& m0, const v4_f64& v0) -> v4_f64;
+
+
+
+        // Matrices
+            // Matrix Addition
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix2_f32& m0, const matrix2_f32& m1) -> matrix2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix2_f64& m0, const matrix2_f64& m1) -> matrix2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix3_f32& m0, const matrix3_f32& m1) -> matrix3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix3_f64& m0, const matrix3_f64& m1) -> matrix3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix4_f32& m0, const matrix4_f32& m1) -> matrix4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix4_f64& m0, const matrix4_f64& m1) -> matrix4_f64;
+
+            // Scalar Addition
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix2_f32& m0, const f32& s0) -> matrix2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const f32& s0, const matrix2_f32& m0) -> matrix2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix2_f64& m0, const f64& s0) -> matrix2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const f64& s0, const matrix2_f64& m0) -> matrix2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix3_f32& m0, const f32& s0) -> matrix3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const f32& s0, const matrix3_f32& m0) -> matrix3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix3_f64& m0, const f64& s0) -> matrix3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const f32& s0, const matrix3_f64& m0) -> matrix3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix4_f32& m0, const f32& s0) -> matrix4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const f32& s0, const matrix4_f32& m0) -> matrix4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const matrix4_f64& m0, const f64& s0) -> matrix4_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator+(const f32& s0, const matrix4_f64& m0) -> matrix4_f64;
+
+            // Matrix Subtraction
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix2_f32& m0, const matrix2_f32& m1) -> matrix2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix2_f64& m0, const matrix2_f64& m1) -> matrix2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix3_f32& m0, const matrix3_f32& m1) -> matrix3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix3_f64& m0, const matrix3_f64& m1) -> matrix3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix4_f32& m0, const matrix4_f32& m1) -> matrix4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix4_f64& m0, const matrix4_f64& m1) -> matrix4_f64;
+
+            // Scalar Subtraction 
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix2_f32& m0, const f32& s0) -> matrix2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const f32& s0, const matrix2_f32& m0) -> matrix2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix2_f64& m0, const f64& s0) -> matrix2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const f64& s0, const matrix2_f64& m0) -> matrix2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix3_f32& m0, const f32& s0) -> matrix3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const f32& s0, const matrix3_f32& m0) -> matrix3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix3_f64& m0, const f64& s0) -> matrix3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const f32& s0, const matrix3_f64& m0) -> matrix3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix4_f32& m0, const f32& s0) -> matrix4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const f32& s0, const matrix4_f32& m0) -> matrix4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const matrix4_f64& m0, const f64& s0) -> matrix4_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator-(const f32& s0, const matrix4_f64& m0) -> matrix4_f64;
+
+            // Matrix Multiplication
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix2_f32& m0, const matrix2_f32& m1) -> matrix2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix2_f64& m0, const matrix2_f64& m1) -> matrix2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix3_f32& m0, const matrix3_f32& m1) -> matrix3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix3_f64& m0, const matrix3_f64& m1) -> matrix3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix4_f32& m0, const matrix4_f32& m1) -> matrix4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix4_f64& m0, const matrix4_f64& m1) -> matrix4_f64;
+
+            // Scalar Multiplication
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix2_f32& m0, const f32& s0) -> matrix2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f32& s0, const matrix2_f32& m0) -> matrix2_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix2_f64& m0, const f64& s0) -> matrix2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f64& s0, const matrix2_f64& m0) -> matrix2_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix3_f32& m0, const f32& s0) -> matrix3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f32& s0, const matrix3_f32& m0) -> matrix3_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix3_f64& m0, const f64& s0) -> matrix3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f32& s0, const matrix3_f64& m0) -> matrix3_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix4_f32& m0, const f32& s0) -> matrix4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f32& s0, const matrix4_f32& m0) -> matrix4_f32;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const matrix4_f64& m0, const f64& s0) -> matrix4_f64;
+
+            TYON_CUDA_SHARED
+            PROC operator*(const f32& s0, const matrix4_f64& m0) -> matrix4_f64; 
 
 
 
@@ -190,34 +773,4 @@ namespace tyon
 
         TYON_CUDA_SHARED
         PROC norm_gaussian_cdf(const f64& mean, const f64& x, const f64& standard_deviation) -> f64;
-
-
-
-    /** Simple fixed size vector type */
-    struct v3_f32
-    {
-        union
-        {
-            struct { f32 x, y, z; };
-            f32 d[3];
-        };
-
-        TYON_CUDA_SHARED
-        CONSTRUCTOR v3_f32( f32 arg = 0 );
-        TYON_CUDA_SHARED
-        CONSTRUCTOR v3_f32( f32 x, f32 y, f32 z );
-        TYON_CUDA_SHARED
-        explicit CONSTRUCTOR v3_f32( f64 arg );
-        /* explicit CONSTRUCTOR v3_f32( v2_f32 ); */
-    };
-
-    /** NOTE: This is a comment box style. We should try to have atleast 1 per header function/global
-     * Vector cross product
-     *
-     * This is cross product idk why
-     */
-
-    TYON_CUDA_SHARED
-    PROC operator*( v3_f32 lhs, v3_f32 rhs ) -> v3_f32;
-
 }
