@@ -2010,4 +2010,1241 @@ namespace tyon
         {
             return 0.5 * (1.0 + error_function((x - mean) / (standard_deviation * square_root(2.0))));
         }
+
+
+
+        // Vector
+            // Dot Product
+            TYON_CUDA_SHARED
+            PROC vector_dot_product(const v2_f32& v0, const v2_f32& v1) -> f32
+            {
+                return v0.x * v1.x + v0.y * v1.y;
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_dot_product(const v2_f64& v0, const v2_f64& v1) -> f64
+            {
+                return v0.x * v1.x + v0.y * v1.y;
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_dot_product(const v3_f32& v0, const v3_f32& v1) -> f32
+            {
+                return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_dot_product(const v3_f64& v0, const v3_f64& v1) -> f64
+            {
+                return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_dot_product(const v4_f32& v0, const v4_f32& v1) -> f32
+            {
+                return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z + v0.w * v1.w;
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_dot_product(const v4_f64& v0, const v4_f64& v1) -> f64
+            {
+                return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z + v0.w * v1.w;
+            }
+
+
+
+            // Cross Product
+            TYON_CUDA_SHARED
+            PROC vector_cross_product(const v3_f32& v0, const v3_f32& v1) -> v3_f32
+            {
+                return v3_f32( v0.y*v1.z - v0.z*v1.y , v0.z*v1.x - v0.x*v1.z , v0.x*v1.y - v0.y*v1.x );
+
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_cross_product(const v3_f64& v0, const v3_f64& v1) -> v3_f64
+            {
+                return v3_f64( v0.y*v1.z - v0.z*v1.y , v0.z*v1.x - v0.x*v1.z , v0.x*v1.y - v0.y*v1.x );
+            }
+
+
+
+            // Angle of two normalized vectors
+            TYON_CUDA_SHARED
+            PROC angle_radians(const v2_f32& v0, const v2_f32& v1) -> f32
+            {
+                return arccos(vector_dot_product(v0, v1));
+            }
+
+            TYON_CUDA_SHARED
+            PROC angle_radians(const v2_f64& v0, const v2_f64& v1) -> f64
+            {
+                return arccos(vector_dot_product(v0, v1));
+            }
+
+            TYON_CUDA_SHARED
+            PROC angle_radians(const v3_f32& v0, const v3_f32& v1) -> f32
+            {
+                return arccos(vector_dot_product(v0, v1));
+            }
+
+            TYON_CUDA_SHARED
+            PROC angle_radians(const v3_f64& v0, const v3_f64& v1) -> f64
+            {
+                return arccos(vector_dot_product(v0, v1));
+            }
+
+            TYON_CUDA_SHARED
+            PROC angle_radians(const v4_f32& v0, const v4_f32& v1) -> f32
+            {
+                return arccos(vector_dot_product(v0, v1));
+            }
+
+            TYON_CUDA_SHARED
+            PROC angle_radians(const v4_f64& v0, const v4_f64& v1) -> f64
+            {
+                return arccos(vector_dot_product(v0, v1));
+            }
+
+
+
+            // Normalize
+            TYON_CUDA_SHARED
+            PROC vector_normalize(const v2_f32& v0) -> v2_f32
+            {
+                return v0 / vector_length(v0);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_normalize(const v2_f64& v0) -> v2_f64
+            {
+                return v0 / vector_length(v0);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_normalize(const v3_f32& v0) -> v3_f32
+            {
+                return v0 / vector_length(v0);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_normalize(const v3_f64& v0) -> v3_f64
+            {
+                return v0 / vector_length(v0);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_normalize(const v4_f32& v0) -> v4_f32
+            {
+                return v0 / vector_length(v0);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_normalize(const v4_f64& v0) -> v4_f64
+            {
+                return v0 / vector_length(v0);
+            }
+
+
+
+            // Reflect
+            TYON_CUDA_SHARED
+            PROC vector_reflect(const v2_f32& d, const v2_f32& n) -> v2_f32
+            {
+                return (d - (2.0f * n * vector_dot_product(d, n)));
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_reflect(const v2_f64& d, const v2_f64& n) -> v2_f64
+            {
+                return (d - (2.0 * n * vector_dot_product(d, n)));
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_reflect(const v3_f32& d, const v3_f32& n) -> v3_f32
+            {
+                return (d - (2.0f * n * vector_dot_product(d, n)));
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_reflect(const v3_f64& d, const v3_f64& n) -> v3_f64
+            {
+                return (d - (2.0 * n * vector_dot_product(d, n)));
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_reflect(const v4_f32& d, const v4_f32& n) -> v4_f32
+            {
+                return (d - (2.0f * n * vector_dot_product(d, n)));
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_reflect(const v4_f64& d, const v4_f64& n) -> v4_f64
+            {
+                return (d - (2.0 * n * vector_dot_product(d, n)));
+            }
+
+
+
+            // Refract
+            TYON_CUDA_SHARED
+            PROC vector_refract(const v2_f32& d, const v2_f32& n, const f32& eta_0, const f32& eta_1) -> v2_f32
+            {
+                f32 cos_theta_i = vector_dot_product(d, n);
+                f32 eta_relative = eta_0 / eta_1;
+                f32 sin2_theta_t = eta_relative * eta_relative * (1.0f - cos_theta_i * cos_theta_i);
+                return (eta_relative * cos_theta_i - square_root(1.0f - sin2_theta_t)) * n - eta_relative * d;
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_refract(const v2_f64& d, const v2_f64& n, const f64& eta_0, const f64& eta_1) -> v2_f64
+            {
+                f32 cos_theta_i = vector_dot_product(d, n);
+                f32 eta_relative = eta_0 / eta_1;
+                f32 sin2_theta_t = eta_relative * eta_relative * (1.0 - cos_theta_i * cos_theta_i);
+                return (eta_relative * cos_theta_i - square_root(1.0 - sin2_theta_t)) * n - eta_relative * d;
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_refract(const v3_f32& d, const v3_f32& n, const f32& eta_0, const f32& eta_1) -> v3_f32
+            {
+                f32 cos_theta_i = vector_dot_product(d, n);
+                f32 eta_relative = eta_0 / eta_1;
+                f32 sin2_theta_t = eta_relative * eta_relative * (1.0f - cos_theta_i * cos_theta_i);
+                return (eta_relative * cos_theta_i - square_root(1.0f - sin2_theta_t)) * n - eta_relative * d;
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_refract(const v3_f64& d, const v3_f64& n, const f64& eta_0, const f64& eta_1) -> v3_f64
+            {
+                f32 cos_theta_i = vector_dot_product(d, n);
+                f32 eta_relative = eta_0 / eta_1;
+                f32 sin2_theta_t = eta_relative * eta_relative * (1.0 - cos_theta_i * cos_theta_i);
+                return (eta_relative * cos_theta_i - square_root(1.0 - sin2_theta_t)) * n - eta_relative * d;
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_refract(const v4_f32& d, const v4_f32& n, const f32& eta_0, const f32& eta_1) -> v4_f32
+            {
+                f32 cos_theta_i = vector_dot_product(d, n);
+                f32 eta_relative = eta_0 / eta_1;
+                f32 sin2_theta_t = eta_relative * eta_relative * (1.0f - cos_theta_i * cos_theta_i);
+                return (eta_relative * cos_theta_i - square_root(1.0f - sin2_theta_t)) * n - eta_relative * d;
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_refract(const v4_f64& d, const v4_f64& n, const f64& eta_0, const f64& eta_1) -> v4_f64
+            {
+                f32 cos_theta_i = vector_dot_product(d, n);
+                f32 eta_relative = eta_0 / eta_1;
+                f32 sin2_theta_t = eta_relative * eta_relative * (1.0 - cos_theta_i * cos_theta_i);
+                return (eta_relative * cos_theta_i - square_root(1.0 - sin2_theta_t)) * n - eta_relative * d;
+            }
+
+
+
+            // Project
+            TYON_CUDA_SHARED
+            PROC vector_project(const v2_f32& v0, const v2_f32& v1) -> v2_f32
+            {
+                return (vector_dot_product(v0, v1) * v1) / vector_dot_product(v1, v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_project(const v2_f64& v0, const v2_f64& v1) -> v2_f64
+            {
+                return (vector_dot_product(v0, v1) * v1) / vector_dot_product(v1, v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_project(const v3_f32& v0, const v3_f32& v1) -> v3_f32
+            {
+                return (vector_dot_product(v0, v1) * v1) / vector_dot_product(v1, v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_project(const v3_f64& v0, const v3_f64& v1) -> v3_f64
+            {
+                return (vector_dot_product(v0, v1) * v1) / vector_dot_product(v1, v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_project(const v4_f32& v0, const v4_f32& v1) -> v4_f32
+            {
+                return (vector_dot_product(v0, v1) * v1) / vector_dot_product(v1, v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_project(const v4_f64& v0, const v4_f64& v1) -> v4_f64
+            {
+                return (vector_dot_product(v0, v1) * v1) / vector_dot_product(v1, v1);
+            }
+
+
+
+            // Barycentric
+            TYON_CUDA_SHARED
+            PROC v_barycentric(const v2_f32& p0, const v2_f32& p1, const v2_f32& p2, const v2_f32& barycentric_coordinates) -> v2_f32
+            {
+                return p0 * barycentric_coordinates.x + p1 * barycentric_coordinates.y + p2 * (1.0f - barycentric_coordinates.x - barycentric_coordinates.y);
+            }
+
+            TYON_CUDA_SHARED
+            PROC v_barycentric(const v2_f64& p0, const v2_f64& p1, const v2_f64& p2, const v2_f64& barycentric_coordinates) -> v2_f64
+            {
+                return p0 * barycentric_coordinates.x + p1 * barycentric_coordinates.y + p2 * (1.0 - barycentric_coordinates.x - barycentric_coordinates.y);
+            }
+
+            TYON_CUDA_SHARED
+            PROC v_barycentric(const v3_f32& p0, const v3_f32& p1, const v3_f32& p2, const v2_f32& barycentric_coordinates) -> v3_f32
+            {
+                return p0 * barycentric_coordinates.x + p1 * barycentric_coordinates.y + p2 * (1.0f - barycentric_coordinates.x - barycentric_coordinates.y);
+            }
+
+            TYON_CUDA_SHARED
+            PROC v_barycentric(const v3_f64& p0, const v3_f64& p1, const v3_f64& p2, const v2_f64& barycentric_coordinates) -> v3_f64
+            {
+                return p0 * barycentric_coordinates.x + p1 * barycentric_coordinates.y + p2 * (1.0 - barycentric_coordinates.x - barycentric_coordinates.y);
+            }
+
+            TYON_CUDA_SHARED
+            PROC v_barycentric(const v4_f32& p0, const v4_f32& p1, const v4_f32& p2, const v2_f32& barycentric_coordinates) -> v4_f32
+            {
+                return p0 * barycentric_coordinates.x + p1 * barycentric_coordinates.y + p2 * (1.0f - barycentric_coordinates.x - barycentric_coordinates.y);
+            }
+
+            TYON_CUDA_SHARED
+            PROC v_barycentric(const v4_f64& p0, const v4_f64& p1, const v4_f64& p2, const v2_f64& barycentric_coordinates) -> v4_f64
+            {
+                return p0 * barycentric_coordinates.x + p1 * barycentric_coordinates.y + p2 * (1.0 - barycentric_coordinates.x - barycentric_coordinates.y);
+            }
+
+
+
+            // Length & Lenght2
+            TYON_CUDA_SHARED
+            PROC vector_length(const v2_f32& v0) -> f32
+            {
+                return square_root( v0.x * v0.x + v0.y * v0.y );
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length(const v2_f64& v0) -> f64
+            {
+                return square_root( v0.x * v0.x + v0.y * v0.y );
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length(const v3_f32& v0) -> f32
+            {
+                return square_root( v0.x * v0.x + v0.y * v0.y + v0.z * v0.z );
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length(const v3_f64& v0) -> f64
+            {
+                return square_root( v0.x * v0.x + v0.y * v0.y + v0.z * v0.z );
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length(const v4_f32& v0) -> f32
+            {
+                return square_root( v0.x * v0.x + v0.y * v0.y + v0.z * v0.z + v0.w * v0.w );
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length(const v4_f64& v0) -> f64
+            {
+                return square_root( v0.x * v0.x + v0.y * v0.y + v0.z * v0.z + v0.w * v0.w );
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length2(const v2_f32& v0) -> f32
+            {
+                return ( v0.x * v0.x + v0.y * v0.y );
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length2(const v2_f64& v0) -> f64
+            {
+                return ( v0.x * v0.x + v0.y * v0.y );
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length2(const v3_f32& v0) -> f32
+            {
+                return ( v0.x * v0.x + v0.y * v0.y + v0.z * v0.z);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length2(const v3_f64& v0) -> f64
+            {
+                return ( v0.x * v0.x + v0.y * v0.y + v0.z * v0.z);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length2(const v4_f32& v0) -> f32
+            {
+                return ( v0.x * v0.x + v0.y * v0.y + v0.z * v0.z + v0.w * v0.w);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_length2(const v4_f64& v0) -> f64
+            {
+                return ( v0.x * v0.x + v0.y * v0.y + v0.z * v0.z + v0.w * v0.w);
+            }
+
+
+
+            // Distance & Distance2
+            TYON_CUDA_SHARED
+            PROC vector_distance(const v2_f32& v0, const v2_f32& v1) -> f32
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance(const v2_f64& v0, const v2_f64& v1) -> f64
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance(const v3_f32& v0, const v3_f32& v1) -> f32
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance(const v3_f64& v0, const v3_f64& v1) -> f64
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance(const v4_f32& v0, const v4_f32& v1) -> f32
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance(const v4_f64& v0, const v4_f64& v1) -> f64
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance2(const v2_f32& v0, const v2_f32& v1) -> f32
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance2(const v2_f64& v0, const v2_f64& v1) -> f64
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance2(const v3_f32& v0, const v3_f32& v1) -> f32
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance2(const v3_f64& v0, const v3_f64& v1) -> f64
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance2(const v4_f32& v0, const v4_f32& v1) -> f32
+            {
+                return vector_length(v0 - v1);
+            }
+
+            TYON_CUDA_SHARED
+            PROC vector_distance2(const v4_f64& v0, const v4_f64& v1) -> f32
+            {
+                return vector_length(v0 - v1);
+            }
+
+
+
+            // Orthonormal basis
+            TYON_CUDA_SHARED
+            PROC construct_orthonormal_basis(const v3_f32& basis_vector_z, const v3_f32& omega, v3_f32& basis_vector_x, v3_f32& basis_vector_y) -> void
+            {
+                basis_vector_x = omega - vector_dot_product(omega, basis_vector_z)*basis_vector_z;
+                basis_vector_y = vector_cross_product(basis_vector_z, basis_vector_x);
+
+                basis_vector_x = basis_vector_x/vector_length(basis_vector_x);
+                basis_vector_y = basis_vector_y/vector_length(basis_vector_y);
+            }
+
+            TYON_CUDA_SHARED
+            PROC construct_orthonormal_basis(const v3_f64& basis_vector_z, const v3_f64& omega, v3_f64& basis_vector_x, v3_f64& basis_vector_y) -> void
+            {
+                basis_vector_x = omega - vector_dot_product(omega, basis_vector_z)*basis_vector_z;
+                basis_vector_y = vector_cross_product(basis_vector_z, basis_vector_x);
+
+                basis_vector_x = basis_vector_x/vector_length(basis_vector_x);
+                basis_vector_y = basis_vector_y/vector_length(basis_vector_y);
+            }
+
+
+
+            // z-aligned normal
+            TYON_CUDA_SHARED
+            PROC transform_to_z_aligned_normal(const v3_f32& omega_i, const v3_f32& normal, v3_f32& basis_vector_x, v3_f32& basis_vector_y, v3_f32& basis_vector_z) -> v3_f32
+            {
+                v3_f32 rotated_omega_i;
+
+                rotated_omega_i.x = vector_dot_product(omega_i, basis_vector_x);
+                rotated_omega_i.y = vector_dot_product(omega_i, basis_vector_y);
+                rotated_omega_i.z = vector_dot_product(omega_i, basis_vector_z);
+
+                return rotated_omega_i;
+            }
+
+            TYON_CUDA_SHARED
+            PROC transform_to_z_aligned_normal(const v3_f64& omega_i, const v3_f64& normal, v3_f64& basis_vector_x, v3_f64& basis_vector_y, v3_f64& basis_vector_z) -> v3_f64
+            {
+                v3_f64 rotated_omega_i;
+
+                rotated_omega_i.x = vector_dot_product(omega_i, basis_vector_x);
+                rotated_omega_i.y = vector_dot_product(omega_i, basis_vector_y);
+                rotated_omega_i.z = vector_dot_product(omega_i, basis_vector_z);
+
+                return rotated_omega_i;
+            }
+
+
+
+            // z to world space
+            TYON_CUDA_SHARED
+            PROC local_direction_to_world_space(const v3_f32& reference_dir, const f32& cos_theta, const f32& phi) -> v3_f32
+            {
+                f32 sin_theta = square_root(1.0f - cos_theta*cos_theta);
+
+                v3_f32 local_dir(
+                    sin_theta*cosinus(phi),
+                    sin_theta*sinus(phi),
+                    cos_theta
+                );
+
+                v3_f32 x_axis;
+                if (absolute(reference_dir.z) < 0.9f)
+                {
+                    x_axis.x = 0.0f;
+                    x_axis.y = 0.0f;
+                    x_axis.z = 1.0f;
+                }
+                else
+                {
+                    x_axis.x = 1.0f;
+                    x_axis.y = 0.0f;
+                    x_axis.z = 0.0f;
+                }
+
+                // Gram-Schmidt orthogonalization
+                x_axis = x_axis - reference_dir*vector_dot_product(x_axis, reference_dir);
+                x_axis = x_axis/vector_length(x_axis);
+
+                v3_f32 y_axis = vector_cross_product(reference_dir, x_axis);
+
+                return local_dir.x*x_axis + local_dir.y*y_axis + local_dir.z*reference_dir;
+            }
+
+            TYON_CUDA_SHARED
+            PROC local_direction_to_world_space(const v3_f64& reference_dir, const f64& cos_theta, const f64& phi) -> v3_f64
+            {
+                f64 sin_theta = square_root(1.0 - cos_theta*cos_theta);
+
+                v3_f64 local_dir(
+                    sin_theta*cosinus(phi),
+                    sin_theta*sinus(phi),
+                    cos_theta
+                );
+
+                v3_f64 x_axis;
+                if (absolute(reference_dir.z) < 0.9)
+                {
+                    x_axis.x = 0.0;
+                    x_axis.y = 0.0;
+                    x_axis.z = 1.0;
+                }
+                else
+                {
+                    x_axis.x = 1.0;
+                    x_axis.y = 0.0;
+                    x_axis.z = 0.0;
+                }
+
+                // Gram-Schmidt orthogonalization
+                x_axis = x_axis - reference_dir*vector_dot_product(x_axis, reference_dir);
+                x_axis = x_axis/vector_length(x_axis);
+
+                v3_f64 y_axis = vector_cross_product(reference_dir, x_axis);
+
+                return local_dir.x*x_axis + local_dir.y*y_axis + local_dir.z*reference_dir;
+            }
+
+
+
+        // Matrix
+            // Rotation
+            TYON_CUDA_SHARED
+            PROC general_2d_rotation_matrix(const f32& theta) -> matrix2_f32
+            {
+                matrix2_f32 result;
+                result.m11 = cosinus(theta);
+                result.m12 = -sinus(theta);
+                result.m21 = sinus(theta);
+                result.m22 = cosinus(theta);
+                return result;
+            }
+
+            TYON_CUDA_SHARED
+            PROC general_2d_rotation_matrix(const f64& theta) -> matrix2_f64
+            {
+                matrix2_f64 result;
+                result.m11 = cosinus(theta);
+                result.m12 = -sinus(theta);
+                result.m21 = sinus(theta);
+                result.m22 = cosinus(theta);
+                return result;
+            }
+
+            TYON_CUDA_SHARED
+            PROC general_3d_rotation_matrix(const f32& r_x, const f32& r_y, const f32& r_z) -> matrix3_f32
+            {
+                matrix3_f32 m_x, m_y, m_z;
+
+                // X Rotation
+                m_x.m11 = 1.0f;
+                m_x.m12 = 0.0f;
+                m_x.m13 = 0.0f;
+
+                m_x.m21 = 0.0f;
+                m_x.m22 = cosinus(r_x);
+                m_x.m23 = -sinus(r_x);
+
+                m_x.m31 = 0.0f;
+                m_x.m32 = sinus(r_x);
+                m_x.m33 = cosinus(r_x);
+            
+                // Y Rotation
+                m_y.m11 = cosinus(r_y);
+                m_y.m12 = 0.0f;
+                m_y.m13 = sinus(r_y);
+
+                m_y.m21 = 0.0f;
+                m_y.m22 = 1.0f;
+                m_y.m23 = 0.0f;
+
+                m_y.m31 = -sinus(r_y);
+                m_y.m32 = 0.0f;
+                m_y.m33 = cosinus(r_y);
+
+                // Z Rotation
+                m_z.m11 = cosinus(r_z);
+                m_z.m12= -sinus(r_z);
+                m_z.m13 = 0.0f;
+
+                m_z.m21 = sinus(r_z);
+                m_z.m22 = cosinus(r_z);
+                m_z.m23 = 0.0f;
+
+                m_z.m31 = 0.0f;
+                m_z.m32 = 0.0f;
+                m_z.m33 = 1.0f;
+
+                return m_x * m_y * m_z;
+            }
+
+            TYON_CUDA_SHARED
+            PROC general_3d_rotation_matrix(const f64& r_x, const f64& r_y, const f64& r_z) -> matrix3_f64
+            {
+            {
+                matrix3_f64 m_x, m_y, m_z;
+
+                // X Rotation
+                m_x.m11 = 1.0;
+                m_x.m12 = 0.0;
+                m_x.m13 = 0.0;
+
+                m_x.m21 = 0.0;
+                m_x.m22 = cosinus(r_x);
+                m_x.m23 = -sinus(r_x);
+
+                m_x.m31 = 0.0;
+                m_x.m32 = sinus(r_x);
+                m_x.m33 = cosinus(r_x);
+            
+                // Y Rotation
+                m_y.m11 = cosinus(r_y);
+                m_y.m12 = 0.0;
+                m_y.m13 = sinus(r_y);
+
+                m_y.m21 = 0.0;
+                m_y.m22 = 1.0;
+                m_y.m23 = 0.0;
+
+                m_y.m31 = -sinus(r_y);
+                m_y.m32 = 0.0;
+                m_y.m33 = cosinus(r_y);
+
+                // Z Rotation
+                m_z.m11 = cosinus(r_z);
+                m_z.m12= -sinus(r_z);
+                m_z.m13 = 0.0;
+
+                m_z.m21 = sinus(r_z);
+                m_z.m22 = cosinus(r_z);
+                m_z.m23 = 0.0;
+
+                m_z.m31 = 0.0;
+                m_z.m32 = 0.0;
+                m_z.m33 = 1.0;
+
+                return m_x * m_y * m_z;
+            }
+            }
+
+            TYON_CUDA_SHARED
+            PROC euler_rotation_matrix(const f32& theta, const v3_f32& u) -> matrix3_f32
+            {
+                matrix3_f32 R;
+
+                R.m11 = cosinus(theta) + u.x * u.x * (1.0f - cosinus(theta));
+                R.m12 = u.x * u.y * ( 1.0f - cosinus(theta)) - u.z * sinus(theta);
+                R.m13 = u.x * u.z * ( 1.0f - cosinus(theta)) + u.y * sinus(theta);
+
+                R.m21 = u.y * u.x * (1.0f - cosinus(theta)) + u.z * sinus(theta);
+                R.m22 = cosinus(theta) + u.y * u.y * (1.0f - cosinus(theta));
+                R.m23 = u.y * u.z * (1.0f - cosinus(theta)) - u.x * sinus(theta);
+
+                R.m31 = u.z * u.x * (1.0f - cosinus(theta)) - u.y * sinus(theta);
+                R.m32 = u.z * u.y * (1.0f - cosinus(theta)) + u.x * sinus(theta);
+                R.m33 = cosinus(theta) + u.z * u.z * (1.0f - cosinus(theta));
+
+                return R;
+            }
+
+            TYON_CUDA_SHARED
+            PROC euler_rotation_matrix(const f64& theta, const v3_f64& u) -> matrix3_f64
+            {
+                matrix3_f64 R;
+
+                R.m11 = cosinus(theta) + u.x * u.x * (1.0 - cosinus(theta));
+                R.m12 = u.x * u.y * ( 1.0 - cosinus(theta)) - u.z * sinus(theta);
+                R.m13 = u.x * u.z * ( 1.0 - cosinus(theta)) + u.y * sinus(theta);
+
+                R.m21 = u.y * u.x * (1.0 - cosinus(theta)) + u.z * sinus(theta);
+                R.m22 = cosinus(theta) + u.y * u.y * (1.0f - cosinus(theta));
+                R.m23 = u.y * u.z * (1.0 - cosinus(theta)) - u.x * sinus(theta);
+
+                R.m31 = u.z * u.x * (1.0 - cosinus(theta)) - u.y * sinus(theta);
+                R.m32 = u.z * u.y * (1.0 - cosinus(theta)) + u.x * sinus(theta);
+                R.m33 = cosinus(theta) + u.z * u.z * (1.0 - cosinus(theta));
+
+                return R;
+            }
+
+
+
+            // Transpose
+            TYON_CUDA_SHARED
+            PROC transpose_matrix(const matrix2_f32& m) -> matrix2_f32
+            {
+                matrix2_f32 transpose;
+                transpose.m11 = m.m11;
+                transpose.m12 = m.m21;
+                transpose.m21 = m.m12;
+                transpose.m22 = m.m22;
+
+                return transpose;
+            }
+
+            TYON_CUDA_SHARED
+            PROC transpose_matrix(const matrix2_f64& m) -> matrix2_f64
+            {
+                matrix2_f64 transpose;
+                transpose.m11 = m.m11;
+                transpose.m12 = m.m21;
+                transpose.m21 = m.m12;
+                transpose.m22 = m.m22;
+
+                return transpose;
+            }
+
+            TYON_CUDA_SHARED
+            PROC transpose_matrix(const matrix3_f32& m) -> matrix3_f32
+            {
+                matrix3_f32 transpose;
+                transpose.m11 = m.m11;
+                transpose.m12 = m.m21;
+                transpose.m13 = m.m31;
+                transpose.m21 = m.m12;
+                transpose.m22 = m.m22;
+                transpose.m23 = m.m32;
+                transpose.m31 = m.m13;
+                transpose.m32 = m.m23;
+                transpose.m33 = m.m33;
+
+                return transpose;
+            }
+
+            TYON_CUDA_SHARED
+            PROC transpose_matrix(const matrix3_f64& m) -> matrix3_f64
+            {
+                matrix3_f64 transpose;
+                transpose.m11 = m.m11;
+                transpose.m12 = m.m21;
+                transpose.m13 = m.m31;
+                transpose.m21 = m.m12;
+                transpose.m22 = m.m22;
+                transpose.m23 = m.m32;
+                transpose.m31 = m.m13;
+                transpose.m32 = m.m23;
+                transpose.m33 = m.m33;
+
+                return transpose;
+            }
+
+            TYON_CUDA_SHARED
+            PROC transpose_matrix(const matrix4_f32& m) -> matrix4_f32
+            {
+                matrix4_f32 transpose;
+                transpose.m11 = m.m11;
+                transpose.m12 = m.m21;
+                transpose.m13 = m.m31;
+                transpose.m14 = m.m41;
+                transpose.m21 = m.m12;
+                transpose.m22 = m.m22;
+                transpose.m23 = m.m32;
+                transpose.m24 = m.m42;
+                transpose.m31 = m.m13;
+                transpose.m32 = m.m23;
+                transpose.m33 = m.m33;
+                transpose.m34 = m.m43;
+                transpose.m41 = m.m14;
+                transpose.m42 = m.m24;
+                transpose.m43 = m.m34;
+                transpose.m44 = m.m44;
+
+                return transpose;
+            }
+
+            TYON_CUDA_SHARED
+            PROC transpose_matrix(const matrix4_f64& m) -> matrix4_f64
+            {
+                matrix4_f64 transpose;
+                transpose.m11 = m.m11;
+                transpose.m12 = m.m21;
+                transpose.m13 = m.m31;
+                transpose.m14 = m.m41;
+                transpose.m21 = m.m12;
+                transpose.m22 = m.m22;
+                transpose.m23 = m.m32;
+                transpose.m24 = m.m42;
+                transpose.m31 = m.m13;
+                transpose.m32 = m.m23;
+                transpose.m33 = m.m33;
+                transpose.m34 = m.m43;
+                transpose.m41 = m.m14;
+                transpose.m42 = m.m24;
+                transpose.m43 = m.m34;
+                transpose.m44 = m.m44;
+
+                return transpose;
+            }
+
+
+
+        // Conversion
+            // To radians
+            TYON_CUDA_SHARED
+            PROC to_radians(const f32& degrees) -> f32
+            {
+                return (degrees * M_PI) / 180.0f;
+            }
+
+            TYON_CUDA_SHARED
+            PROC to_radians(const f64& degrees) -> f64
+            {
+                return (degrees * M_PI) / 180.0;
+            }
+
+
+
+            // To degrees
+            TYON_CUDA_SHARED
+            PROC to_degrees(const f32& radians) -> f32
+            {
+                return radians * (180.0f / M_PI);
+            }
+
+            TYON_CUDA_SHARED
+            PROC to_degrees(const f64& radians) -> f64
+            {
+                return radians * (180.0 / M_PI);
+            }
+
+
+
+            // Spherical coordinates
+            TYON_CUDA_SHARED
+            PROC cartesian_to_spherical(const v3_f32& cartesian) -> v3_f32
+            {
+                f32 r = vector_length(cartesian);
+                f32 theta = arccos(cartesian.y / r);
+                f32 phi = arctan2(cartesian.z, cartesian.x);
+
+                return v3_f32(r, theta, phi);
+            }
+
+            TYON_CUDA_SHARED
+            PROC cartesian_to_spherical(const v3_f64& cartesian) -> v3_f64
+            {
+                f64 r = vector_length(cartesian);
+                f64 theta = arccos(cartesian.y / r);
+                f64 phi = arctan2(cartesian.z, cartesian.x);
+
+                return v3_f64(r, theta, phi);
+            }
+
+            TYON_CUDA_SHARED
+            PROC spherical_to_cartesian(const v3_f32& spherical) -> v3_f32
+            {
+                f32 x = spherical.x * sinus(spherical.y) * cosinus(spherical.z);
+                f32 y = spherical.x * cosinus(spherical.y);
+                f32 z = spherical.x * sinus(spherical.y) * sinus(spherical.z);
+
+                return v3_f32(x, y, z);
+            }
+
+            TYON_CUDA_SHARED
+            PROC spherical_to_cartesian(const v3_f64& spherical) -> v3_f64
+            {
+                f32 x = spherical.x * sinus(spherical.y) * cosinus(spherical.z);
+                f32 y = spherical.x * cosinus(spherical.y);
+                f32 z = spherical.x * sinus(spherical.y) * sinus(spherical.z);
+
+                return v3_f64(x, y, z);
+            }
+
+
+
+        // Utility
+            // Lerp
+            TYON_CUDA_SHARED
+            PROC lerp(const f32& a, const f32& b, const f32& t) -> f32
+            {
+                return a + t * (b - a);
+            }
+
+            TYON_CUDA_SHARED
+            PROC lerp(const f64& a, const f64& b, const f64& t) -> f64
+            {
+                return a + t * (b - a);
+            }
+
+            TYON_CUDA_SHARED
+            PROC lerp(const v2_f32& va, const v2_f32& vb, const f32& t) -> v2_f32
+            {
+                return v2_f32( lerp(va.x, vb.x, t), lerp(va.y, vb.y, t) );
+            }
+
+            TYON_CUDA_SHARED
+            PROC lerp(const v2_f64& va, const v2_f64& vb, const f64& t) -> v2_f64
+            {
+                return v2_f64( lerp(va.x, vb.x, t), lerp(va.y, vb.y, t) );
+            }
+
+            TYON_CUDA_SHARED
+            PROC lerp(const v3_f32& va, const v3_f32& vb, const f32& t) -> v3_f32
+            {
+                return v3_f32( lerp(va.x, vb.x, t), lerp(va.y, vb.y, t), lerp(va.z, vb.z, t) );
+            }
+
+            TYON_CUDA_SHARED
+            PROC lerp(const v3_f64& va, const v3_f64& vb, const f64& t) -> v3_f64
+            {
+                return v3_f64( lerp(va.x, vb.x, t), lerp(va.y, vb.y, t), lerp(va.z, vb.z, t) );
+            }
+
+            TYON_CUDA_SHARED
+            PROC lerp(const v4_f32& va, const v4_f32& vb, const f32& t) -> v4_f32
+            {
+                return v4_f32( lerp(va.x, vb.x, t), lerp(va.y, vb.y, t), lerp(va.z, vb.z, t), lerp(va.w, vb.w, t) );
+            }
+
+            TYON_CUDA_SHARED
+            PROC lerp(const v4_f64& va, const v4_f64& vb, const f64& t) -> v4_f64
+            {
+                return v4_f64( lerp(va.x, vb.x, t), lerp(va.y, vb.y, t), lerp(va.z, vb.z, t), lerp(va.w, vb.w, t) );
+            }
+
+
+
+            // Smooth step
+            TYON_CUDA_SHARED
+            PROC smooth_step(const f32& edge0, const f32& edge1, const f32& t) -> f32
+            {
+                f32 x = clamp_range(0.0f, 1.0f, ((t - edge0) / (edge1 * edge0)));
+                return x * x * (3.0f - 2.0f * x);
+            }
+
+            TYON_CUDA_SHARED
+            PROC smooth_step(const f64& edge0, const f64& edge1, const f64& t) -> f64
+            {
+                f64 x = clamp_range(0.0, 1.0, ((t - edge0) / (edge1 * edge0)));
+                return x * x * (3.0 - 2.0 * x);
+            }
+
+
+
+            // Absolute
+            TYON_CUDA_SHARED
+            PROC absolute(const f32& a) -> f32
+            {
+                return std::fabs(a);
+            }
+
+            TYON_CUDA_SHARED
+            PROC absolute(const f64& a) -> f64
+            {
+                return std::abs(a);
+            }
+
+
+
+            // Clamp
+            TYON_CUDA_SHARED
+            PROC clamp_range(const f32& edge0, const f32& edge1, const f32& a) -> f32
+            {
+                if(a < edge0) return edge0;
+                if(a > edge1) return edge1;
+                return a;
+            }
+
+            TYON_CUDA_SHARED
+            PROC clamp_range(const f64& edge0, const f64& edge1, const f64& a) -> f64
+            {
+                if(a < edge0) return edge0;
+                if(a > edge1) return edge1;
+                return a;
+            }
+
+
+
+            // Min
+            TYON_CUDA_SHARED
+            PROC minimum(const f32& a, const f32& b) -> f32
+            {
+                if(a < b)
+                {
+                    return a;
+                }
+                
+                return b;
+            }
+
+            TYON_CUDA_SHARED
+            PROC minimum(const f64& a, const f64& b) -> f64
+            {
+                if(a < b)
+                {
+                    return a;
+                }
+                
+                return b;
+            }
+
+
+
+            // Max
+            TYON_CUDA_SHARED
+            PROC maximum(const f32& a, const f32& b) -> f32
+            {
+                if(a > b)
+                {
+                    return a;
+                }
+                
+                return b;
+            }
+
+            TYON_CUDA_SHARED
+            PROC maximum(const f64& a, const f64& b) -> f64
+            {
+                if(a > b)
+                {
+                    return a;
+                }
+                
+                return b;
+            }
+
+
+
+            // Round down
+            TYON_CUDA_SHARED
+            PROC round_down(const f32& a) -> f32
+            {
+                return std::floorf(a);
+            }
+
+            TYON_CUDA_SHARED
+            PROC round_down(const f64& a) -> f64
+            {
+                return std::floor(a);
+            }
+
+
+
+            // Round up
+            TYON_CUDA_SHARED
+            PROC round_up(const f32& a) -> f32
+            {
+                return std::ceilf(a);
+            }
+
+            TYON_CUDA_SHARED
+            PROC round_up(const f64& a) -> f64
+            {
+                return std::ceil(a);
+            }
+
+
+
+            // Round normal
+            TYON_CUDA_SHARED
+            PROC round_normal(const f32& a) -> f32
+            {
+                return std::roundf(a);
+            }
+
+            TYON_CUDA_SHARED
+            PROC round_normal(const f64& a) -> f64
+            {
+                return std::round(a);
+            }
+
+
+
+            // Fraction
+            TYON_CUDA_SHARED
+            PROC fraction(const f32& a) -> f32
+            {
+                f32 _fraction;
+                return std::modff(a, &_fraction);
+            }
+
+            TYON_CUDA_SHARED
+            PROC fraction(const f64& a) -> f64
+            {
+                f64 _fraction;
+                return std::modf(a, &_fraction);
+            }
+
+
+
+            // Remap
+            TYON_CUDA_SHARED
+            PROC remap(const f32& start0, const f32& end0, const f32& start1, const f32& end1, const f32& value) -> f32
+            {
+                return start1 + ((end1 - start1) / (end0 - start0)) * (value - start0);
+            }
+
+            TYON_CUDA_SHARED
+            PROC remap(const f64& start0, const f64& end0, const f64& start1, const f64& end1, const f64& value) -> f64
+            {
+                return start1 + ((end1 - start1) / (end0 - start0)) * (value - start0);
+            }
+
+
+
+            // Swap
+            TYON_CUDA_SHARED
+            PROC swap_pair(f32& a, f32& b) -> void
+            {
+                f32 temp = b;
+                b = a;
+                a = temp;
+            }
+
+            TYON_CUDA_SHARED
+            PROC swap_pair(f64& a, f64& b) -> void
+            {
+                f64 temp = b;
+                b = a;
+                a = temp;
+            }
+
+            TYON_CUDA_SHARED
+            PROC swap_pair(c32& a, c32& b) -> void
+            {
+                c32 temp = b;
+                b = a;
+                a = temp;
+            }
+
+            TYON_CUDA_SHARED
+            PROC swap_pair(c64& a, c64& b) -> void
+            {
+                c64 temp = b;
+                b = a;
+                a = temp;
+            }
+
+            TYON_CUDA_SHARED
+            PROC swap_pair(v2_f32& a, v2_f32& b) -> void
+            {
+                v2_f32 temp = b;
+                b = a;
+                a = temp;
+            }
+
+            TYON_CUDA_SHARED
+            PROC swap_pair(v2_f64& a, v2_f64& b) -> void
+            {
+                v2_f64 temp = b;
+                b = a;
+                a = temp;
+            }
+
+            TYON_CUDA_SHARED
+            PROC swap_pair(v3_f32& a, v3_f32& b) -> void
+            {
+                v3_f32 temp = b;
+                b = a;
+                a = temp;
+            }
+
+            TYON_CUDA_SHARED
+            PROC swap_pair(v3_f64& a, v3_f64& b) -> void
+            {
+                v3_f64 temp = b;
+                b = a;
+                a = temp;
+            }
+
+            TYON_CUDA_SHARED
+            PROC swap_pair(v4_f32& a, v4_f32& b) -> void
+            {
+                v4_f32 temp = b;
+                b = a;
+                a = temp;
+            }
+
+            TYON_CUDA_SHARED
+            PROC swap_pair(v4_f64& a, v4_f64& b) -> void
+            {
+                v4_f64 temp = b;
+                b = a;
+                a = temp;
+            }
 }
