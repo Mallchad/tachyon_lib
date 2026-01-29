@@ -80,7 +80,9 @@
 #define FMT_USE_EXCEPTIONS 0
 
 // Slow to compile?
-#define FMT_HEADER_ONLY 1
+#if (TYON_FMTLIB_HEADER_ONLY)
+    #define FMT_HEADER_ONLY 1
+#endif
 
 // #define FMT_USE_CONSTEXPR 1
 // #define FMT_USE_CONSTEVAL 0
