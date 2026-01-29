@@ -80,7 +80,7 @@
 #define FMT_USE_EXCEPTIONS 0
 
 // Slow to compile?
-// #define FMT_HEADER_ONLY 1
+#define FMT_HEADER_ONLY 1
 
 // #define FMT_USE_CONSTEXPR 1
 // #define FMT_USE_CONSTEVAL 0
