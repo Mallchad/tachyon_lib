@@ -19,11 +19,20 @@ test_linked_list()
     push.push_tail( 10 );
 
     TYON_LOG( "Testing push to linked-list" );
+    fstring line_1;
+    fstring line_2;
+    std::vector<int> output;
     auto i_push = push.indexer_ranged( 0, push.nodes.size() - 1 );
     for (; i_push.do_iteration; i_push.forward())
     {
-        TYON_LOG( i_push.value->value );
+        line_2 += format::format( "{}", i_push.index );
+        line_1 += fmt::format( "{}", i_push.value->value );
+        output.push_back( i_push.value );
     }
+    TYON_LOG( line_2 );
+    TYON_LOG( line_2 );
+    auto compare = std::vector<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    TYON_LOGF( "matchin_output: {}", memcmp( output(), compare.data(), compare.size())  );
 
     push.remove_node( push[3] );
     push.remove_node( push[1] );

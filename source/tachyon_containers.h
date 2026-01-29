@@ -715,13 +715,13 @@ struct linked_list
         /** Returns true if this iteration should be used */
         PROC forward() -> fresult
         {
-            bool next_valid = (value->next < 0);
-            do_iteration = (index <= range_max);
-            if (do_iteration && next_valid)
-            {   TYON_ERROR( "Container must be broken if the next node is negative" );
+            bool next_invalid = (value->next < 0);
+            do_iteration = (index < range_max);
+            if (do_iteration && next_invalid)
+            {   TYON_ERROR( "Container must be broken if the current node is negative" );
                 TYON_BREAK();
             }
-            if (next_valid)
+            if (next_invalid == false)
             {   value = &context->nodes[ value->next ];
             }
             index += 1;
@@ -731,8 +731,9 @@ struct linked_list
         /** Returns true if this iteration should be used */
         PROC backward() -> fresult
         {
-            do_iteration = (index - 1 >= range_min);
-            if (do_iteration && value->prev < 0)
+            bool prev_invalid = (value->prev < 0);
+            do_iteration = (index > range_min);
+            if (do_iteration && prev_invalid)
             {   TYON_ERROR( "Container must be broken if the prev node is negative" );
                 TYON_BREAK();
             }

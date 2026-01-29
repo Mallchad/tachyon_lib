@@ -118,7 +118,7 @@ namespace tyon
 #ifdef __GNUC__
     #define TYON_SOURCE_LOCATION() ::tyon::source_location { __LINE__, 0, __FILE__, __PRETTY_FUNCTION__ }
 #else
-    #define TYON_SOURCE_LOCATION() source_location()
+    #define TYON_SOURCE_LOCATION() ::tyon::source_location { __LINE__, 0, __FILE__, __func__ }
 #endif // __GNUC__
 
 
