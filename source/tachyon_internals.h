@@ -49,6 +49,7 @@ struct log_entry
     log_string category;
     log_string message;
     time_date timestamp;
+    source_location call_point;
 };
 
 FORWARD template <class> struct array;

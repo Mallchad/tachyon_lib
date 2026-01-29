@@ -451,7 +451,7 @@ namespace tyon
 
         // Cast it to a normal string to let std::filesystem convert Windows wstrings.
         fstring file_string = target.string();
-        new_file = fopen( file_string.c_str(), "r" );
+        new_file = fopen( file_string.c_str(), "rb" );
         if (new_file == nullptr)
         {
             TYON_LOG( "File", "Failed to open file: ", target );
@@ -469,6 +469,7 @@ namespace tyon
 
         // Return to beginning
         fseek( new_file, 0, SEEK_SET );
+        i64 pos = ftell( new_file );
 
         result.memory.data = allocator->allocate_raw( filesize );
         if (result.memory.data == nullptr)
@@ -476,6 +477,8 @@ namespace tyon
         result.memory.size = filesize;
 
         isize read_size = fread( result.memory.data, sizeof(byte), result.memory.size, new_file );
+        bool end_of_file = feof( new_file );
+        i32 file_error = ferror( new_file );
         ERROR_GUARD( read_size == result.memory.size,
                      "Something is amiss if we read a different amount than we sized for." );
         TYON_LOG( "File", "Loaded whole file at path: ", target );
@@ -493,7 +496,7 @@ namespace tyon
         fstring filename = arg->filename.string();
 
         // Overwrite pre-existing file completely
-        FILE* file_ = fopen( filename.c_str(), "w" );
+        FILE* file_ = fopen( filename.c_str(), "wb" );
         ERROR_GUARD( file_, "Failed to open file" );
         u64 bytes_written = fwrite( arg->memory.data, 1, arg->memory.size, file_ );
         bool write_ok = (i64(bytes_written) >= arg->memory.size);
