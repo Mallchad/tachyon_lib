@@ -539,9 +539,14 @@ namespace tyon
         for (; i_search < g_asset->search_paths.head_size; ++i_search)
         {
             x_path = g_asset->search_paths[i_search];
-            if (fs::is_directory( x_path ) == false) { continue; }
+            x_path = fs::canonical( x_path );
+            if (fs::is_directory( x_path ) == false)
+            {   TYON_LOGF( "Failed to find asset search path: '{}'", x_path.string() );
+                continue;
+            }
+            TYON_LOGF( "Searching for assets in search_path: '{}'", x_path.string() );
             auto iterator = fs::recursive_directory_iterator( x_path );
-            for (i32 i_file=0; i_file < iteration_limit; i_file++)
+            for (i32 i_file=0; i_file < iteration_limit; i_file++, iterator++)
             {
                 if (iterator == fs::end( iterator)) { break; }
                 x_entry = *iterator;
@@ -555,7 +560,7 @@ namespace tyon
                 {
                     // TODO: Do asset reloading logic
                     TYON_LOGF( "Skipping already existing asset for load '{}'",
-                               lookup.match->name );
+                               lookup.match->file_.filename );
                     continue;
                 }
 
@@ -566,7 +571,6 @@ namespace tyon
                     new_asset.name = x_filename.filename().string();
                     g_asset->assets.push_tail( new_asset );
                 }
-                iterator++;
             }
         }
 
