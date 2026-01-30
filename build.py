@@ -127,15 +127,29 @@ if args.clean:
 
 # Main Program
 
-build_dir_empty = os.path.isdir( build_dir )
-if args.clean or build_dir_empty:
-    execute( "meson setup build" )
-if args.configure:
-    execute( "meson setup build --reconfigure" )
+build_dir_empty = not os.path.isdir( build_dir )
+configure_fail = 0
+build_fail = 0
+test_fail = 0
+did_configure = False
 
-execute( "meson compile -C build" )
+if args.clean or build_dir_empty:
+    configure_fail = execute( "meson setup build" )
+    did_configure = True
+if args.configure:
+    configure_fail = execute( "meson setup build --reconfigure" )
+    did_configure = True
+
+# Don't try to fail if we didn't do a manual configuration
+if did_configure and configure_fail:
+    sys.exit( 1 )
+
+build_fail = execute( "meson compile -C build" )
+
+if build_fail:
+    sys.exit( 1)
 
 if args.test_no_output:
-    execute( "meson test -C build" )
+    test_fail = execute( "meson test -C build" )
 else:
-    execute( "meson test -C build --verbose" )
+    test_fail = execute( "meson test -C build --verbose" )
