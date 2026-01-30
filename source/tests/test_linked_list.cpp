@@ -25,14 +25,14 @@ test_linked_list()
     auto i_push = push.indexer_ranged( 0, push.nodes.size() - 1 );
     for (; i_push.do_iteration; i_push.forward())
     {
-        line_2 += format::format( "{}", i_push.index );
+        line_2 += fmt::format( "{}", i_push.index );
         line_1 += fmt::format( "{}", i_push.value->value );
-        output.push_back( i_push.value );
+        output.push_back( i_push.value->value );
     }
     TYON_LOG( line_2 );
     TYON_LOG( line_2 );
     auto compare = std::vector<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    TYON_LOGF( "matchin_output: {}", memcmp( output(), compare.data(), compare.size())  );
+    TYON_LOGF( "matchin_output: {}", memcmp( output.data(), compare.data(), compare.size())  );
 
     push.remove_node( push[3] );
     push.remove_node( push[1] );
