@@ -41,19 +41,20 @@ test1 = executable(
 )
 
 if tyon_cuda_on
-# Broken
-if system_name == 'linux'
-# test2 = executable(
-#   'tachyon_lib_tests_cuda_meson',
-#   'source/tests/tachyon_lib_tests_cuda.cu',
-#   include_directories : cuda_includes,
-#   dependencies: cuda_dependency
-# )
+  # Broken
+  if system_name == 'linux'
+    message( 'Linux Cuda' )
+    test2 = executable(
+      'tachyon_lib_tests_cuda_meson',
+      'source/tests/tachyon_lib_tests_cuda.cu',
+      include_directories : cuda_includes,
+      dependencies: cuda_dependency
+)
 
 else
-# command structure used
-# clear ; nvcc .\source\tests\tachyon_lib_tests_cuda.cu -std=c++20 -I .\external\fmt\include\ -lrpcrt4 -g
-test2 = custom_target(
+  # command structure used
+  # clear ; nvcc .\source\tests\tachyon_lib_tests_cuda.cu -std=c++20 -I .\external\fmt\include\ -lrpcrt4 -g
+  test2 = custom_target(
     'tachyon_lib_tests_cuda',
     build_by_default: true,
     install: true,
@@ -70,9 +71,10 @@ test2 = custom_target(
       '-g',
       '-D', 'CCCL_ENABLE_ASSERTIONS=1'
     ]
-)
-test( 'tachyon_lib_tests_all', test2 )
+  )
 endif
+test( 'tachyon_lib_tests_all', test2 )
+
 endif
 
 # # Need to fill out
