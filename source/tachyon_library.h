@@ -22,7 +22,6 @@
         #define TYON_API __declspec(dllimport)
     #endif
 #endif
-#define TYON_API
 
 // TYON_BREAK should be valid in release builds
 #define TYON_SIGTRAP 5
