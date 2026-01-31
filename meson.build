@@ -59,13 +59,13 @@ else
     build_by_default: true,
     install: true,
     install_dir: 'runtime',
-    output : 'tachyon_lib_tests_cuda.exe',
+    output : 'tachyon_lib_tests_cuda.so',
     input : 'source/tests/tachyon_lib_tests_cuda.cu',
     command : [
       'nvcc',
       '@INPUT@',
       '-std=c++20',
-      '-l', 'rpcrt4',
+      # Forcefully interpret library as CUDA C++
       '-o', '@OUTPUT@',
       '-I', '../external/fmt/include',
       '-g',
@@ -76,6 +76,70 @@ endif
 test( 'tachyon_lib_tests_all', test2 )
 
 endif
+
+# NOTE: Custom command to test VMEC setup
+uuid_library = 'uuid'
+tachyon_lib_cuda = custom_target(
+    'tachyon_lib_cuda',
+    build_by_default: true,
+    install: true,
+    install_dir: 'runtime',
+    output : 'tachyon_lib_cuda.so',
+    input : 'source/build_control/tachyon_lib_unity_core.cpp',
+    command : [
+      'nvcc',
+      '@INPUT@',
+      # Generated shared library
+      '--shared',
+      '--relocatable-device-code=true',
+      # Need to tell Linux compiler to make code position independent too
+      '--compiler-options', '-fPIC',
+      '--device-link',
+
+      # Forcefully interpret library as CUDA C++
+      '-x', 'cu',
+      '-std=c++20',
+      '-l', uuid_library,
+       # cPTX Linker Verbose help
+      '--ptxas-options=--verbose',
+      '-o', '@OUTPUT@',
+      '-I', '../external/fmt/include',
+      '-g',
+      '-D', 'CCCL_ENABLE_ASSERTIONS=1'
+    ]
+  )
+
+
+
+custom_target(
+    'tachyon_lib_tests_cuda_dll',
+    build_by_default: true,
+    install: true,
+    install_dir: 'runtime',
+    output : 'tachyon_lib_tests_cuda_dll.exe',
+    input : [tachyon_lib_cuda, 'source/tests/tachyon_lib_tests_cuda_dll.cu' ],
+    command : [
+      'nvcc',
+      '@INPUT@',
+      '-std=c++20',
+      '--device-link',
+
+      # Not relevant for code with an entry point
+      # Generated shared library
+      # '--shared',
+      # '--relocatable-device-code=true',
+      # Need to tell Linux compiler to make code position independent too
+      '--compiler-options', '-fPIC',
+
+      # PTX Linker Verbose help
+      '--ptxas-options=--verbose',
+      '-o', '@OUTPUT@',
+      '-I', '../external/fmt/include',
+      '-g',
+      '-D', 'CCCL_ENABLE_ASSERTIONS=1'
+    ]
+  )
+  # 'source/tests/tachyon_lib_tests_core.cpp',
 
 # # Need to fill out
 # test3 = executable(
