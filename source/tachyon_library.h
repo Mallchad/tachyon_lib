@@ -11,17 +11,21 @@
 // #include <thread>
 // #include <mutex>
 
+#define TYON_SHARED_LIBRARY 0
+
 #ifndef TYON_EXPORTS
     #define TYON_EXPORTS 0
 #endif
 
-#if  (REFLECTION_PLATFORM_WINDOWS)
+#if  (REFLECTION_PLATFORM_WINDOWS && TYON_SHARED_LIBRARY)
     #if (TYON_EXPORTS)
         #define TYON_API __declspec(dllexport)
     #else
         #define TYON_API __declspec(dllimport)
     #endif
-#endif
+#else
+    #define TYON_API
+#endif // REFLECTION_PLATFORM_WINDOWS && TYON_SHARED_LIBRARY
 
 // TYON_BREAK should be valid in release builds
 #define TYON_SIGTRAP 5
