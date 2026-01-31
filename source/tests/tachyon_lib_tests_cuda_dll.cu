@@ -1,16 +1,22 @@
 
-#include "../build_control/tachyon_lib_unity_core.cpp"
+// Not including on purpose because we're testing tachyon lib as a shared library
+// #include "../build_control/tachyon_lib_unity_core.cpp"
+
+#include "../include_tachyon_lib_core.h"
 
 using namespace tyon;
+#if REFLECTION_COMPILER_CUDA
+    #pragma message "Compiling for CUDA"
+#endif
 
 extern array<typed_procedure<void()>> g_tests_list;
 array<typed_procedure<void()>> g_tests_list {};
 
 TYON_CUDA_KERNEL void test_kernel()
 {
-    tyon::v3_f32 foo = 5;
-    foo = foo * foo;
-    f32 test_float = tyon::square_root( foo.x );
+    // tyon::v3_f32 foo;
+    // foo = foo * foo;
+    f32 test_float = tyon::square_root( 5.0f );
     printf( "yep yep \n" );
 }
 

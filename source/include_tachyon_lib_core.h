@@ -79,6 +79,10 @@
 // Causing exceptions on formatting code is just bad. don't do it.
 #define FMT_USE_EXCEPTIONS 0
 
+#ifndef TYON_FMTLIB_HEADER_ONLY
+    #define TYON_FMTLIB_HEADER_ONLY 1
+#endif
+
 // Slow to compile?
 #if (TYON_FMTLIB_HEADER_ONLY)
     #define FMT_HEADER_ONLY 1
