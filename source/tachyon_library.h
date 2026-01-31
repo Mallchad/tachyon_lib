@@ -141,27 +141,27 @@ namespace tyon
 
     // -- Globals Variables --
     // make sure to initialize Pointer Types before using
-    extern tyon::time_monotonic g_program_epoch;
-    extern bool g_little_endian;
-    extern i32 g_log_largest_category;
-    extern memory_stack_allocator* g_allocator;
-    extern memory_stack_allocator* g_taint_allocator;
-    extern std::mutex* g_allocator_lock;
-    extern std::mutex g_taint_allocator_lock;
+    TYON_API extern tyon::time_monotonic g_program_epoch;
+    TYON_API extern bool g_little_endian;
+    TYON_API extern i32 g_log_largest_category;
+    TYON_API extern memory_stack_allocator* g_allocator;
+    TYON_API extern memory_stack_allocator* g_taint_allocator;
+    TYON_API extern std::mutex* g_allocator_lock;
+    TYON_API extern std::mutex g_taint_allocator_lock;
     constexpr isize memory_default_block_size = 268'435'456;
 
     // TODO: Make these use null pages
-    extern raw_pointer g_null_read;
-    extern raw_pointer g_null_write;
+    TYON_API extern raw_pointer g_null_read;
+    TYON_API extern raw_pointer g_null_write;
 
-    extern library_context* g_library;
-    extern logger* g_logger;
+    TYON_API extern library_context* g_library;
+    TYON_API extern logger* g_logger;
     // Prevent deadlocking from recursive calls
-    extern logger* g_switch_logger;
-    extern asset g_asset_stub;
-    extern asset_machine* g_asset;
+    TYON_API extern logger* g_switch_logger;
+    TYON_API extern asset g_asset_stub;
+    TYON_API extern asset_machine* g_asset;
 
-    extern null_type null;
+    TYON_API extern null_type null;
 
     struct raw_pointer
     {
