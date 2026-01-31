@@ -1,6 +1,10 @@
 
 #pragma once
 
+// Required for windows DLL
+#define TYON_EXPORTS 1
+#include "../include_tachyon_lib_core.h"
+
 #include "../tachyon_library.cpp"
 #include "../tachyon_math.cpp"
 #include "../tachyon_platform_common.cpp"
