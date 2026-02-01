@@ -50,8 +50,9 @@ namespace reflection
 // nVIDIA CUDA SDK
 #if (__NVCC__)
     #define REFLECTION_COMPILER_CUDA 1
-    constexpr tyon::fstring_view compiler_name = "nvcc";
-    constexpr tyon::version compiler_version = {};
+    // Relies on host compiler like clang or gcc. can't override this name
+    // constexpr tyon::fstring_view compiler_name = "nvcc";
+    // constexpr tyon::version compiler_version = {};
 #else
     #define REFLECTION_COMPILER_CUDA 0
 #endif // __NVCC__
