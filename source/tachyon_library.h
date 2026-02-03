@@ -869,6 +869,11 @@ namespace tyon
             else
             {   return {}; }
         }
+
+        /** Returns a copy of the the only match OR the specified default value */
+        PROC copy_default( T default_value ) -> T
+        {   return (match_found ? *match : default_value);
+        }
     };
 
     inline bool function_simple_stub() { return false; }
