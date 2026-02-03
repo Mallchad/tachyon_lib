@@ -872,7 +872,7 @@ namespace tyon
 
         /** Returns a copy of the the only match OR the specified default value */
         PROC copy_default( T default_value ) -> T
-        {   return (match_found ? *match : default_value);
+        {   return (error == false ? value : default_value);
         }
     };
 
