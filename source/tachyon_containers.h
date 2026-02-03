@@ -109,6 +109,21 @@ struct search_result
     T* match = nullptr;
     i64 index = -1;
     bool match_found = false;
+
+    /** Returns a copy of the the only match OR the specified default value */
+    PROC copy_default( T default_value ) -> T
+    {   return (match_found ? *match : default_value);
+    }
+
+    /** Returns a pointer to only match OR the specified default value */
+    PROC allocate_default( T default_value ) -> T*
+    {   if (this->match)
+        {   return this->match;
+        }
+        T* result = memory_allocate<T>( 1 );
+        *result = default_value;
+        return result;
+    }
 };
 
 template <typename t_key, typename t_value>

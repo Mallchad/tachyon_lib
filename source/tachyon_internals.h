@@ -104,6 +104,8 @@ struct logger
         };
         e_primitive type;
 
+        PROC get_string() -> monad<fstring>;
+
         CONSTRUCTOR dynamic_primitive();
 
         CONSTRUCTOR dynamic_primitive( const dynamic_primitive& arg );

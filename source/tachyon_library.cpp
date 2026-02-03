@@ -863,9 +863,10 @@ namespace tyon
         }
 
         bool double_dash_flag = false;
-        bool quote_arg = false;
-        bool speech_arg = false;
-        bool string_arg = false;
+        /** NOTE: I  Tried to detect strings  here but we can't  do that because
+            quote or speech marks are never  actually provided to us. So we just
+            have  to  take  it  verbatim  as  a  string  if  no  other  type  is
+            detected. Even if it looks weird. */
         bool empty_string_arg = (arg.size() == 0);
         bool assignment_flag = false;
 
@@ -879,9 +880,20 @@ namespace tyon
 
         i32 offset = 0;
         if (double_dash_flag)
-        {   offset = 2;
-        }
+        {   // Skip first two chars
+            offset = 2;
 
+            // Strip assignment chars if exists
+            if (arg.back() == '=')
+            {   arg.resize( arg.size() - 1 );
+            }
+            else if (arg.back() == ':')
+            {   arg.resize( arg.size() - 1 );
+            }
+            else if (arg.back() == '=' && arg.back()-- == ':')
+            {   arg.resize( arg.size() -2 );
+            }
+        }
         bool numeric_flag = true;
         bool float_flag = false;
         char x_char = 0;
@@ -890,6 +902,16 @@ namespace tyon
         {
             x_char = arg[ offset + i ];
             x_char = std::tolower( x_char );
+
+            if (double_dash_flag)
+            {
+                // Convert dashed arguments to underscore for uniformity
+                x_char = (x_char =='-' ? '_' : x_char);
+                // Skip adding whitespace
+                if (x_char == ' ')
+                {   continue;
+                }
+            }
             normalized[i] = x_char;
 
             bool float_char = (x_char == 'e' || x_char == 'E');
@@ -920,8 +942,7 @@ namespace tyon
             }
         }
         else // String Value
-        {   normalized = (empty_string_arg ? ""  :
-                          arg.substr( 1, arg.size() - 1 ));
+        {   normalized = arg;
             result.value = normalized;
             result.is_value = true;
             return result;
@@ -947,7 +968,7 @@ namespace tyon
         {
             x_arg = argv[i];
             cmdline_argument x_argument = string_cmdline_parse( x_arg );
-            TYON_LOGF( "    '{}'", x_argument.original );
+            TYON_LOGF( "    '{}' Internal Name: '{}'", x_argument.original, x_argument.name );
             bool next_in_range = (1+ i < arg_limit);
             if (x_argument.requires_value && next_in_range)
             {   cmdline_argument x_next = string_cmdline_parse( argv[1+ i] );
@@ -998,6 +1019,17 @@ namespace tyon
             case e_primitive::pointer_:   return "e_primitive::pointer_";
             case e_primitive::string_:    return "e_primitive::string_";
         }
+    }
+
+    PROC dynamic_primitive::get_string() -> monad<fstring>
+    {   monad<fstring> result;
+        if (type == e_primitive::string_)
+        {   result.value = string_;
+        }
+        else
+        {   result.error = true;
+        }
+        return result;
     }
 
     CONSTRUCTOR dynamic_primitive::dynamic_primitive()

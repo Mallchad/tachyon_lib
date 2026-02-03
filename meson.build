@@ -22,7 +22,7 @@ elif system_name == 'windows'
 endif
 
 cuda = import('unstable-cuda')
-tyon_cuda_on = true
+tyon_cuda_on = false
 cuda_dependency = [
   dependency(
   'cuda', version : '>=10',
@@ -41,19 +41,15 @@ test1 = executable(
 )
 
 if tyon_cuda_on
-  # Broken
-  if system_name == 'linux'
-    message( 'Linux Cuda' )
-    test2 = executable(
-      'tachyon_lib_tests_cuda_meson',
-      'source/tests/tachyon_lib_tests_cuda.cu',
-      include_directories : cuda_includes,
-      dependencies: cuda_dependency
-)
-
-else
   # command structure used
   # clear ; nvcc .\source\tests\tachyon_lib_tests_cuda.cu -std=c++20 -I .\external\fmt\include\ -lrpcrt4 -g
+  uuid_flag = ''
+  if  system_name == 'linux'
+    uuid_flag = '-luuid'
+  else
+    uuid_flag = '-lrpcrt4'
+  endif
+
   test2 = custom_target(
     'tachyon_lib_tests_cuda',
     build_by_default: true,
@@ -69,11 +65,11 @@ else
       '-o', '@OUTPUT@',
       '-I', '../external/fmt/include',
       '-g',
-      '-D', 'CCCL_ENABLE_ASSERTIONS=1'
+      '-D', 'CCCL_ENABLE_ASSERTIONS=1',
+      uuid_flag
     ]
   )
-endif
-test( 'tachyon_lib_tests_all', test2 )
+  test( 'tachyon_lib_tests_all', test2 )
 
 endif
 
@@ -108,38 +104,6 @@ tachyon_lib_cuda = custom_target(
       '-D', 'CCCL_ENABLE_ASSERTIONS=1'
     ]
   )
-
-
-
-custom_target(
-    'tachyon_lib_tests_cuda_dll',
-    build_by_default: true,
-    install: true,
-    install_dir: 'runtime',
-    output : 'tachyon_lib_tests_cuda_dll.exe',
-    input : [tachyon_lib_cuda, 'source/tests/tachyon_lib_tests_cuda_dll.cu' ],
-    command : [
-      'nvcc',
-      '@INPUT@',
-      '-std=c++20',
-      '--device-link',
-
-      # Not relevant for code with an entry point
-      # Generated shared library
-      # '--shared',
-      # '--relocatable-device-code=true',
-      # Need to tell Linux compiler to make code position independent too
-      '--compiler-options', '-fPIC',
-
-      # PTX Linker Verbose help
-      '--ptxas-options=--verbose',
-      '-o', '@OUTPUT@',
-      '-I', '../external/fmt/include',
-      '-g',
-      '-D', 'CCCL_ENABLE_ASSERTIONS=1'
-    ]
-  )
-  # 'source/tests/tachyon_lib_tests_core.cpp',
 
 # # Need to fill out
 # test3 = executable(
