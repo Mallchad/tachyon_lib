@@ -116,11 +116,18 @@ struct logger
 
         PROC operator= ( int rhs ) -> dynamic_primitive&;
 
+        /** Internal deduplication helper */
+        PROC copy_from( const dynamic_primitive& rhs ) -> dynamic_primitive&;
+
+        /** Internal container reset */
         PROC clean_old() -> void;
 
         DESTRUCTOR ~dynamic_primitive();
 
     };
+
+    /** Copy and swap helper */
+    void swap( dynamic_primitive& a, dynamic_primitive& b );
 
     struct cmdline_argument
     {

@@ -1037,34 +1037,29 @@ namespace tyon
     }
 
     CONSTRUCTOR dynamic_primitive::dynamic_primitive( const dynamic_primitive& arg )
-    {
-        memory_zero_raw( this, sizeof(dynamic_primitive));
-        memory_copy<const dynamic_primitive>( this, &arg, 1 );
+    {   copy_from( arg );
     }
 
     PROC dynamic_primitive::operator= ( const dynamic_primitive& rhs ) -> dynamic_primitive&
+    {   return copy_from( rhs );
+    }
+
+    PROC dynamic_primitive::operator= ( const fstring& rhs ) -> dynamic_primitive&
+    {   clean_old();
+        new(&string_) fstring { rhs };
+        type = e_primitive::string_;
+        return *this;
+    }
+
+    PROC dynamic_primitive::copy_from( const dynamic_primitive& rhs ) -> dynamic_primitive&
     {
         clean_old();
-
         if (rhs.type == e_primitive::string_)
-        {   new(&string_) fstring { rhs.string_ },
+        {   new(&string_) fstring { rhs.string_ };
             type = e_primitive::string_;
         }
         else
         {   memory_copy<const dynamic_primitive>( this, &rhs, 1 );
-        }
-        return *this;
-    }
-
-    PROC dynamic_primitive::operator= ( const fstring& rhs ) -> dynamic_primitive&
-    {
-        if (type == e_primitive::string_)
-        {   string_ = rhs;
-        }
-        else
-        {   clean_old();
-            new(&string_) fstring { rhs },
-            type = e_primitive::string_;
         }
         return *this;
     }
