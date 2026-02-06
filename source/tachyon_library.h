@@ -1681,12 +1681,6 @@ namespace tyon
         update_status();
     };
 
-    auto file_load_binary( const fpath target, i_memory_allocator* allocator = g_allocator ) -> file;
-
-    auto file_write_binary( file* arg ) -> fresult;
-
-    auto file_write_binary_stdlib( file* arg ) -> fresult;
-
     /////////////////////////////
 ////// -- Threading Library -- /////////////////////////////////////////////////
     /////////////////////////////

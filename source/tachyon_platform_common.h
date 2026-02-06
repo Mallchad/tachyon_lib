@@ -121,7 +121,18 @@ namespace tyon
     fresult
     file_open( file* arg );
 
+    auto file_load_binary( const fpath target, i_memory_allocator* allocator = g_allocator ) -> file;
+
+    auto file_write_binary( file* arg ) -> fresult;
+
+    auto file_write_binary_stdlib( file* arg ) -> fresult;
+
     PROC file_set_working_directory( fstring arg ) -> void;
+
+    /** Recursively creates directory specified.
+
+     Returns true if directy exists at the end */
+    PROC file_create_directory( fstring arg ) -> fresult;
 
     u128
     uuid_generate();

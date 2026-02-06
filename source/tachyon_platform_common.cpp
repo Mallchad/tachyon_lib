@@ -14,4 +14,14 @@ namespace tyon
         fs::current_path( arg );
     }
 
+    PROC file_create_directory( fstring arg )  -> fresult
+    {
+        fresult result = false;
+        try 
+        {   result = fs::create_directories( arg );
+        }
+        catch ( std::exception& e ) { TYON_ERRORF( "An exception occured: '{}'", e.what() ); }
+        return result;
+    }
+
 }
