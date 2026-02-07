@@ -1019,6 +1019,7 @@ namespace tyon
             case e_primitive::pointer_:   return "e_primitive::pointer_";
             case e_primitive::string_:    return "e_primitive::string_";
         }
+        return "no_conversion_found";
     }
 
     PROC dynamic_primitive::get_string() -> monad<fstring>
