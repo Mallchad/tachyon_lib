@@ -66,10 +66,6 @@
 #define NODECLARE
 #define NODEC
 
-// Confusing Static Usage
-#define INTERNAL static
-#define GLOBAL static
-
 namespace tyon
 {
 
