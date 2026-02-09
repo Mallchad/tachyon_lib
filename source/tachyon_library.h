@@ -1760,6 +1760,110 @@ namespace tyon
         logger_write_message( g_logger, category, message, e_log_entry::error, location );
     }
 
+    template <typename T>
+    struct thread_pointer
+    {
+        using t_self = thread_pointer<T>;
+        T* value;
+
+        explicit CONSTRUCTOR thread_pointer( T* arg = nullptr ) : value(arg) {}
+        CONSTRUCTOR thread_pointer( void* arg ) : value((T*)arg) {}
+
+        // Derference Operator
+        PROC operator* ()  -> T&
+        {   return (*value); }
+
+        PROC operator-> () -> T*
+        {   return (value) ;}
+
+        /* Cast to any other pointer or pointer wrapper type, just returns the typed pointer
+
+           Explicit to prevent auto-casts. Still pretty safe but convenient */
+        template <typename t_pointer>
+        explicit operator t_pointer()
+        {
+            return t_pointer { this->value };
+        }
+    };
+
+    template <typename T>
+    struct cpu_pointer
+    {
+        using t_self = cpu_pointer<T>;
+        T* value;
+
+        explicit CONSTRUCTOR cpu_pointer( T* arg = nullptr ) : value(arg) {}
+        CONSTRUCTOR cpu_pointer( void* arg ) : value((T*)arg) {}
+
+        // Derference Operator
+        PROC operator* ()  -> T&
+        {   return (*value); }
+
+        PROC operator-> () -> T*
+        {   return (value) ;}
+
+        /* Cast to any other pointer or pointer wrapper type, just returns the typed pointer
+
+           Explicit to prevent auto-casts. Still pretty safe but convenient */
+        template <typename t_pointer>
+        explicit operator t_pointer()
+        {
+            return t_pointer { this->value };
+        }
+    };
+
+    template <typename T>
+    struct gpu_pointer
+    {
+        using t_self = gpu_pointer<T>;
+        T* value;
+
+        explicit CONSTRUCTOR gpu_pointer( T* arg = nullptr ) : value(arg) {}
+        CONSTRUCTOR gpu_pointer( void* arg ) : value((T*)arg) {}
+
+        // Derference Operator
+        PROC operator* ()  -> T&
+        {   return (*value); }
+
+        PROC operator-> () -> T*
+        {   return (value) ;}
+
+        /* Cast to any other pointer or pointer wrapper type, just returns the typed pointer
+
+           Explicit to prevent auto-casts. Still pretty safe but convenient */
+        template <typename t_pointer>
+        explicit operator t_pointer()
+        {
+            return t_pointer { this->value };
+        }
+    };
+
+    template <typename T>
+    struct unified_pointer
+    {
+        using t_self = unified_pointer<T>;
+        T* value;
+
+        explicit CONSTRUCTOR unified_pointer( T* arg = nullptr ) : value(arg) {}
+        CONSTRUCTOR unified_pointer( void* arg ) : value((T*)arg) {}
+
+        // Derference Operator
+        PROC operator* ()  -> T&
+        {   return (*value); }
+
+        PROC operator-> () -> T*
+        {   return (value) ;}
+
+        /* Cast to any other pointer or pointer wrapper type, just returns the typed pointer
+
+           Explicit to prevent auto-casts. Still pretty safe but convenient */
+        template <typename t_pointer>
+        explicit operator t_pointer()
+        {
+            return t_pointer { this->value };
+        }
+    };
+
 }
 
 // -- String Formatters --
