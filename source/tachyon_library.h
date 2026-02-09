@@ -1667,6 +1667,7 @@ namespace tyon
     {
         fpath filename;
         buffer memory;
+        i64 stream_readhead = 0;
         /// File pointed to by 'filename' is confirmed to exist or not
         bool file_exists = false;
         /** Signifies file writes will be passed through straight to disk
