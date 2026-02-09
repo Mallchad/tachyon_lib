@@ -127,6 +127,8 @@ namespace tyon
 
     auto file_write_binary_stdlib( file* arg ) -> fresult;
 
+    PROC file_streamed_write( file* out_file, raw_pointer address, i64 size ) -> fresult;
+
     PROC file_set_working_directory( fstring arg ) -> void;
 
     /** Recursively creates directory specified.
