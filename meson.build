@@ -33,6 +33,7 @@ cuda_dependency = [
 
 test1 = executable(
   'tachyon_lib_tests_core',
+  'source/build_control/tachyon_lib_unity_core.cpp',
   'source/tests/tachyon_lib_tests_core.cpp',
   # 'external/fmt/src/format.cc',
   include_directories : include_dirs,
@@ -42,6 +43,7 @@ test1 = executable(
 
 test('', executable(
   'tachyon_lib_tests_part_1',
+  'source/build_control/tachyon_lib_unity_core.cpp',
   'source/tests/ai_generated/iterator_requirements.cpp',
   # 'external/fmt/src/format.cc',
   include_directories : include_dirs,
