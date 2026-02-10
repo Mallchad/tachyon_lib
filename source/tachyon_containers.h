@@ -636,6 +636,7 @@ struct array
         operator bool() { return (offset < context->head_size); }
     };
 
+    using iterator = stl_iterator;
     stl_iterator begin() { return stl_iterator{ this, data.data, 0 }; }
     stl_iterator end() { return stl_iterator{ this, data.data, head_size }; }
 };
