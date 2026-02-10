@@ -9,7 +9,7 @@ namespace tyon
         fresult result = true;
         // TODO: Need to change this to make / platform specific append
         // mode: read/write append binary
-        FILE* file_ref = fopen( out_file->filename.c_str(), "a+b" );
+        FILE* file_ref = fopen( out_file->filename.string().c_str(), "a+b" );
         if (file_ref == nullptr)
         {   TYON_ERRORF( "Failed to open file: '{}'", out_file->filename );
             return false;
@@ -40,7 +40,7 @@ namespace tyon
         fresult result = true;
         // TODO: Need to change this to make / platform specific append
         // mode: read/write binary
-        FILE* file_ref = fopen( arg->filename.c_str(), "r+b" );
+        FILE* file_ref = fopen( arg->filename.string().c_str(), "r+b" );
         if (file_ref == nullptr)
         {   TYON_ERRORF( "Failed to open file: '{}'", arg->filename );
             return false;
