@@ -1,5 +1,6 @@
 
 #include "../build_control/tachyon_lib_unity_core.cpp"
+#include <numeric>
 
 using namespace tyon;
 
@@ -7,6 +8,7 @@ extern array<typed_procedure<void()>> g_tests_list;
 array<typed_procedure<void()>> g_tests_list {};
 
 #include "test_linked_list.cpp"
+// #include "ai_generated/iterator_requirements.cpp"
 
 int
 main( int argc, char** argv )
@@ -20,7 +22,11 @@ main( int argc, char** argv )
         g_tests_list[i].invoke();
     }
     test_linked_list();
-    // TYON_BREAK();
+    // test_template_requirements();
+
+    array<int> foo = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    i64 accumulated = std::accumulate( foo.begin(), foo.end(), 0 );
+    TYON_LOG( "Accumulated value", accumulated );
 
     TYON_LOG( "Program ended" );
 }

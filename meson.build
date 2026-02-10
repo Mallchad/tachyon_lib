@@ -40,6 +40,15 @@ test1 = executable(
 
 )
 
+test('', executable(
+  'tachyon_lib_tests_part_1',
+  'source/tests/ai_generated/iterator_requirements.cpp',
+  # 'external/fmt/src/format.cc',
+  include_directories : include_dirs,
+  dependencies: libraries
+
+))
+
 if tyon_cuda_on
   # command structure used
   # clear ; nvcc .\source\tests\tachyon_lib_tests_cuda.cu -std=c++20 -I .\external\fmt\include\ -lrpcrt4 -g

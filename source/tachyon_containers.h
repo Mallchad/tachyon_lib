@@ -523,29 +523,115 @@ struct array
 
     struct stl_iterator
     {
-        using iterator_category = std::bidirectional_iterator_tag;
+        using iterator_category = std::random_access_iterator_tag;
         using difference_type   = i64;
         using value_type        = T;
         using pointer           = T*;  // or also value_type*
         using reference         = T&;  // or also value_type&
+        using t_self = stl_iterator;
+        using t_context = array<value_type>*;
 
-        array<value_type>* context = nullptr;
+        t_context context = nullptr;
         pointer data = nullptr;
-        i64 offset = 0;
+        difference_type offset = 0;
+
+        CONSTRUCTOR stl_iterator() = default;
+        CONSTRUCTOR stl_iterator( t_context arg1, pointer arg2, difference_type arg3 ) :
+            context(arg1), data(arg2), offset(arg3) {}
+        CONSTRUCTOR stl_iterator( const t_self& arg )
+        {
+            context = arg.context;
+            data = arg.data;
+            offset = arg.offset;
+        }
 
         reference operator *() { return *(data +offset); }
         pointer operator->() { return (data +offset); }
+
+        // PROC operator= ( t_self rhs ) -> t_self&
+        // {
+        //     context = rhs.context;
+        //     data = rhs.data;
+        //     offset = rhs.offset;
+        //     return (*this);
+        // }
+
+        COPY_CONSTRUCTOR PROC operator= ( const t_self& rhs ) -> t_self&
+        {
+            context = rhs.context;
+            data = rhs.data;
+            offset = rhs.offset;
+            return (*this);
+        }
+
+        PROC operator+ ( difference_type arg_offset ) -> t_self
+        {
+            t_self result = (*this);
+            result.offset += arg_offset;
+            return result;
+        }
+
+        friend
+        PROC operator+ ( difference_type& lhs, t_self& rhs ) -> t_self
+        {   t_self result = rhs;
+            rhs.offset += lhs;
+            return result;
+        }
+
+        PROC operator+= ( difference_type arg_offset ) -> t_self&
+        {   offset += arg_offset;
+            return *this;
+        }
+
+        PROC operator- ( difference_type arg_offset ) -> t_self
+        {
+            t_self result = (*this);
+            result.offset -= arg_offset;
+            return result;
+        }
+
+        PROC operator- ( t_self rhs ) -> t_self
+        {
+            t_self result = (*this);
+            result.offset -= rhs.offset;
+            return result;
+        }
+
+        friend
+        PROC operator- ( difference_type& lhs, t_self& rhs ) -> difference_type
+        {   return (lhs - rhs.offset);
+        }
+
+        PROC operator-= ( difference_type arg_offset ) -> t_self&
+        {   return (*this) += (-arg_offset); }
+
+        PROC operator[]( difference_type arg_offset ) -> t_self&
+        {   offset += arg_offset;
+            return *this;
+        }
+
         stl_iterator& operator++() { ++offset; return *this; }
-        stl_iterator& operator++(int)
+        stl_iterator operator++(int)
         {
             stl_iterator tmp = *this;
             ++(*this);
             return tmp;
         }
-        friend bool operator==( stl_iterator& rhs, stl_iterator& lhs )
-        { return rhs.data == lhs.data; }
 
-        /** True iterator if has no reached passed tail index. End iterators
+        stl_iterator& operator--() { --offset; return *this; }
+        stl_iterator operator--(int)
+        {
+            stl_iterator tmp = *this;
+            --(*this);
+            return tmp;
+        }
+        friend bool operator==( stl_iterator& rhs, stl_iterator& lhs )
+        { return rhs.offset == lhs.offset; }
+
+        friend bool operator!=( stl_iterator& rhs, stl_iterator& lhs )
+        { return rhs.offset != lhs.offset; }
+
+        /** True iterator if has not reached passed tail index. End iterators
          * are invalid to dereference */
         operator bool() { return (offset < context->head_size); }
     };
