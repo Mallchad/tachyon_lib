@@ -1454,7 +1454,12 @@ namespace tyon
     struct u128
     {
         u8 d[16] = {};
-        // constexpr CONSTRUCTOR u128() = default;
+        // constexpr CONSTRUCTOR u128( const u128& arg ) {
+        //     d[0]  = arg.d[0]; d[1] = arg.d[1]; d[2] = arg.d[2]; d[3] = arg.d[3];
+        //     d[4]  = arg.d[4]; d[5] = arg.d[5]; d[6] = arg.d[6]; d[7] = arg.d[7];
+        //     d[8]  = arg.d[8]; d[9] = arg.d[9]; d[10] = arg.d[10]; d[11] = arg.d[11];
+        //     d[12] = arg.d[12]; d[13] = arg.d[13]; d[14] = arg.d[14]; d[15] = arg.d[15];
+        // }
     };
     struct u256 { u64 d[4]; };
     struct u512 { u64 d[8]; };
@@ -1511,6 +1516,47 @@ namespace tyon
     inline i64
     operator ""_TB( literal_integer arg )
     { return arg * std::pow( 10, 12 ); }
+
+    constexpr
+    PROC operator ""_uuid ( literal_string arg, std::size_t size ) -> u128
+    {
+        ERROR_GUARD( size == 36, "UUID must be 36 long" );
+        u128 result;
+        char hex_value[128] = {
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+             0, 1, 2, 3, 4, 5, 6, 7, 8, 9,-1,-1,-1,-1,-1,-1,
+            -1,10,11,12,13,14,15,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,10,11,12,13,14,15,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        };
+        // 7 bits defined
+        u8 std_ascii_mask = (0xFF >> 1);
+        // Minimum 32 size
+        char buf[40] = {};
+        i32 buf_size = 0;
+        // Strip out redundant - char's before beginning
+        for (i32 i=0; i < size; ++i)
+        {   if (arg[i] == '-') { continue; }
+            buf[ buf_size ] = (arg[i] & std_ascii_mask);
+            ++buf_size;
+        }
+
+        char low = 0;
+        char high = 0;
+        // Covnert each character into hex half-byte value and shift into the right plce
+        for (i32 i=0; i < 16; ++i)
+        {
+            high = hex_value[ buf[ i*2 +0 ] ];
+            low = hex_value[ buf[ i*2 +1 ] ];
+            result.d[i] = (high << 4) | low;
+            fmt::print( "{:d} {:d} ", high, low );
+            // fmt::print( "{} {}", buf[ i*2 +0 ], buf[ i*2 +1 ] );
+        }
+        return result;
+    }
 
     }
 
