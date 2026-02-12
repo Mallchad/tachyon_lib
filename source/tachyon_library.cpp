@@ -745,11 +745,11 @@ namespace tyon
             switch (entry.type)
             {
                 case e_log_entry::error:
-                    // formatted_message = fmt::format(
-                        // "[{0}][{1}] \n\tLocation: {2} @ {3}:{4}:{5} \n\t{6} \n",
-                        // nanoseconds, entry.category, call_point.function_name(),
-                        // call_point.file_name(), call_point.line(), call_point.column(),
-                        // entry.message );
+                    formatted_message = fmt::format(
+                        "[{0}][{1}] \n\tLocation: {2} @ {3}:{4}:{5} \n\t{6} \n",
+                        nanoseconds, entry.category, call_point.function_name(),
+                        call_point.file_name(), call_point.line(), call_point.column(),
+                        entry.message );
                     fmt::print( fmt::emphasis::bold | fmt::fg(fmt::color::red), "{}", formatted_message );
                     break;
 
@@ -758,6 +758,7 @@ namespace tyon
                         "[{}][{}] {} \n", nanoseconds, entry.category, entry.message );
                     fmt::print( "{}", formatted_message );
             }
+            fflush( stdout );
 
             if (string_output_enabled)
             {
