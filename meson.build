@@ -82,8 +82,6 @@ if tyon_cuda_on
   )
   test( 'tachyon_lib_tests_all', test2 )
 
-endif
-
 # NOTE: Custom command to test VMEC setup
 uuid_library = 'uuid'
 tachyon_lib_cuda = custom_target(
@@ -115,6 +113,7 @@ tachyon_lib_cuda = custom_target(
       '-D', 'CCCL_ENABLE_ASSERTIONS=1'
     ]
   )
+endif
 
 # # Need to fill out
 # test3 = executable(

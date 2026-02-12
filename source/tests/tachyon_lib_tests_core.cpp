@@ -41,8 +41,11 @@ main( int argc, char** argv )
 
     // Should not work properly
     // TYON_LOGF( "UUID from literal {}", uid("wutwut"_uuid) );
+    // constexpr u128 bad_uuid = "wutwut"_uuid;
+    // TYON_LOGF( "UUID from literal constexpr {}", uid(bad_uuid) );
+
     u128 create_uuid_1 = "012345678-9ABC-DEFa-bcde-f6f9610e78b"_uuid;
-    u128 create_uuid_2 = "41adfacc-0b27-4960-a052-6f9610e78b88a"_uuid;
+    u128 create_uuid_2 = "41adfacc-0b27-4960-a052-6f9610e78b88"_uuid;
     TYON_LOGF( "UUID from literal {}", uid(create_uuid_1) );
     TYON_LOGF( "UUID from literal {}", uid(create_uuid_2) );
     u128 ref_uuid_1 = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,

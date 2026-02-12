@@ -154,7 +154,15 @@ struct version
     #define VMEC_CUDA_SHARED
     #define VMEC_CUDA_KERNEL
 #endif
-#endif // TYON_PREFETCH_CACHELINE
+#endif // TYON_HELPER_STANDALONE
+
+#if defined(__cpp_consteval) && __cpp_consteval >= 201811L
+    #define TYON_COMPILED_PROC consteval
+#elif (__cplusplus >= 201103L) // >= C++ 11
+    #define TYON_COMPILED_PROC constexpr
+#else
+    #define TYON_COMPILED_PROC
+#endif // defined(__cpp_consteval) && __cpp_consteval >= 201811L
 
 
 /// Call a member function pointer, this is insane to remember, don't do it manually.

@@ -1517,10 +1517,17 @@ namespace tyon
     operator ""_TB( literal_integer arg )
     { return arg * std::pow( 10, 12 ); }
 
-    constexpr
+    /* Generates a u128 UUID out of a UUID string in this format 'f1e9148d-2b4f-4c57-8d30-4a5e98187489'
+       NOTE: This always runs at compile time may need to be changed for C++17 or lower
+       NOTE: I tried will compile error if the input argument is bad.
+       NOTE: I tried to make it force compile-time evaluation with 'constexpr but
+       it doesn't work. Don't be tempted to use static_assert or constexpr if tricks-
+       that doesn't work either.*/
+    TYON_COMPILED_PROC
     PROC operator ""_uuid ( literal_string arg, std::size_t size ) -> u128
     {
-        ERROR_GUARD( size == 36, "UUID must be 36 long" );
+        // Error checking only works in non-constexpr context
+        if (size != 36 ) { throw( "UUID must be 36 characters long" ); }
         u128 result;
         char hex_value[128] = {
             -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
@@ -1552,10 +1559,15 @@ namespace tyon
             high = hex_value[ buf[ i*2 +0 ] ];
             low = hex_value[ buf[ i*2 +1 ] ];
             result.d[i] = (high << 4) | low;
-            fmt::print( "{:d} {:d} ", high, low );
+            if  ((high == -1) || ( low == -1 ))
+            {   throw( "Invalid character found in UUID.\n"
+                       "Valid characters are hexidecimal '0123456789ABCDE' and '-' " );
+            };
+            // fmt::print( "{:d} {:d} ", high, low );
             // fmt::print( "{} {}", buf[ i*2 +0 ], buf[ i*2 +1 ] );
         }
         return result;
+
     }
 
     }
