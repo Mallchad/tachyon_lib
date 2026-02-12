@@ -1467,6 +1467,55 @@ namespace tyon
     struct u2048 { u64 d[32]; };
     struct u4096 { u64 d[64]; };
 
+    TYON_COMPILED_PROC
+    PROC uuid( literal_string arg ) -> u128
+    {
+        // Error checking only works in non-constexpr context
+        i64 size = 0;
+        for (; arg[ size ] != 0x0; ++size) {}
+        if (size != 36 ) { throw( "UUID must be 36 characters long" ); }
+        u128 result;
+        char hex_value[128] = {
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+             0, 1, 2, 3, 4, 5, 6, 7, 8, 9,-1,-1,-1,-1,-1,-1,
+            -1,10,11,12,13,14,15,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,10,11,12,13,14,15,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+        };
+        // 7 bits defined
+        u8 std_ascii_mask = (0xFF >> 1);
+        // Minimum 32 size
+        char buf[40] = {};
+        i32 buf_size = 0;
+        // Strip out redundant - char's before beginning
+        for (i32 i=0; i < size; ++i)
+        {   if (arg[i] == '-') { continue; }
+            buf[ buf_size ] = (arg[i] & std_ascii_mask);
+            ++buf_size;
+        }
+
+        char low = 0;
+        char high = 0;
+        // Covnert each character into hex half-byte value and shift into the right plce
+        for (i32 i=0; i < 16; ++i)
+        {
+            high = hex_value[ buf[ i*2 +0 ] ];
+            low = hex_value[ buf[ i*2 +1 ] ];
+            result.d[i] = (high << 4) | low;
+            if  ((high == -1) || ( low == -1 ))
+            {   throw( "Invalid character found in UUID.\n"
+                       "Valid characters are hexidecimal '0123456789ABCDE' and '-' " );
+            };
+            // fmt::print( "{:d} {:d} ", high, low );
+            // fmt::print( "{} {}", buf[ i*2 +0 ], buf[ i*2 +1 ] );
+        }
+        return result;
+
+    }
+
     namespace literals
     {
     /** Literal that provides a number with a single zero-indexed bit position set as 1 */
@@ -1525,50 +1574,7 @@ namespace tyon
        that doesn't work either.*/
     TYON_COMPILED_PROC
     PROC operator ""_uuid ( literal_string arg, std::size_t size ) -> u128
-    {
-        // Error checking only works in non-constexpr context
-        if (size != 36 ) { throw( "UUID must be 36 characters long" ); }
-        u128 result;
-        char hex_value[128] = {
-            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-             0, 1, 2, 3, 4, 5, 6, 7, 8, 9,-1,-1,-1,-1,-1,-1,
-            -1,10,11,12,13,14,15,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-            -1,10,11,12,13,14,15,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-            -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-        };
-        // 7 bits defined
-        u8 std_ascii_mask = (0xFF >> 1);
-        // Minimum 32 size
-        char buf[40] = {};
-        i32 buf_size = 0;
-        // Strip out redundant - char's before beginning
-        for (i32 i=0; i < size; ++i)
-        {   if (arg[i] == '-') { continue; }
-            buf[ buf_size ] = (arg[i] & std_ascii_mask);
-            ++buf_size;
-        }
-
-        char low = 0;
-        char high = 0;
-        // Covnert each character into hex half-byte value and shift into the right plce
-        for (i32 i=0; i < 16; ++i)
-        {
-            high = hex_value[ buf[ i*2 +0 ] ];
-            low = hex_value[ buf[ i*2 +1 ] ];
-            result.d[i] = (high << 4) | low;
-            if  ((high == -1) || ( low == -1 ))
-            {   throw( "Invalid character found in UUID.\n"
-                       "Valid characters are hexidecimal '0123456789ABCDE' and '-' " );
-            };
-            // fmt::print( "{:d} {:d} ", high, low );
-            // fmt::print( "{} {}", buf[ i*2 +0 ], buf[ i*2 +1 ] );
-        }
-        return result;
-
-    }
+    {   return uuid( arg ); }
 
     }
 
