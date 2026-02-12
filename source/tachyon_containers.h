@@ -564,10 +564,11 @@ struct array
             return (*this);
         }
 
-        PROC operator+ ( difference_type arg_offset ) -> t_self
+        friend
+        PROC operator+ ( t_self& lhs, difference_type& rhs ) -> t_self
         {
-            t_self result = (*this);
-            result.offset += arg_offset;
+            t_self result = (lhs);
+            result.offset += rhs;
             return result;
         }
 
