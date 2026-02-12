@@ -11,13 +11,13 @@ array<typed_procedure<void()>> g_tests_list {};
 #include "test_linked_list.cpp"
 // #include "ai_generated/iterator_requirements.cpp"
 
-PROC test( bool condition ) -> void
+PROC test( bool condition, fstring description = "" ) -> void
 {
     if (condition)
-    {   TYON_LOG( "Passed!" );
+    {   TYON_LOGF( "[TEST] Passed! | {}", description );
     }
     else
-    {   TYON_LOG( "Failed!" );
+    {   TYON_LOGF( "[TEST] Failed! | {}", description );
     }
 }
 
@@ -37,6 +37,7 @@ main( int argc, char** argv )
 
     array<int> foo = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
     i64 accumulated = std::accumulate( foo.begin(), foo.end(), 0 );
+    test( accumulated == 55, "Sum tyon::array using STL iterator" );
     TYON_LOG( "Accumulated value", accumulated );
 
     // Should not work properly
@@ -50,7 +51,20 @@ main( int argc, char** argv )
     TYON_LOGF( "UUID from literal {}", uid(create_uuid_2) );
     u128 ref_uuid_1 = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
                         0xab, 0xcd, 0xef, 0x6f, 0x96, 0x10, 0xe7, 0x8b  };
-    test( memory_same( ref_uuid_1, create_uuid_1) );
+    test( memory_same( ref_uuid_1, create_uuid_1), "UUID creation matches reference bytes" );
+
+    // SECTION: Entity testing
+    entity_type<file> _;
+    entity_type_register<file>();
+    file* test_file = entity_allocate<file>();
+    *test_file = file_load_binary( "latest.log" );
+    test( test_file, "File entity loaded real file" );
+    if (test_file)
+    {   test( test_file->memory.size, "File entity loaded file with some decent size" );
+        fstring file_read = { test_file->memory.data, 50 };
+        TYON_LOGF( "Random file read string: '{}' File Memory Size:{}", file_read, test_file->memory.size );
+        test( file_read.size(), "String copy from file entity loaded memory" );
+    }
 
     TYON_LOG( "Program ended" );
 }
