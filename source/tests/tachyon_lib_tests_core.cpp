@@ -54,7 +54,7 @@ main( int argc, char** argv )
     test( memory_same( ref_uuid_1, create_uuid_1), "UUID creation matches reference bytes" );
 
     // SECTION: Entity testing
-    entity_type<file> _;
+    entity_type_definition<file> _;
     entity_type_register<file>();
     file* test_file = entity_allocate<file>();
     *test_file = file_load_binary( "latest.log" );

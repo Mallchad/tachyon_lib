@@ -155,6 +155,7 @@ struct logger
         std::mutex taint_allocator_lock;
         logger default_logger;
         logger switch_logger;
+        entity_context entity;
         raw_pointer null_read;
         raw_pointer null_write;
         array<cmdline_argument> cmdline_arguments;

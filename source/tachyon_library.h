@@ -1729,9 +1729,14 @@ namespace tyon
     // -- File Library --
     struct file
     {
+        uid id;
+        /// Entity lookup name, can be auto-initialized to the filename
+        fstring name;
         fpath filename;
         buffer memory;
         i64 stream_readhead = 0;
+
+        // TODO: flag all out of date
         /// File pointed to by 'filename' is confirmed to exist or not
         bool file_exists = false;
         /** Signifies file writes will be passed through straight to disk
