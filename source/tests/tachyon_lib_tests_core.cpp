@@ -54,16 +54,44 @@ main( int argc, char** argv )
     test( memory_same( ref_uuid_1, create_uuid_1), "UUID creation matches reference bytes" );
 
     // SECTION: Entity testing
-    entity_type_definition<file> _;
-    entity_type_register<file>();
-    file* test_file = entity_allocate<file>();
-    *test_file = file_load_binary( "latest.log" );
-    test( test_file, "File entity loaded real file" );
-    if (test_file)
-    {   test( test_file->memory.size, "File entity loaded file with some decent size" );
-        fstring file_read = { test_file->memory.data, 50 };
-        TYON_LOGF( "Random file read string: '{}' File Memory Size:{}", file_read, test_file->memory.size );
-        test( file_read.size(), "String copy from file entity loaded memory" );
+    {
+        entity_type_definition<file> _;
+        entity_type_register<file>();
+        test( g_entity_type<file>, "Type-Specific Entity Cotnext is initialized" );
+        file* test_file = entity_allocate<file>();
+
+        *test_file = file_load_binary( "latest.log" );
+        test( test_file, "File entity loaded real file" );
+        if (test_file)
+        {   test( test_file->memory.size, "File entity loaded file with some decent size" );
+            fstring file_read = { test_file->memory.data, 50 };
+            TYON_LOGF( "Random file read string: '{}' File Memory Size:{}", file_read, test_file->memory.size );
+            test( file_read.size(), "String copy from file entity loaded memory" );
+        }
+    }
+    {
+        entity_type_definition<file> _;
+        file* test_file = entity_allocate<file>();
+        fstring test_file_name = "random_name";
+        test_file->name = test_file_name;
+        entity_init( test_file );         test( true, "entity_init() compilation" );
+        entity_tick( test_file );         test( true, "entity_tick() compilation" );
+        entity_destroy( test_file );      test( true, "entity_destroy() compilation" );
+
+        file* test_file2 = entity_search<file>( test_file->id );
+        bool test_file_id_match = false;
+        if (test_file2)
+        {   test_file_id_match = (test_file2->id == test_file->id);
+        }
+        file* test_file3 = entity_search_name<file>( test_file_name );
+        bool test_file_id_match_2 = false;
+        if (test_file3)
+        {   test_file_id_match = (test_file3->id == test_file->id);
+        }
+        test( test_file2, "Entity search returns match");
+        test( test_file_id_match, "Search entity result matches original ID" );
+        test( test_file3, "Find file by name" );
+        test( test_file_id_match_2, "Search entity by name result matches original ID" );
     }
 
     TYON_LOG( "Program ended" );

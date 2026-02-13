@@ -20,8 +20,8 @@ namespace tyon
     {
         fstring name;
         e_asset type = asset_type::none;
-        asset_function loader = &asset_function_stub;;
-        asset_function unloader =  &asset_function_stub;;
+        asset_function loader = &asset_function_stub;
+        asset_function unloader =  &asset_function_stub;
     };
 
     struct asset

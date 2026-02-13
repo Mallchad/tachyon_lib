@@ -90,6 +90,8 @@ namespace tyon
 
     extern entity_context* g_entity;
 
+    // SECTION: User Overriden Entity Functions
+
     template <typename t_entity>
     PROC entity_allocate() -> t_entity*
     {
@@ -99,15 +101,21 @@ namespace tyon
 
     template <typename t_entity>
     PROC entity_init( t_entity* arg ) -> fresult
-    {}
+    {
+        entity<t_entity>.init();
+        return false;
+    }
 
     template <typename t_entity>
     PROC entity_destroy( t_entity* arg ) -> void
-    {}
+    {
+    }
 
     template <typename t_entity>
     PROC entity_tick( t_entity* arg ) -> void
     {}
+
+    // Shared Entity Functions
 
     template <typename t_entity>
     PROC entity_search( uid arg ) -> monad<t_entity*>
@@ -130,7 +138,9 @@ namespace tyon
 
     template <typename t_entity>
     PROC entity_search_name( fstring id ) -> t_entity*
-    {}
+    {
+        return nullptr;
+    }
 
     template <typename t_entity>
     PROC entity_type_validator() -> void
@@ -154,11 +164,18 @@ namespace tyon
     template <typename t_entity>
     PROC entity_type_register() -> void
     {
+        if (g_entity_type<t_entity> != nullptr)
+        {   TYON_ERRORF( "Tried to register a type that has already been registered \n"
+            "Type Name: {}"
+            "Type UUID: {}", entity<t_entity>.name, uid(entity<t_entity>.id) );
+            return;
+        }
+
         /* Instansiate function to validate type, DON'T ACTUALLY call it, it's
            not defined what shuld happen */
-        generic_procedure<void()> _proc = entity_type_validator<t_entity>;
+        if (false) { entity_type_validator<t_entity>(); }
         // Instansiate type data
-        entity<t_entity>;
+        (void)entity<t_entity>;
 
         entity_type new_type;
         new_type.name = entity<t_entity>.name;
@@ -166,9 +183,13 @@ namespace tyon
         new_type.context_tick = entity<t_entity>.context_tick;
         new_type.destroy_all = entity<t_entity>.destroy_all;
 
+        // Add typed subcontext to global list on contexts
         auto new_context = memory_allocate< entity_type_context<t_entity> >(1);
         g_entity->types.push_back( new_type );
         g_entity->type_contexts.push_back( new_context );
+
+        // Add context to easily accessible global handle too
+        g_entity_type<t_entity> = new_context;
     }
 
 }

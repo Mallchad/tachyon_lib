@@ -295,12 +295,12 @@ namespace tyon
         /* Allow comparison to nullptr like 'void*' */
         inline bool
         operator == ( std::nullptr_t rhs )
-        { return data == nullptr; }
+        { (void)(rhs); return data == nullptr; }
 
         /* Allow comparison to nullptr like 'void*' */
         inline bool
         operator != ( std::nullptr_t rhs )
-        { return data != nullptr; }
+        { (void)(rhs); return data != nullptr; }
     };
 
     // -- Math Constants --
@@ -1502,8 +1502,8 @@ namespace tyon
         // Covnert each character into hex half-byte value and shift into the right plce
         for (i32 i=0; i < 16; ++i)
         {
-            high = hex_value[ buf[ i*2 +0 ] ];
-            low = hex_value[ buf[ i*2 +1 ] ];
+            high = hex_value[ i32(buf[ i*2 +0 ]) ];
+            low  = hex_value[ i32(buf[ i*2 +1 ]) ];
             result.d[i] = (high << 4) | low;
             if  ((high == -1) || ( low == -1 ))
             {   throw( "Invalid character found in UUID.\n"

@@ -31,13 +31,23 @@ cuda_dependency = [
 )
 ] + libraries
 
+compiler_args = [
+    '-Werror=all',
+    '-Wextra',
+    '-Wpedantic',
+
+    '-Wno-unused-parameter',
+    '-Wno-unused-variable'
+  ]
+
 test1 = executable(
   'tachyon_lib_tests_core',
   'source/build_control/tachyon_lib_unity_core.cpp',
   'source/tests/tachyon_lib_tests_core.cpp',
   # 'external/fmt/src/format.cc',
   include_directories : include_dirs,
-  dependencies: libraries
+  dependencies: libraries,
+  cpp_args: compiler_args
 
 )
 
