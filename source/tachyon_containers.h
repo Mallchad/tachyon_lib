@@ -808,7 +808,9 @@ struct linked_list
 
     struct indexer
     {
+        /** What index in the container the current value is */
         isize index = 0;
+        isize iteration = 0;
         t_self* context;
         t_node* value = nullptr;
         isize range_min = 0;
@@ -828,6 +830,7 @@ struct linked_list
             {   value = &context->nodes[ value->next ];
             }
             index += 1;
+            iteration += 1;
             return do_iteration;
         }
 
@@ -844,6 +847,7 @@ struct linked_list
             {   value = &context->nodes[ value->prev ];
             }
             index -= 1;
+            iteration += 1;
             return do_iteration;
         }
 
@@ -865,7 +869,7 @@ struct linked_list
         result = indexer {
             .index = min,
             .context = this,
-            .value = head(),
+            .value = (*this)[min].copy_default({}),
             .range_min = min,
             .range_max = max,
             .do_iteration = true

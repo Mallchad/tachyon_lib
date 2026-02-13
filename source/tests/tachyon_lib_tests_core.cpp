@@ -8,18 +8,24 @@ using namespace tyon;
 extern array<typed_procedure<void()>> g_tests_list;
 array<typed_procedure<void()>> g_tests_list {};
 
-#include "test_linked_list.cpp"
 // #include "ai_generated/iterator_requirements.cpp"
+
+i32 tests_passed = 0;
+i32 tests_failed = 0;
 
 PROC test( bool condition, fstring description = "" ) -> void
 {
     if (condition)
     {   TYON_LOGF( "[TEST] Passed! | {}", description );
+        ++tests_passed;
     }
     else
     {   TYON_LOGF( "[TEST] Failed! | {}", description );
+        ++tests_failed;
     }
 }
+
+#include "test_linked_list.cpp"
 
 int
 main( int argc, char** argv )
@@ -32,7 +38,6 @@ main( int argc, char** argv )
     {
         g_tests_list[i].invoke();
     }
-    test_linked_list();
     // test_template_requirements();
 
     array<int> foo = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -83,16 +88,19 @@ main( int argc, char** argv )
         if (test_file2)
         {   test_file_id_match = (test_file2->id == test_file->id);
         }
-        file* test_file3 = entity_search_name<file>( test_file_name );
+        file* test_file3 = entity_search_name<file>( test_file_name ).copy_default(nullptr);
         bool test_file_id_match_2 = false;
         if (test_file3)
-        {   test_file_id_match = (test_file3->id == test_file->id);
+        {   test_file_id_match_2 = (test_file3->id == test_file->id);
         }
         test( test_file2, "Entity search returns match");
         test( test_file_id_match, "Search entity result matches original ID" );
-        test( test_file3, "Find file by name" );
+        test( test_file3, "Search entity by name" );
         test( test_file_id_match_2, "Search entity by name result matches original ID" );
     }
 
     TYON_LOG( "Program ended" );
+    TYON_LOGF( "Tests Passed: {}", tests_passed );
+    TYON_LOGF( "Tests Failed: {}", tests_failed );
+    return (tests_failed == 0 ? EXIT_SUCCESS : EXIT_FAILURE);
 }

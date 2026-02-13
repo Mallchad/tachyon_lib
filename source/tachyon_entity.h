@@ -95,8 +95,10 @@ namespace tyon
     template <typename t_entity>
     PROC entity_allocate() -> t_entity*
     {
+        // TODO: We need to give the context to the allocate hook.
         entity<t_entity>.allocate();
-        return memory_allocate<t_entity>( 1 );
+        auto& entity_list = g_entity_type<t_entity>->list;
+        return &entity_list.push_tail({});
     }
 
     template <typename t_entity>
@@ -138,9 +140,23 @@ namespace tyon
     }
 
     template <typename t_entity>
-    PROC entity_search_name( fstring id ) -> t_entity*
+    PROC entity_search_name( fstring name ) -> monad<t_entity*>
     {
-        return nullptr;
+        monad<t_entity*> result;
+        result.error = true;
+
+        auto& entity_list = g_entity_type<t_entity>->list;
+        t_entity* x_entity;
+        for (i64 i=0; i < entity_list.size(); ++i)
+        {
+            x_entity = entity_list.data + i;
+            if (x_entity->name == name)
+            {   result.value = x_entity;
+                result.error = false;
+                break;
+            }
+        }
+        return result;
     }
 
     template <typename t_entity>
