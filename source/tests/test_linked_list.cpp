@@ -34,8 +34,8 @@ test_linked_list()
     auto compare = std::vector<int>{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     TYON_LOGF( "matchin_output: {}", memcmp( output.data(), compare.data(), compare.size())  );
 
-    push.remove_node( push[3] );
-    push.remove_node( push[1] );
+    push.remove_node( push[3].copy_default({}) );
+    push.remove_node( push[1].copy_default({}) );
     TYON_LOG( push[0].value[0].value, push[1].value[0].value, push[2].value[0].value );
     i_push = push.indexer_full();
     for (; i_push.do_iteration; i_push.forward())

@@ -78,7 +78,7 @@ main( int argc, char** argv )
         entity_tick( test_file );         test( true, "entity_tick() compilation" );
         entity_destroy( test_file );      test( true, "entity_destroy() compilation" );
 
-        file* test_file2 = entity_search<file>( test_file->id );
+        file* test_file2 = entity_search<file>( test_file->id ).copy_default(nullptr);
         bool test_file_id_match = false;
         if (test_file2)
         {   test_file_id_match = (test_file2->id == test_file->id);

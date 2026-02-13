@@ -862,8 +862,13 @@ namespace tyon
         // Non-zero on error value
         fresult error = false;
 
-        // Cast to value type, auto-stubs out
-        operator T()
+        /* Cast to value type, auto-stubs out
+
+           NOTE: We previously had this as non-explicit but that leads to kind
+           of nonsense behaviour. What is better is if you have a user-provided
+           nullish value, THEN you can safely stub out by default
+        */
+        explicit operator T()
         {   if (error == false)
             {   return value; }
             else

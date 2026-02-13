@@ -129,7 +129,8 @@ namespace tyon
         {
             x_entity = entity_list.data + i;
             if (x_entity->id == arg)
-            {   result.error = false;
+            {   result.value = x_entity;
+                result.error = false;
                 break;
             }
         }
