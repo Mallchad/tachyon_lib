@@ -61,14 +61,15 @@ namespace tyon
 
         PROC allocate() -> void
         {}
-        PROC init() -> fresult
+        PROC init( t_entity* arg ) -> fresult
         {
+            arg->id = uuid_generate();
             return false;
         }
-        PROC destroy() -> void
+        PROC destroy( t_entity* arg ) -> void
         {}
 
-        PROC tick() -> void
+        PROC tick( t_entity* arg ) -> void
         {}
 
         static PROC context_tick( void* context ) -> void
@@ -104,7 +105,7 @@ namespace tyon
     template <typename t_entity>
     PROC entity_init( t_entity* arg ) -> fresult
     {
-        entity<t_entity>.init();
+        entity<t_entity>.init( arg );
         return false;
     }
 
@@ -118,6 +119,13 @@ namespace tyon
     {}
 
     // Shared Entity Functions
+
+    /** Convenience function to get a type-dependent context because tempalted
+     * variables are nor a familar concept to most developers */
+    template <typename t_entity>
+    PROC entity_get_context() -> entity_type_context<t_entity>*
+    {   return g_entity_type<t_entity>;
+    }
 
     template <typename t_entity>
     PROC entity_search( uid arg ) -> monad<t_entity*>

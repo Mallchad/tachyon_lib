@@ -1400,15 +1400,26 @@ namespace tyon
         }
     };
 
-    template <typename t_proc = procedure<>>
-    struct delegate
+    // Template Deduction gudie to help split t_return and t_args into seperate types...
+    template <typename t_signature>
+    struct delegate;
+
+    template <typename t_return, typename ... t_args>
+    struct delegate< t_return( t_args... ) >
     {
-        std::vector<t_proc> procedures;
+        using t_functor = procedure< t_return( t_args... ) >;
+        std::vector<t_functor> procedures;
 
         void
-        register_procedure( t_proc proc )
+        register_procedure( t_functor proc )
         {
-            procedures.push_back( proc );
+            procedures.push_back( {} ).assign( proc );
+        }
+
+        void
+        register_closure( t_functor proc, void* context = nullptr )
+        {
+            procedures.push_back( {} ).assign_closure( proc, context );
         }
 
         void
@@ -1418,11 +1429,11 @@ namespace tyon
         }
 
         void
-        invoke_all()
+        invoke_all( t_args... args )
         {
             for (i32 i=0; i < procedures.size(); ++i)
             {
-                procedures[i].invoke();
+                procedures[i].invoke( args... );
             }
         }
     };

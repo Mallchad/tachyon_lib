@@ -119,11 +119,6 @@
 #include "tachyon_library.h"
 #include "tachyon_containers.h"
 #include "tachyon_math.h"
-#include "tachyon_entity.h"
-#include "tachyon_resources.h"
-#include "tachyon_internals.h"
-#include "tachyon_assets.h"
-#include "tachyon_allocators.h"
 
 /** SECTION: Platform Specific Includes. */
 #include "tachyon_platform_common.h"
@@ -134,3 +129,8 @@
     #include "tachyon_platform_windows.h"
 #endif // REFLECTION_PLATFORM
 
+#include "tachyon_entity.h"
+#include "tachyon_resources.h"
+#include "tachyon_internals.h"
+#include "tachyon_assets.h"
+#include "tachyon_allocators.h"
