@@ -902,6 +902,7 @@ namespace tyon
         t_function* data= nullptr;
         bool enabled = false;
 
+        CONSTRUCTOR typed_procedure() = default;
         COPY_CONSTRUCTOR typed_procedure( t_function_ptr rhs )
         {   assign(rhs);
         }
