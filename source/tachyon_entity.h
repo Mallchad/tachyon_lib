@@ -225,12 +225,19 @@ namespace tyon
         u128 uuid;
 
         CONSTRUCTOR entity_uid() = default;
-        constexpr CONSTRUCTOR entity_uid( i64 _id, u128 _uuid ) : id( _id ), uuid( _uuid ) {}
-        constexpr CONSTRUCTOR entity_uid( u128 _uuid ) : id(0), uuid( _uuid ) {}
-        constexpr CONSTRUCTOR entity_uid( i64 _id )
+        explicit constexpr
+        CONSTRUCTOR entity_uid( i64 _id, u128 _uuid ) : id( _id ), uuid( _uuid ) {}
+        explicit constexpr
+        CONSTRUCTOR entity_uid( u128 _uuid ) : id(0), uuid( _uuid ) {}
+        explicit constexpr
+        CONSTRUCTOR entity_uid( i64 _id )
             : id(_id), uuid() { }
-        constexpr COPY_CONSTRUCTOR entity_uid( const t_self& arg )
+        explicit constexpr
+        COPY_CONSTRUCTOR entity_uid( const t_self& arg )
             : id(arg.id), uuid(arg.uuid) { }
+        COPY_CONSTRUCTOR entity_uid( const uid& arg )
+            : id(arg.id), uuid(arg.uuid) { }
+
         explicit operator i64();
 
         PROC operator ==( t_self rhs ) -> bool
