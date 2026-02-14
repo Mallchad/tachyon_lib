@@ -263,6 +263,67 @@ namespace tyon
         return result;
     }
 
+    PROC platform_init() -> fresult
+    {
+
+        // SECTION: ANSI truecolor escape code and unicode block char
+        // NOTE: We need this to try to make colouring and ANSI escape code stuff work on Windows cmd
+#if (REFLECTION_PLATFORM_WINDOWS)
+        // Copied from https://stackoverflow.com/questions/5068392/create-window-console-inside-main-win32-window
+        // Changed 'long' to u64 because 'long' isn't big enough on some platforms
+
+        CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
+        i32 consoleHandleR, consoleHandleW;
+        u64 stdioHandle;
+        FILE *fptr;
+
+        // Creates a new console window if one wasn't open already
+        AllocConsole();
+        fstring console_name = "VMEC Logging Console";
+        SetConsoleTitleA( console_name.c_str() );
+
+        EnableMenuItem(GetSystemMenu(GetConsoleWindow(), FALSE), SC_CLOSE , MF_GRAYED);
+        DrawMenuBar(GetConsoleWindow());
+
+        GetConsoleScreenBufferInfo( GetStdHandle(STD_OUTPUT_HANDLE), &consoleInfo );
+
+        stdioHandle = (u64)GetStdHandle( STD_INPUT_HANDLE );
+        consoleHandleR = _open_osfhandle( stdioHandle, _O_TEXT );
+        fptr = _fdopen( consoleHandleR, "r" );
+        *stdin = *fptr;
+        setvbuf( stdin, nullptr, _IONBF, 0 );
+
+        stdioHandle = (u64)GetStdHandle( STD_OUTPUT_HANDLE );
+        auto wstdout = stdioHandle;
+        consoleHandleW = _open_osfhandle( stdioHandle, _O_TEXT );
+        fptr = _fdopen( consoleHandleW, "w" );
+        *stdout = *fptr;
+        setvbuf( stdout, nullptr, _IONBF, 0 );
+
+        stdioHandle = (u64)GetStdHandle( STD_ERROR_HANDLE );
+        *stderr = *fptr;
+        setvbuf( stderr, nullptr, _IONBF, 0 );
+
+        // Enable ANSI 256 color processing on normal Command Prompt Window
+        HANDLE win32_stdout = GetStdHandle( STD_OUTPUT_HANDLE );
+        HANDLE win32_stdin = GetStdHandle( STD_INPUT_HANDLE );
+        auto err = SetConsoleMode( win32_stdout, ENABLE_VIRTUAL_TERMINAL_PROCESSING | ENABLE_PROCESSED_OUTPUT );
+        auto err2 = SetConsoleMode( win32_stdin, ENABLE_VIRTUAL_TERMINAL_INPUT );
+        /* Tell the console not to interpret the input stream for unicode, take
+           it verbatim _O_U8TEXT or _O_U16TEXT is an option but requires
+           rewriting of the console output facilities. */
+        _setmode( _fileno(stdin), _O_BINARY );
+        _setmode( _fileno(stdout), _O_BINARY );
+        /* Enable UTF-8 however. This is irrelevant in proper _O_U8TEXT mode or
+           simiar. But convenient for unformatted UTF-8 unicode strings */
+        SetConsoleOutputCP( 65001 ); // CP_UTF8
+
+        vmec_log("Setting Win32 console mode" );
+        vmec_log("Win32 SetConsoleMode errors codes: ", err, err2 );
+#endif
+        return true;
+    }
+
 }
 
 #endif // REFLECTION_PLATFORM_WINDOWS

@@ -809,6 +809,9 @@ namespace tyon
         g_null_read = reinterpret_cast<byte*>( malloc( 1'000'000'000 ) );
         g_null_write = reinterpret_cast<byte*>( malloc( 1'000'000'000 ) );
 
+        // Mandatory subsystems
+        platform_init();
+
         // Init optional sub-systems
         asset_machinery_init();
 

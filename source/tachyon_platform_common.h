@@ -144,4 +144,6 @@ namespace tyon
 
     PROC file_home_directory() -> fstring;
 
+    PROC platform_init() -> fresult;
+
 }

@@ -166,6 +166,12 @@ namespace tyon
         return result;
     }
 
+    PROC platform_init() -> fresult
+    {
+        return true;
+    }
+
+
 }
 
 #endif // REFLECTION_PLATFORM_LINUX
