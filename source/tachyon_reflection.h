@@ -25,6 +25,13 @@ namespace reflection
     constexpr tyon::version clang_version = { __clang_major__, __clang_minor__, __clang_patchlevel__ };
     constexpr tyon::fstring_view compiler_name = "clang";
     constexpr tyon::version compiler_version = clang_version;
+
+    constexpr bool little_endian = (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__);
+    #if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+        #define REFLECTION_LITTLE_ENDIAN 1
+    #else
+        #define REFLECTION_LITTLE_ENDIAN 0
+    #endif // (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 #else
     #define REFLECTION_COMPILER_CLANG 0
     constexpr tyon::version clang_version = {};
@@ -33,6 +40,14 @@ namespace reflection
 // GNUC means "GNU Cextensions" not "GCC"
 #if (__GNUC__ && (!REFLECTION_COMPILER_CLANG))
     #define REFLECTION_COMPILER_GCC 1
+
+    constexpr bool little_endian = (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__);
+    #if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+        #define REFLECTION_LITTLE_ENDIAN 1
+    #else
+        #define REFLECTION_LITTLE_ENDIAN 0
+    #endif // (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+
     // It's quite tricky to detect true standard GCC but if this is defined we can assume its GCC
     #if (!__GNU_PATCHLEVEL__)
     // MinGW gcc doesn't support extra version granularity
@@ -88,6 +103,9 @@ namespace reflection
 #if defined(_WIN32)
     #define REFLECTION_PLATFORM_WINDOWS 1
     constexpr tyon::fstring_view build_os_name = "windows";
+    // Windows is always little-endian in user facing code
+    constexpr bool little_endian = true;
+    #define REFLECTION_LITTLE_ENDIAN 1
 #else
     #define REFLECTION_PLATFORM_WINDOWS 0
 #endif // win32
