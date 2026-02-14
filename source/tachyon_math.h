@@ -233,7 +233,19 @@ namespace tyon
             explicit CONSTRUCTOR matrix4_f64( f32 arg );
         };
 
+        struct transform_2d
+        {
+          v2_f32 translation;
+          v2_f32 rotation;
+          v2_f32 scale;
+        };
 
+        struct transform_3d
+        {
+          v3_f32 translation;
+          v3_f32 rotation;
+          v3_f32 scale;
+        };
 
     /** Operators */
         // Complex numbers

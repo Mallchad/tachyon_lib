@@ -217,4 +217,33 @@ namespace tyon
         g_entity_type<t_entity> = new_context;
     }
 
+    template <typename t_entity>
+    struct entity_uid
+    {
+        using t_self = entity_uid<t_entity>;
+        i64 id;
+        u128 uuid;
+
+        CONSTRUCTOR entity_uid() = default;
+        constexpr CONSTRUCTOR entity_uid( i64 _id, u128 _uuid ) : id( _id ), uuid( _uuid ) {}
+        constexpr CONSTRUCTOR entity_uid( u128 _uuid ) : id(0), uuid( _uuid ) {}
+        constexpr CONSTRUCTOR entity_uid( i64 _id )
+            : id(_id), uuid() { }
+        constexpr COPY_CONSTRUCTOR entity_uid( const t_self& arg )
+            : id(arg.id), uuid(arg.uuid) { }
+        explicit operator i64();
+
+        PROC operator ==( t_self rhs ) -> bool
+        {   return memory_same( this->uuid, rhs.uuid ); }
+
+        PROC valid() -> bool
+        {   auto empty = u128 {};
+            return memory_different( this->uuid, empty );
+        }
+
+        PROC untyped_uid() -> uid
+        {   return uid { id, uuid };
+        }
+    };
+
 }
