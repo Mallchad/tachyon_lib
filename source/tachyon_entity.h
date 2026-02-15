@@ -116,7 +116,19 @@ namespace tyon
 
     template <typename t_entity>
     PROC entity_tick( t_entity* arg ) -> void
-    {}
+    {
+        entity<t_entity>.tick( arg );
+    }
+
+    template <typename t_entity>
+    PROC entity_tick_all() -> void
+    {
+        auto& entity_list = g_entity_type<t_entity>->list;
+        for (i32 i=0; i < entity_list.size(); ++i)
+        {
+            entity<t_entity>.tick( &entity_list[i] );
+        }
+    }
 
     // Shared Entity Functions
 
@@ -171,19 +183,19 @@ namespace tyon
     PROC entity_type_validator() -> void
     {
         using T = t_entity;
-        T _a;
-        entity_init( &_a );
-        entity_destroy( &_a );
-        entity_tick<T>( &_a );
+        T _a;                                     // ERROR: User defined entity implimented incorrectly
+        entity_init( &_a );                       // ERROR: User defined entity implimented incorrectly
+        entity_destroy( &_a );                    // ERROR: User defined entity implimented incorrectly
+        entity_tick<T>( &_a );                    // ERROR: User defined entity implimented incorrectly
 
-        entity_search<T>( uid() );
-        entity_search_name<T>( "" );
-        entity_context entity_;
-        T* _b = entity_allocate<T>();
-        entity_init( _b );
+        entity_search<T>( uid() );                // ERROR: User defined entity implimented incorrectly
+        entity_search_name<T>( "" );              // ERROR: User defined entity implimented incorrectly
+        entity_context entity_;                   // ERROR: User defined entity implimented incorrectly
+        T*             _b = entity_allocate<T>(); // ERROR: User defined entity implimented incorrectly
+        entity_init( _b );                        // ERROR: User defined entity implimented incorrectly
 
-        entity_type type;
-        t_entity* context;
+        entity_type type;                         // ERROR: User defined entity implimented incorrectly
+        t_entity*   context;                      // ERROR: User defined entity implimented incorrectly
     };
 
     template <typename t_entity>
@@ -191,7 +203,7 @@ namespace tyon
     {
         if (g_entity_type<t_entity> != nullptr)
         {   TYON_ERRORF( "Tried to register a type that has already been registered \n"
-            "Type Name: {}"
+            "Type Name: {}    "
             "Type UUID: {}", entity<t_entity>.name, uid(entity<t_entity>.id) );
             return;
         }

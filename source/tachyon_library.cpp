@@ -811,6 +811,7 @@ namespace tyon
 
         // Mandatory subsystems
         platform_init();
+        entity_type_register<file>();
 
         // Init optional sub-systems
         asset_machinery_init();
