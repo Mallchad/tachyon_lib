@@ -1043,7 +1043,8 @@ namespace tyon
     }
 
     CONSTRUCTOR dynamic_primitive::dynamic_primitive( const dynamic_primitive& arg )
-    {   copy_from( arg );
+    {   memory_zero_raw( this, sizeof(dynamic_primitive));
+        copy_from( arg );
     }
 
     PROC dynamic_primitive::operator= ( const dynamic_primitive& rhs ) -> dynamic_primitive&
