@@ -61,7 +61,8 @@ main( int argc, char** argv )
     // SECTION: Entity testing
     {
         entity_type_definition<file> _;
-        entity_type_register<file>();
+        // TODO: Need to rework, already registered by entity, need to test custom type
+        // entity_type_register<file>();
         test( g_entity_type<file>, "Type-Specific Entity Cotnext is initialized" );
         file* test_file = entity_allocate<file>();
 
