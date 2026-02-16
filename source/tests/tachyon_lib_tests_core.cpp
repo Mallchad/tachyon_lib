@@ -27,6 +27,52 @@ PROC test( bool condition, fstring description = "" ) -> void
 
 #include "test_linked_list.cpp"
 
+PROC test_allocators() -> void
+{
+    raw_pointer foo = (void*)0xDEADBEEF;
+    ERROR_GUARD( foo == (void*)0xDEADBEEF, "Comparison isn't working " );
+    test( foo == (void*)0xDEADBEEF, "'raw_pointer' comparison to 'void*'" );
+    memory_heap_allocator allocator;
+    raw_pointer article_1 = allocator.allocate_raw( 100, 4 );
+    raw_pointer good_ptr = allocator.allocate_relocate( article_1, 800 );
+
+    // Breaks as it should?
+    // raw_pointer bad_ptr = allocator.allocate_relocate( (void*)0x1234124, 400 );
+    TYON_LOGF( "good_ptr: ", good_ptr != nullptr );
+    TYON_LOGF( "bad_ptr: ", good_ptr != nullptr );
+
+    linked_list<int> list;
+    list.push_tail( 1 );
+    list.push_tail( 2 );
+    list.push_tail( 3 );
+    list.push_tail( 4 );
+    list.push_tail( 5 );
+    list.push_tail( 6 );
+    list.push_tail( 7 );
+    list.push_tail( 8 );
+    auto node = list.push_tail( 99 );
+    // node->value = 3;
+    // node_link<int> bad_node;
+    // list.remove_node( &bad_node );
+
+    node_link<int>* node_2 = list.insert_after( node, 4 );
+    ERROR_GUARD( node_2->value == 4, "" );
+    test( node_2->value == 4, "undocumented" );
+
+    auto step = list.indexer_full();
+    auto iter = step; // copy
+    ERROR_GUARD( step.do_iteration, "Failed indexer range check" );
+    test( step.do_iteration, "linked_list<> indexer range check" );
+    for (; step.do_iteration; step.forward() )
+    {
+        TYON_LOGF( "Node index: {} value: {}", step.index, step.value->value );
+    }
+    do
+    {
+        TYON_LOGF( "Node index: {} value: {}", iter.index, iter.value->value );
+    } while( iter.forward() );
+}
+
 int
 main( int argc, char** argv )
 {
@@ -99,6 +145,8 @@ main( int argc, char** argv )
         test( test_file3, "Search entity by name" );
         test( test_file_id_match_2, "Search entity by name result matches original ID" );
     }
+
+    test_allocators();
 
     TYON_LOG( "Program ended" );
     TYON_LOGF( "Tests Passed: {}", tests_passed );

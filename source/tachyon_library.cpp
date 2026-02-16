@@ -126,6 +126,7 @@ namespace tyon
             ++blanked_blocks;
             x_block->head_size = 0;
         }
+        entries.clear();
     }
 
     void memory_stack_allocator::operator= ( const memory_stack_allocator& )
@@ -170,6 +171,14 @@ namespace tyon
         ++churn;
         ++allocations;
 
+        stack_entry new_entry {
+            .data = result,
+            // Not important right now.
+            .position = 0,
+            .size = bytes,
+            .alignment = alignment_bytes
+        };
+
         return result;
     }
 
@@ -186,8 +195,31 @@ namespace tyon
 
     PROC memory_stack_allocator::allocate_relocate( void* reference, i64 bytes ) -> raw_pointer
     {
+        raw_pointer result;
+        if (reference == nullptr)
+        {   return nullptr;
+        }
         // reallocation doesn't make a tonne of sense on stack allocates... Leave it broken for now
-        return nullptr;
+        // TODO: Working on
+        // auto search = entries.linear_search( [](heap_entry& arg ) {
+            // return arg.data == reference; } );
+        auto iter = std::find_if( entries.begin(), entries.end(),
+                               [=](stack_entry& arg ) {
+                                   return arg.data == reference; } );
+        stack_entry _tmp = (iter != entries.end() ? *iter : stack_entry{});
+        search_result<stack_entry> search = { .match = &_tmp, .match_found = (iter != entries.end()) };
+
+        stack_entry entry = search.copy_default({});
+        if (search.match_found == false)
+        {   return nullptr;
+        }
+        result = this->allocate_raw( bytes, entry.alignment );
+        if (result)
+        {   memory_copy_raw( result, entry.data, entry.size );
+        }
+        // Blank old entry
+        *search.match = {};
+        return result;
     }
 
 

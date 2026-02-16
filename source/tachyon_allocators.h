@@ -10,6 +10,8 @@ struct heap_entry
     i64 position;
     i64 size;
     i64 alignment;
+    // User specified ID to disambiguate between different entries
+    i32 id;
 };
 
 struct memory_heap_allocator final : i_allocator
@@ -18,6 +20,9 @@ struct memory_heap_allocator final : i_allocator
     linked_list<heap_entry> used;
     linked_list<heap_entry> free;
     array<buffer> blocks;
+    std::mutex lock;
+    // Required for self-calls
+    std::mutex lock2;
 
     CONSTRUCTOR memory_heap_allocator();
 
@@ -30,7 +35,5 @@ struct memory_heap_allocator final : i_allocator
     PROC blank_all() -> void override;
     PROC get_memory_statistics() -> allocator_info override;
 };
-
-PROC test_allocators() -> void;
 
 };

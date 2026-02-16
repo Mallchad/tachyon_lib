@@ -245,7 +245,7 @@ struct array
     bool
     FUNCTION allocate( i_memory_allocator* allocator, isize count )
     {
-        // BROKEN
+        // TODO: BROKEN
         data = allocator->allocate_raw( count * sizeof(T) );
         size_ = count;
         head_size = std::min( head_size, count );
@@ -676,7 +676,7 @@ struct linked_list
     PROC push_tail( T arg ) -> t_node*
     {
         t_node* new_node = &nodes.push_tail( {} );
-        new_node->index = list_size;
+        new_node->index = nodes.size() - 1;
         new_node->value = arg;
 
         bool no_tail = (this->tail_ < 0);
@@ -775,12 +775,12 @@ struct linked_list
         arg->prev = -1;
         arg->next = -1;
 
-        nodes.head_size--;
+        // ai marked as bad
+        // nodes.head_size--;
         list_size--;
         ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ == -1 && tail_ == -1) ||
                      (head_ >= 0 && tail_ >= 0),
                      "Wut" );
-        TYON_LOG( "remove list_size", list_size );
     }
 
     /** LOOKING links in node order from head to tail */
@@ -806,6 +806,7 @@ struct linked_list
     PROC tail() -> t_node*
     {   return &nodes[ tail_ ]; }
 
+    // TODO: Indexer is bugged, I cant' for the life of me figured out why, some kind off by one error
     struct indexer
     {
         /** What index in the container the current value is */

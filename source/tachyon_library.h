@@ -444,12 +444,21 @@ namespace tyon
     };
     using i_memory_allocator = i_allocator;
 
+    struct stack_entry
+    {
+        raw_pointer data;
+        i64 position;
+        i64 size;
+        i64 alignment;
+    };
+
     /** Simplistic stack allocator
      *
      * This allocator is not thread safe. It is not meant for that. **/
     struct memory_stack_allocator : i_memory_allocator
     {
         std::vector<buffer> blocks;
+        std::vector<stack_entry> entries;
 
         allocator_info info;
         /// Minimum block size
