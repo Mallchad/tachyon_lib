@@ -5,9 +5,15 @@ project(
      default_options : ['cpp_std=c++20']
 )
 
+fs = import('fs')
 cmake = import( 'cmake' )
 
-include_dirs = include_directories( 'source', 'external/fmt/include' )
+include_dirs = include_directories(
+  'source',
+  'external/fmt/include',
+  # Not needed in unity build
+  'external/catch2/src/'
+)
 cuda_includes = include_directories( 'source', 'external/fmt/include', 'source/cuda' )
 libraries = [  ]
 
@@ -40,10 +46,20 @@ compiler_args = [
     '-Wno-unused-variable'
   ]
 
-test1 = executable(
+test_core = executable(
   'tachyon_lib_tests_core',
   'source/build_control/tachyon_lib_unity_core.cpp',
   'source/tests/tachyon_lib_tests_core.cpp',
+  # 'external/fmt/src/format.cc',
+  include_directories : include_dirs,
+  dependencies: libraries,
+  cpp_args: compiler_args
+)
+
+test_catch2_core = executable(
+  'tachyon_lib_tests_catch2_core',
+  'source/build_control/tachyon_lib_unity_core.cpp',
+  'source/tests/unity_catch2_core.cpp',
   # 'external/fmt/src/format.cc',
   include_directories : include_dirs,
   dependencies: libraries,
@@ -134,5 +150,20 @@ endif
 #   dependencies: libraries
 # )
 
-test( 'tachyon_lib_tests_all', test1 )
+# test( 'tachyon_lib_tests_all', test_core )
+test( 'catch2_core', test_catch2_core,
+    args: [
+      # Show output even on test
+      '--success',
+      # Show execution time of each test
+      '--durations=yes',
+      # Print to standard output/console
+      '--reporter=console',
+      # Print to files also
+      '--reporter=console::out=tachyon_catch2_test_log.txt',
+      '--reporter=json::out=tachyon_catch2_test_log.json',
+      '--reporter=json::out=tachyon_catch2_test_log.xml',
+      '--reporter compact::out=tachyon_catch2_test_log.compact.txt'
+    ]
+    )
 # test( 'tachyon_lib_tests_all', test3 )
