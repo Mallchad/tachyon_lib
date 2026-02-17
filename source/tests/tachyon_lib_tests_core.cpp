@@ -2,6 +2,7 @@
 #include "../include_tachyon_lib_core.h"
 // #include "../build_control/tachyon_lib_unity_core.cpp"
 #include <numeric>
+#include <random>
 
 using namespace tyon;
 
@@ -71,6 +72,33 @@ PROC test_allocators() -> void
     {
         TYON_LOGF( "Node index: {} value: {}", iter.index, iter.value->value );
     } while( iter.forward() );
+
+    std::random_device hardware_rng;
+    std::default_random_engine rand_engine(hardware_rng());
+    std::uniform_int_distribution<> rand( 0, 40000);
+    std::uniform_int_distribution<> rand_alignment( 0, 40000);
+    tyon::array<i32> random_list;
+    random_list.resize( 10'000 );
+    random_list.map_procedure( [&](i32& arg){
+        arg = rand( rand_engine ); });
+
+    memory_heap_allocator heap1;
+    array<void*> allocate_raw_1;
+    array<void*> deallocate_1;
+    random_list.map_procedure( [&](i32& arg){
+        if (arg > 20000)
+        {
+            allocate_raw_1.push_tail( heap1.allocate_raw( arg, rand_alignment( rand_engine ))
+            );
+        }
+        else
+        {
+            deallocate_1.push_tail( allocate_raw_1.pop_tail( ) );
+        }
+
+    });
+
+
 }
 
 int

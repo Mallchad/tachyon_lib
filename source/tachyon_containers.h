@@ -324,9 +324,9 @@ struct array
     }
 
     T
-    FUNCTION pop_tail( T item )
+    FUNCTION pop_tail()
     {
-        if (bounded && (head_size == 0)) { return false; }
+        if (bounded && (head_size == 0)) { return {}; }
         T result = data[ head + head_size - 1 ];
         --head_size;
         return result;
