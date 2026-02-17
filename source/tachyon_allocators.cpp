@@ -39,20 +39,9 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
 
     // Just unpoison the part after alignment
     memory_unpoison( result, bytes );
-    block->head_size += used_bytes + 100
-;
+    block->head_size += used_bytes + 100;
     TYON_LOGF( "bytes alignment block head size {} {} {} {}",
                bytes, alignment, block->size, block->head_size );
-    if (result == nullptr)
-    {
-        TYON_LOG( "is nullptr");
-    }
-    TYON_LOGF( "Saved heap pointer {} index {}:", (void*)entry->data, new_node->index );
-    ERROR_GUARD( result != nullptr, "What happened???" );
-    ERROR_GUARD( entry->data == (void*)result, "Should be equal" );
-    TYON_LOGF( "ALLOCATE NEW LIST SIZE: {}", used.list_size );
-    TYON_LOGF( "Heap used nodes size:  {}", used.nodes.size() );
-    TYON_LOGF( "Heap free nodes:  {}", free.nodes.size() );
 
     return result;
 }
@@ -77,8 +66,10 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
             x_entry = x_node->value;
             if (x_entry.data == reference)
             { match = true; break; }
-            TYON_LOGF( "Checking entry with address {} bytes {}",
-                       (void*)(x_entry.data), x_entry.size );
+
+            // DEBUG: Really really slow
+            // TYON_LOGF( "Checking entry with address {} bytes {}",
+                       // (void*)(x_entry.data), x_entry.size );
             if (x_node->next == -1)
             {   break; }
             x_node = &used.nodes[ x_node->next ];
@@ -101,9 +92,6 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         raw_pointer result = this->allocate_raw( bytes );
         // // Move data to new memory
         memory_copy_raw( result, x_entry.data, x_entry.size - x_entry.alignment );
-        this->deallocate( x_entry.data );
-
-        TYON_LOGF( "RELOCATE NEW LIST SIZE: {}", used.list_size );
 
         return result;
     }
