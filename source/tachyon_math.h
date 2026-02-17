@@ -247,6 +247,17 @@ namespace tyon
           v3_f32 scale;
         };
 
+        struct box_2d
+        {
+            v2_f32 position;
+            v2_f32 size;
+        };
+        struct box_3d
+        {
+            v3_f32 position;
+            v3_f32 size;
+        };
+
     /** Operators */
         // Complex numbers
             // Addition
@@ -1167,14 +1178,55 @@ namespace tyon
 
 
 
-            // Absolute
-            TYON_CUDA_SHARED
-            PROC absolute(const f32& a) -> f32;
+            /** Absolute() or abs() value.
 
-            TYON_CUDA_SHARED
-            PROC absolute(const f64& a) -> f64;
+                Has the effect or removing the the negative part of the number.
+
+                NOTE: This is  a type safe version because the  built in cstdlib
+                version  are  quite  error  prone and  have  lots  of  undefined
+                behaviour.   With   the   help   of   some   template   function
+                ovelroads/template  specialization  we  can  gurantee  only  the
+                correct version can ever be called.
+
+                This  is  because  template  specializations  have  the  special
+                property that they do not do automatic type casting.
+
+                According to some sources non std::abs is very dangerous and can
+                truncate numbers randomally on top of normal casting issues.
+
+                This is the generic version using long double. Other other
+                primitive will get it's own overload.
+            */
+            template <typename t_numberic> TYON_CUDA_SHARED constexpr
+            PROC absolute( const t_numberic& arg ) -> t_numberic
+            {   return std::fabsl( arg ); }
 
 
+            template <> TYON_CUDA_SHARED constexpr
+            PROC absolute<f32>( const f32& arg ) -> f32
+            {   return std::fabsf( arg ); }
+
+            template <> TYON_CUDA_SHARED constexpr
+            PROC absolute<f64>( const f64& arg ) -> f64
+            {   return std::fabsl( arg ); }
+
+            //* NOTE: Don't be an idiot like I did and try to define absolute for an unsigned integer */
+
+            template <> TYON_CUDA_SHARED constexpr
+            PROC absolute<i8>( const i8& arg ) -> i8
+            {   return std::abs( arg ); }
+
+            template <> TYON_CUDA_SHARED constexpr
+            PROC absolute<i16>( const i16& arg ) -> i16
+            {   return std::abs( arg ); }
+
+            template <> TYON_CUDA_SHARED constexpr
+            PROC absolute<i32>( const i32& arg ) -> i32
+            {   return std::abs( arg ); }
+
+            template <> TYON_CUDA_SHARED constexpr
+            PROC absolute<i64>( const i64& arg ) -> i64
+            {   return std::llabs( arg ); }
 
             // Clamp
             TYON_CUDA_SHARED

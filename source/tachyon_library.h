@@ -53,10 +53,14 @@
     #define TYON_PREFETCH_CACHELINE( address ) ERROR_PREFETCH_NOT_DEFINED
 #endif // compiler
 
+/** NOTE: Constexpr is helpful for marking code as CUDA compatible.
+
+    It also solves issues with templates and One Definition Rule ODR. It's fine
+    to have constexpr on a function that is never constexpr. */
 #if REFLECTION_COMPILER_CUDA
     #define TYON_CUDA_DEVICE __device__
-    #define TYON_CUDA_HOST __host__
-    #define TYON_CUDA_SHARED __device__ __host__
+    #define TYON_CUDA_HOST  __host__
+    #define TYON_CUDA_SHARED  __device__ __host__
     #define TYON_CUDA_KERNEL __global__
 #else
     #define TYON_CUDA_DEVICE

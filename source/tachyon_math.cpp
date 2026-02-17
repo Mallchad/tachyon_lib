@@ -3004,23 +3004,6 @@ namespace tyon
                 return x * x * (3.0 - 2.0 * x);
             }
 
-
-
-            // Absolute
-            TYON_CUDA_SHARED
-            PROC absolute(const f32& a) -> f32
-            {
-                return std::fabs(a);
-            }
-
-            TYON_CUDA_SHARED
-            PROC absolute(const f64& a) -> f64
-            {
-                return std::abs(a);
-            }
-
-
-
             // Clamp
             TYON_CUDA_SHARED
             PROC clamp_range(const f32& edge0, const f32& edge1, const f32& a) -> f32
