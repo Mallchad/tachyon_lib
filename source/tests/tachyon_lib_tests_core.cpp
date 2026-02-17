@@ -16,11 +16,11 @@ i32 tests_failed = 0;
 PROC test( bool condition, fstring description = "" ) -> void
 {
     if (condition)
-    {   TYON_LOGF( "[TEST] Passed! | {}", description );
+    {   TYON_BASE_LOGF( "Tachyon Test", "Passed! | {}", description );
         ++tests_passed;
     }
     else
-    {   TYON_LOGF( "[TEST] Failed! | {}", description );
+    {   TYON_BASE_LOGF( "Tachyon Test",  "Failed! | {}", description );
         ++tests_failed;
     }
 }
@@ -147,6 +147,27 @@ main( int argc, char** argv )
     }
 
     test_allocators();
+
+    test( memory_padding( 4,  (void*)0xDEAD ) == 3,  "memory_padding" );
+    test( memory_padding( 16, (void*)0xF003 ) == 13, "memory_padding" );
+    test( memory_padding( 2,  (void*)0x0ad3 ) == 1,  "memory_padding" );
+    test( memory_padding( 25, (void*)0x2afd ) == 20, "memory_padding" );
+    test( memory_padding( 4,  (void*)0x0021 ) == 3,  "memory_padding" );
+
+    test( memory_padding( 4,    0xDEAD ) == 3,  "memory_padding" );
+    test( memory_padding( 16,   0xF003 ) == 13, "memory_padding" );
+    test( memory_padding( 2,    0x0ad3 ) == 1,  "memory_padding" );
+    test( memory_padding( 25,   0x2afd ) == 20, "memory_padding" );
+    test( memory_padding( 4,    0x0021 ) == 3,  "memory_padding" );
+
+    test( memory_align( 0xDEAD,  4 ) == 0xDEB0,  "memory_align" );
+    test( memory_align( 0xF003, 16 ) == 0xF010,  "memory_align" );
+    test( memory_align( 0x0ad3,  2 ) == 0x00ad4, "memory_align" );
+    test( memory_align( 0x2afd, 25 ) == 0x2b11,  "memory_align" );
+    test( memory_align( 0x0021,  4 ) == 0x0024,  "memory_align" );
+    test( memory_align( 0x0021,  64 ) == 0x0040,  "memory_align" );
+
+    test( memory_align_typed<i32>( 1, 64) == 64, "memory_align_typed" );
 
     TYON_LOG( "Program ended" );
     TYON_LOGF( "Tests Passed: {}", tests_passed );

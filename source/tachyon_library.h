@@ -368,10 +368,10 @@ namespace tyon
     // -- Memory Management Library --
 
     isize
-    binary_padding( isize padding, isize size );
+    memory_padding( isize padding, isize size );
 
     isize
-    binary_alignment( isize padding, void* target );
+    memory_padding( isize padding, void* target );
 
     void
     memory_poison( void*, isize size );
@@ -425,7 +425,7 @@ namespace tyon
         {
             T* result = nullptr;
             i64 size_bytes = (sizeof(T) * count);
-            i64 alignment = binary_alignment( alignof(T), result );
+            i64 alignment = memory_padding( alignof(T), result );
             result = allocate_raw( size_bytes + alignment );
 
             // Default allocate storage
@@ -486,7 +486,7 @@ namespace tyon
             isize size = (count * sizeof(T));
             isize type_size = sizeof(T);
             buffer* block = &(blocks.back());
-            isize alignment = binary_alignment( alignof(T), block->data + block->head_size );
+            isize alignment = memory_padding( alignof(T), block->data + block->head_size );
             void* head_data = (block->data + block->head_size + alignment);
             T* result = nullptr;
 
@@ -505,7 +505,7 @@ namespace tyon
                 blocks.push_back( new_block );
                 // Fixup stale data
                 block = &(blocks.back());
-                alignment = binary_alignment( alignof(T), head_data );
+                alignment = memory_padding( alignof(T), head_data );
                 head_data = (block->data + block->head_size + alignment);
 
                 if (new_block.data == nullptr) { return nullptr; }
@@ -644,7 +644,7 @@ namespace tyon
         return (bytes + (alignment - (bytes % alignment)));
     }
 
-    TYON_FORCEINLINE isize
+    isize
     memory_align( isize bytes, i32 alignment );
 
     /** There were supposed to be std::unique_ptr compat functions here which

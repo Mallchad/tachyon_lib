@@ -26,7 +26,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
     block = blocks.tail_address();
     node_link<heap_entry>* new_node = used.push_tail( {} );
     heap_entry* entry = &new_node->value;
-    isize alignment_bytes = binary_alignment( alignment, block->data + block->head_size );
+    isize alignment_bytes = memory_padding( alignment, block->data + block->head_size );
     isize used_bytes = (alignment_bytes + bytes);
     raw_pointer result = (block->data + block->head_size + alignment_bytes);
 

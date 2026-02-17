@@ -31,11 +31,11 @@ namespace tyon
     // -- Memory Management Library --
 
     isize
-    binary_padding( isize padding, isize size )
+    memory_padding( isize padding, isize size )
     { return (padding - (size % padding) % padding); }
 
     isize
-    binary_alignment( isize padding, void* target )
+    memory_padding( isize padding, void* target )
     { return (padding - (u64(target) % padding) % padding); }
 
     raw_pointer
@@ -137,7 +137,7 @@ namespace tyon
         isize size = (bytes);
         isize type_size = 1;
         buffer* block = &(blocks.back());
-        isize alignment_bytes = binary_alignment( alignment, block->data + block->head_size );
+        isize alignment_bytes = memory_padding( alignment, block->data + block->head_size );
         void* head_data = (block->data + block->head_size + alignment_bytes);
         void* result = nullptr;
 
@@ -157,7 +157,7 @@ namespace tyon
             blocks.push_back( new_block );
             // Fixup stale data
             block = &(blocks.back());
-            alignment_bytes = binary_alignment( 1, head_data );
+            alignment_bytes = memory_padding( 1, head_data );
             head_data = (block->data + block->head_size + alignment_bytes);
 
             if (new_block.data == nullptr) { return nullptr; }
@@ -185,7 +185,7 @@ namespace tyon
     PROC memory_stack_allocator::allocate_raw_fast( i64 bytes, isize alignment ) -> raw_pointer
     {
         buffer* block = &(blocks.back());
-        isize alignment_bytes = binary_alignment( alignment, block->data + block->head_size );
+        isize alignment_bytes = memory_padding( alignment, block->data + block->head_size );
         isize allocation_size = (alignment + block->head_size);
         raw_pointer result = (block->data + allocation_size);
         block->head_size += allocation_size;
