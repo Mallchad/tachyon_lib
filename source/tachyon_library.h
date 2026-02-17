@@ -88,6 +88,7 @@ namespace tyon
     using time_monotonic = chrono::time_point< chrono::steady_clock >;
     /// Calender time from system_clock
     using time_date = chrono::time_point< chrono::system_clock >;
+    using time_date_ns = u64;
 
     enum class e_log_entry
     {
