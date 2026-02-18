@@ -11,10 +11,10 @@
 // #include "../build_control/tachyon_lib_unity_core.cpp"
 
 /* SECTION: Test Definitions */
+using namespace tyon;
 
 TEST_CASE( "Memory Alignment Helpers", "memory" )
 {
-    using namespace tyon;
 
     SECTION( "memory_padding" )
     {
@@ -59,35 +59,49 @@ TEST_CASE( "Memory Alignment Helpers", "memory" )
 
         REQUIRE( memory_align_typed<i32>( 1, 64) == 64 );
     }
+}
 
-    SECTION( "uid/uuid Unique Identifiers" )
-    {
-        uid valid = uuid_generate();
-        REQUIRE( valid.valid() );
+TEST_CASE( "uid/uuid Unique Identifiers" )
+{
+    uid valid = uuid_generate();
+    REQUIRE( valid.valid() );
 
-        uid invalid;
-        REQUIRE( invalid.valid() == false );
+    uid invalid;
+    REQUIRE( invalid.valid() == false );
 
-        uid copy1 = uuid_generate();
-        copy1.id = 25;
-        uid copy2 = copy1;
-        REQUIRE( memcmp( &copy1, &copy2, sizeof( uid) ) == 0 );
+    uid copy1 = uuid_generate();
+    copy1.id = 25;
+    uid copy2 = copy1;
+    REQUIRE( memcmp( &copy1, &copy2, sizeof( uid) ) == 0 );
 
-        uid equal1 = uuid_generate();
-        equal1.id = 25;
-        uid equal2 = equal1;
-        REQUIRE( equal1 == equal2 );
+    uid equal1 = uuid_generate();
+    equal1.id = 25;
+    uid equal2 = equal1;
+    REQUIRE( equal1 == equal2 );
 
-        uid equal_different1 = uuid_generate();
-        equal_different1.id = 25;
-        uid equal_different2 = uuid_generate();
-        REQUIRE( (equal_different1 == equal_different2) == false );
+    uid equal_different1 = uuid_generate();
+    equal_different1.id = 25;
+    uid equal_different2 = uuid_generate();
+    REQUIRE( (equal_different1 == equal_different2) == false );
 
-        // Unimplimented
-        // uid inequal1 = uuid_generate();
-        // inequal1.id = 25;
-        // uid inequal2 = inequal1;
-        // REQUIRE( inequal1 != inequal2 );
+    // Unimplimented
+    // uid inequal1 = uuid_generate();
+    // inequal1.id = 25;
+    // uid inequal2 = inequal1;
+    // REQUIRE( inequal1 != inequal2 );
 
-    }
+}
+
+TEST_CASE( "Compile Time Library" )
+{
+    // constexpr uid v1;
+    // // uid c1 = compile_expression( v1 );
+
+    // constexpr uid v2;
+    // // uid c2 = compile_expression( v2 );
+    // uid c3 = compile_expression( 9 + 10 );
+    // constexpr uid v3 = 0;
+
+    // constexpr int c4 = compile_expression( 9 + 10 );
+
 }
