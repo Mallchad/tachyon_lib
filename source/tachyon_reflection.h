@@ -8,7 +8,7 @@ namespace reflection
 #ifndef TYON_BUILD_GIT_HASH_STRING
         #if TYON_AGGRESSIVE_DEBUGGING
         #error "No git gash provided"
-    #endif TYON_AGGRESSIVE_DEBUGGING
+    #endif // TYON_AGGRESSIVE_DEBUGGING
     #define TYON_BUILD_GIT_HASH_STRING "unknown"
 #endif // TYON_BUILD_GIT_HASH_STRING
 

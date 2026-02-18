@@ -1618,17 +1618,27 @@ namespace tyon
         u128 uuid;
 
         CONSTRUCTOR uid() = default;
-        constexpr CONSTRUCTOR uid( i64 _id, u128 _uuid );
+        constexpr CONSTRUCTOR uid( i64 _id, u128 _uuid ) : id( _id ), uuid( _uuid ) {}
         constexpr CONSTRUCTOR uid( u128 _uuid ) : id(0), uuid( _uuid ) {}
         constexpr CONSTRUCTOR uid( i64 _id )
             : id(_id), uuid() { }
         constexpr COPY_CONSTRUCTOR uid( const uid& arg )
             : id(arg.id), uuid(arg.uuid) { }
-        explicit operator i64();
 
-        PROC operator ==( uid rhs ) -> bool;
+        constexpr TYON_CUDA_SHARED
+        PROC operator ==( uid rhs ) -> bool
+        {
+            return memory_same( this->uuid, rhs.uuid );
+        }
 
-        PROC valid() -> bool;
+        constexpr PROC valid() -> bool
+        {
+            auto empty = u128 {};
+            return memory_different( this->uuid, empty );
+        }
+
+        explicit operator i64()
+        {   return id; }
     };
 
     struct minihash

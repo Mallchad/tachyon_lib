@@ -318,8 +318,8 @@ namespace tyon
            simiar. But convenient for unformatted UTF-8 unicode strings */
         SetConsoleOutputCP( 65001 ); // CP_UTF8
 
-        vmec_log("Setting Win32 console mode" );
-        vmec_log("Win32 SetConsoleMode errors codes: ", err, err2 );
+       TYON_LOG( "Setting Win32 console mode" );
+       TYON_LOG("Win32 SetConsoleMode errors codes: ", err, err2 );
 #endif
         return true;
     }

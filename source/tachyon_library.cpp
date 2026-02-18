@@ -434,20 +434,6 @@ namespace tyon
     // -- Threading Library --
 
     // -- Type Support Library --
-    constexpr CONSTRUCTOR uid::uid( i64 _id, u128 _uuid ) : id( _id ), uuid( _uuid ) {}
-    uid::operator i64()
-    {   return id;
-    }
-
-    PROC uid::operator ==( uid rhs ) -> bool
-    {   return memory_same( this->uuid, rhs.uuid );
-    }
-
-    PROC uid::valid() -> bool
-    {
-        auto empty = u128 {};
-        return memory_different( this->uuid, empty );
-    }
 
     bool
     minihash::operator== ( minihash& rhs ) { return this->value == rhs.value; };
