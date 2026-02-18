@@ -1196,37 +1196,40 @@ namespace tyon
 
                 This is the generic version using long double. Other other
                 primitive will get it's own overload.
+
+                NOTE: CUDA templates get stamped out into the header when device
+                code so need to be inline
             */
-            template <typename t_numberic> TYON_CUDA_SHARED constexpr
+            template <typename t_numberic> TYON_CUDA_SHARED inline
             PROC absolute( const t_numberic& arg ) -> t_numberic
-            {   return std::fabsl( arg ); }
+            {   return fabsl( arg ); }
 
 
-            template <> TYON_CUDA_SHARED constexpr
+            template <> TYON_CUDA_SHARED inline
             PROC absolute<f32>( const f32& arg ) -> f32
-            {   return std::fabsf( arg ); }
+            {   return fabsf( arg ); }
 
-            template <> TYON_CUDA_SHARED constexpr
+            template <> TYON_CUDA_SHARED inline
             PROC absolute<f64>( const f64& arg ) -> f64
-            {   return std::fabsl( arg ); }
+            {   return fabsl( arg ); }
 
             //* NOTE: Don't be an idiot like I did and try to define absolute for an unsigned integer */
 
-            template <> TYON_CUDA_SHARED constexpr
+            template <> TYON_CUDA_SHARED inline
             PROC absolute<i8>( const i8& arg ) -> i8
-            {   return std::abs( arg ); }
+            {   return abs( arg ); }
 
-            template <> TYON_CUDA_SHARED constexpr
+            template <> TYON_CUDA_SHARED inline
             PROC absolute<i16>( const i16& arg ) -> i16
-            {   return std::abs( arg ); }
+            {   return abs( arg ); }
 
-            template <> TYON_CUDA_SHARED constexpr
+            template <> TYON_CUDA_SHARED inline
             PROC absolute<i32>( const i32& arg ) -> i32
-            {   return std::abs( arg ); }
+            {   return abs( arg ); }
 
-            template <> TYON_CUDA_SHARED constexpr
+            template <> TYON_CUDA_SHARED inline
             PROC absolute<i64>( const i64& arg ) -> i64
-            {   return std::llabs( arg ); }
+            {   return llabs( arg ); }
 
             // Clamp
             TYON_CUDA_SHARED

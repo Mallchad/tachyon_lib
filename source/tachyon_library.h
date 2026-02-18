@@ -1628,13 +1628,31 @@ namespace tyon
         constexpr TYON_CUDA_SHARED
         PROC operator ==( uid rhs ) -> bool
         {
-            return memory_same( this->uuid, rhs.uuid );
+            bool difference = (
+                (uuid.d[0]   ^ rhs.uuid.d[0]) |
+                (uuid.d[1]   ^ rhs.uuid.d[1]) |
+                (uuid.d[2]   ^ rhs.uuid.d[2]) |
+                (uuid.d[3]   ^ rhs.uuid.d[3]) |
+                (uuid.d[4]   ^ rhs.uuid.d[4]) |
+                (uuid.d[5]   ^ rhs.uuid.d[5]) |
+                (uuid.d[6]   ^ rhs.uuid.d[6]) |
+                (uuid.d[7]   ^ rhs.uuid.d[7]) |
+                (uuid.d[8]   ^ rhs.uuid.d[8]) |
+                (uuid.d[9]   ^ rhs.uuid.d[9]) |
+                (uuid.d[10]  ^ rhs.uuid.d[10]) |
+                (uuid.d[11]  ^ rhs.uuid.d[11]) |
+                (uuid.d[12]  ^ rhs.uuid.d[12]) |
+                (uuid.d[13]  ^ rhs.uuid.d[13]) |
+                (uuid.d[14]  ^ rhs.uuid.d[14]) |
+                (uuid.d[15]  ^ rhs.uuid.d[15]) |
+                (uuid.d[15]  ^ rhs.uuid.d[15]));
+            return (difference == 0);
         }
 
         constexpr PROC valid() -> bool
         {
             auto empty = u128 {};
-            return memory_different( this->uuid, empty );
+            return (*this == empty);
         }
 
         explicit operator i64()
