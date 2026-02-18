@@ -1652,7 +1652,7 @@ namespace tyon
         constexpr PROC valid() -> bool
         {
             auto empty = u128 {};
-            return (*this == empty);
+            return (*this != empty);
         }
 
         explicit operator i64()
