@@ -92,7 +92,7 @@
 // #define FMT_USE_CONSTEVAL 0
 // #define FMT_ENFORCE_COMPILE_STRING 1
 // #define FMT_DISABLE_CONSTEVAL 1
-#if (REFLECTION_COMPILER_CUDA)
+#if (REFLECTION_COMPILER_CUDA || TYON_FMT_UNICODE_OFF)
     #define FMT_UNICODE 0
     #pragma warning "Unicode not supported on CUDA compiler so can't use FMT_UNICODE"
 #endif // REFLECTION_COMPILER_CUDA
