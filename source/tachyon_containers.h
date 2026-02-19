@@ -35,6 +35,9 @@ struct pointer final
     TYON_FORCEINLINE t_any&
     operator []( isize i ) { return data[i]; }
 
+    TYON_FORCEINLINE t_any&
+    operator []( isize i ) const { return data[i]; }
+
     TYON_FORCEINLINE
     CONSTRUCTOR pointer( std::nullptr_t rhs )
     {
@@ -354,7 +357,7 @@ struct array
     }
 
     t_self&
-    COPY_ASSIGNMENT operator =( t_self rhs )
+    COPY_ASSIGNMENT operator= ( const t_self& rhs )
     {
         this->change_allocation( rhs.size_ );
         this->head_size = rhs.size_;

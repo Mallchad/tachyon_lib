@@ -197,8 +197,10 @@ namespace tyon
         CONSTRUCTOR raw_pointer( void* rhs )
         { this->data = reinterpret_cast<byte*>(rhs); }
 
-        COPY_ASSIGNMENT operator=( const raw_pointer& rhs )
-        { this->data = rhs.data; }
+        COPY_ASSIGNMENT PROC operator=( const raw_pointer& rhs ) -> raw_pointer&
+        { this->data = rhs.data;
+            return *this;
+        }
 
         inline byte&
         operator [] ( i64 arg)
@@ -1619,6 +1621,12 @@ namespace tyon
         constexpr COPY_CONSTRUCTOR uid( const uid& arg )
             : id(arg.id), uuid(arg.uuid) { }
 
+        constexpr
+        PROC operator= ( const uid& arg ) -> uid&
+        {   id = arg.id; uuid = arg.uuid;
+            return *this;
+        }
+
         constexpr TYON_CUDA_SHARED
         PROC operator ==( uid rhs ) -> bool
         {
@@ -2005,8 +2013,6 @@ struct fmt::formatter< tyon::uid > : formatter<string_view>
     auto format( tyon::uid arg, format_context& context ) const -> format_context::iterator
     {
         using namespace tyon;
-        // TYON_BREAK();
-        tyon::uid tmp = arg;
         tyon::raw_pointer data = &arg.uuid;
         char hexbytes[] = "0123456789abcdefZZZZZZ";
         char formatted[40] {};

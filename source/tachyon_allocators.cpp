@@ -40,7 +40,8 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         .position = block->head_size,
         .size = used_bytes,
         .active_size = bytes,
-        .alignment = alignment
+        .alignment = alignment,
+        .id = 0
     };
 
     // Just unpoison the part after alignment.

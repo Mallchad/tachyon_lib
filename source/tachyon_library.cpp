@@ -1102,7 +1102,7 @@ namespace tyon
         if (type == e_primitive::string_)
         {   string_.~fstring();
         }
-        memory_zero( this, 1 );
+        memory_zero_raw( &this->_buffer, 32);
     }
 
 }

@@ -101,6 +101,7 @@ struct logger
             byte byte_;
             raw_pointer pointer_;
             fstring string_;
+            u8 _buffer[32];
         };
         e_primitive type;
 
