@@ -488,7 +488,7 @@ namespace tyon
             isize type_size = sizeof(T);
             buffer* block = &(blocks.back());
             isize alignment = memory_padding( alignof(T), block->data + block->head_size );
-            void* head_data = (block->data + block->head_size + alignment);
+            raw_pointer* head_data = (block->data + block->head_size + alignment);
             T* result = nullptr;
 
             bool size_exceeded = ((alignment + block->head_size + size) > block->size);
@@ -513,9 +513,13 @@ namespace tyon
             }
 
             // Allocate the new memory
-            memory_unpoison( head_data, size );
             result = reinterpret_cast<T*>( head_data );
-            block->head_size += (alignment + size);
+            // Redzone bytes helps a lot with debugging, redzone bytes won't be unpoisioned
+            i64 redzone_bytes = memory_padding( 64, head_data + size );
+            // Remove poisioning from active portion of memory
+            memory_unpoison( head_data, size );
+
+            block->head_size += (alignment + size + redzone_bytes);
             // Default construct objects in-place
             new( result ) T[count] {};
             churn_bytes += size;
