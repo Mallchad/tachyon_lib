@@ -21,7 +21,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         TYON_LOG( "New heap block" );
         block = &blocks.push_tail( {} );
         block->data = malloc( 400_MiB );
-        block->size = 400_MiB;
+        block->size = std::max( 400_MiB, bytes + 100MiB );
     }
     block = blocks.tail_address();
     node_link<heap_entry>* new_node = used.push_tail( {} );
@@ -62,7 +62,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
 
     PROC memory_heap_allocator::allocate_relocate( void* reference, i64 bytes ) -> raw_pointer
     {
-        std::scoped_lock _lock( this->lock2 );
+        std::scoped_lock _lock( this->lock );
 
         heap_entry x_entry {};
         node_link<heap_entry>* x_node = used.head();
@@ -98,8 +98,11 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
 
         // Allocate new storage
         raw_pointer result = this->allocate_raw( bytes );
-        // // Move data to new memory
-        memory_copy_raw( result, x_entry.data, x_entry.active_size );
+        /* Move data to new memory
+           Normal reallocation APIs specifies the size may be smalelr than normal.
+           So we have to copy only everything up to that point. */
+        i64 copy_bytes = std::min( x_entry.active_size, bytes );
+        memory_copy_raw( result, x_entry.data, copy_bytes );
         TYON_LOGF( "Copying bytes for reallocation: {:<10}", x_entry.active_size );
 
         return result;

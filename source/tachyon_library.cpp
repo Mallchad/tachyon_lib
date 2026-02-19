@@ -300,12 +300,6 @@ namespace tyon
         return (bytes + (alignment - (bytes % alignment)));
     }
 
-    TYON_FORCEINLINE isize
-    memory_align( raw_pointer address, i32 alignment )
-    {
-        return (bytes + (alignment - (bytes % alignment)));
-    }
-
     PROC resource_arena::run_cleanup() -> void
     {
         constexpr bool debug = true;

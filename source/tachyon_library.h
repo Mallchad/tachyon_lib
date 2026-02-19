@@ -648,8 +648,13 @@ namespace tyon
     isize
     memory_align( isize bytes, i32 alignment );
 
-    isize
-    memory_align( raw_pointer address, i32 alignment );
+    template <typename T> TYON_FORCEINLINE
+    PROC memory_align( T* address, i32 alignment ) -> T*
+    {
+        u64 addr = u64(address);
+        return (T*)(addr + (alignment - (addr % alignment)) );
+    }
+
 
     /** There were supposed to be std::unique_ptr compat functions here which
      * supposed to work with memory_allocate give them ownership of values

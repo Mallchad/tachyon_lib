@@ -21,9 +21,8 @@ struct memory_heap_allocator final : i_allocator
     linked_list<heap_entry> used;
     linked_list<heap_entry> free;
     array<buffer> blocks;
-    std::mutex lock;
     // Required for self-calls
-    std::mutex lock2;
+    std::recursive_mutex lock;
 
     CONSTRUCTOR memory_heap_allocator();
 
