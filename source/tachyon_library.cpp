@@ -70,6 +70,8 @@ namespace tyon
         (void)address; (void)size;
 #if (defined(__SANITIZE_ADDRESS__))
         __asan_poison_memory_region( address, size );
+#else
+        memset( address, 0XFF, size );
 #endif // address sanitizer
     }
 

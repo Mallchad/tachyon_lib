@@ -1,5 +1,9 @@
 
-#pragma once
+// NOTE: Its a warning to use pragma once in top level build file
+#ifdef UNITY_TACHYON_LIB_CORE_
+    #error "Included a unity file twice"
+#endif
+#define UNITY_TACHYON_LIB_CORE_
 
 // Required for windows DLL
 #define TYON_EXPORTS 1

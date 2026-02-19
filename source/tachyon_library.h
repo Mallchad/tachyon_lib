@@ -197,6 +197,9 @@ namespace tyon
         CONSTRUCTOR raw_pointer( void* rhs )
         { this->data = reinterpret_cast<byte*>(rhs); }
 
+        COPY_ASSIGNMENT operator=( const raw_pointer& rhs )
+        { this->data = rhs.data; }
+
         inline byte&
         operator [] ( i64 arg)
         { return data[arg]; }
@@ -357,15 +360,6 @@ namespace tyon
             #condition, bool(condition), (message) );                   \
             TYON_BREAK();                                               \
         };
-
-    // #define ERROR_GUARD( condition, message ) \
-    //     if (!(condition)) \
-    //     { \
-    //         printf( "\e[0;31m[Error Guard]    %s @ %s:%d: Condition: (%s): %s \e[0m \n", \
-    //             __FUNCTION__, __FILE__, __LINE__, #condition, message );    \
-    //         log_flush(); \
-    //         TYON_BREAK(); \
-    //     };
 
     #define ERROR_GUARD_NULL( value ) \
         ERROR_GUARD( value != nullptr, "Null pointer was found where it shouldn't be." );

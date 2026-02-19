@@ -27,17 +27,24 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
     node_link<heap_entry>* new_node = used.push_tail( {} );
     heap_entry* entry = &new_node->value;
     isize alignment_bytes = memory_padding( alignment, block->data + block->head_size );
-    isize used_bytes = (alignment_bytes + bytes);
+    const i64 redzone_min_size = 64;
+    isize redzone_size = redzone_min_size + memory_padding(
+        alignment,
+        (block->data + block->head_size + alignment + redzone_min_size)
+    );
+    isize used_bytes = (alignment_bytes + bytes + redzone_min_size);
     raw_pointer result = (block->data + block->head_size + alignment_bytes);
 
     *entry = heap_entry {
         .data = result,
         .position = block->head_size,
         .size = used_bytes,
+        .active_size = bytes,
         .alignment = alignment
     };
 
-    // Just unpoison the part after alignment
+    // Just unpoison the part after alignment.
+    // Leave the redzone poisioned
     memory_unpoison( result, bytes );
     block->head_size += used_bytes + 100;
     TYON_LOGF( "bytes alignment block head size {} {} {} {}",
@@ -91,11 +98,10 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         // Allocate new storage
         raw_pointer result = this->allocate_raw( bytes );
         // // Move data to new memory
-        memory_copy_raw( result, x_entry.data, x_entry.size - x_entry.alignment );
+        memory_copy_raw( result, x_entry.data, x_entry.active_size - x_entry.alignment );
 
         return result;
     }
-
 
     PROC memory_heap_allocator::deallocate( void* address ) -> void
     {

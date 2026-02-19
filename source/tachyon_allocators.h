@@ -9,6 +9,7 @@ struct heap_entry
     raw_pointer data;
     i64 position;
     i64 size;
+    i64 active_size;
     i64 alignment;
     // User specified ID to disambiguate between different entries
     i32 id;
