@@ -21,7 +21,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         TYON_LOG( "New heap block" );
         block = &blocks.push_tail( {} );
         block->data = malloc( 400_MiB );
-        block->size = std::max( 400_MiB, bytes + 100MiB );
+        block->size = std::max( 400_MiB, bytes + 100_MiB );
     }
     block = blocks.tail_address();
     node_link<heap_entry>* new_node = used.push_tail( {} );
