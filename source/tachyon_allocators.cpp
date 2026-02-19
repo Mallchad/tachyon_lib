@@ -99,13 +99,16 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         // Allocate new storage
         raw_pointer result = this->allocate_raw( bytes );
         // // Move data to new memory
-        memory_copy_raw( result, x_entry.data, x_entry.active_size - x_entry.alignment );
+        memory_copy_raw( result, x_entry.data, x_entry.active_size );
 
         return result;
     }
 
     PROC memory_heap_allocator::deallocate( void* address ) -> void
     {
+        // NOTE: Passing nullptr is a valid operation, simplifies error handlig.
+        if (address == nullptr) { return; }
+
         std::scoped_lock _lock( this->lock );
         TYON_LOGF( "Deleted heap pointer {}", (void*)address );
         auto iter = used.indexer_full();
