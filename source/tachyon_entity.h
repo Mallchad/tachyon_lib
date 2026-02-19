@@ -60,10 +60,10 @@ namespace tyon
         static constexpr u128 id = uuid("980ad1e7-ea61-49de-8131-bb1b4060dc73");
 
         PROC allocate() -> void
-        {}
+        {
+        }
         PROC init( t_entity* arg ) -> fresult
         {
-            arg->id = uuid_generate();
             return false;
         }
         PROC destroy( t_entity* arg ) -> void
@@ -97,9 +97,17 @@ namespace tyon
     PROC entity_allocate() -> t_entity*
     {
         // TODO: We need to give the context to the allocate hook.
+        /** I wanted create the uuid on  init but honestly it creates incoherent
+            and sloppy logic if we do. All uids should just always be valid.  We
+            can use  some other mechanism  for inactive entities.  Likely simply
+            just  "bool  active" for  most  entities,  but  they can  manage  it
+            themselves
+        */
         entity<t_entity>.allocate();
         auto& entity_list = g_entity_type<t_entity>->list;
-        return &entity_list.push_tail({});
+        t_entity* result = &entity_list.push_tail({});
+        result->id = uuid_generate();
+        return result;
     }
 
     template <typename t_entity>
