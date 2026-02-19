@@ -648,6 +648,9 @@ namespace tyon
     isize
     memory_align( isize bytes, i32 alignment );
 
+    isize
+    memory_align( raw_pointer address, i32 alignment );
+
     /** There were supposed to be std::unique_ptr compat functions here which
      * supposed to work with memory_allocate give them ownership of values
      * allocated elsewhere, but since arena's will deallocate these values at

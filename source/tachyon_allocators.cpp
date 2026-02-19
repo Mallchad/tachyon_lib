@@ -100,6 +100,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         raw_pointer result = this->allocate_raw( bytes );
         // // Move data to new memory
         memory_copy_raw( result, x_entry.data, x_entry.active_size );
+        TYON_LOGF( "Copying bytes for reallocation: {:<10}", x_entry.active_size );
 
         return result;
     }
