@@ -122,6 +122,7 @@ namespace tyon
     FORWARD struct logger;
     FORWARD struct string;
     FORWARD struct library_context;
+    struct thread_context;
 
     struct source_location
     {
@@ -183,6 +184,7 @@ namespace tyon
     TYON_API extern asset_machine* g_asset;
 
     TYON_API extern null_type null;
+    extern thread_local thread_context* g_thread;
 
     struct raw_pointer
     {
@@ -1823,31 +1825,6 @@ namespace tyon
         fresult
         update_status();
     };
-
-    /////////////////////////////
-////// -- Threading Library -- /////////////////////////////////////////////////
-    /////////////////////////////
-
-    struct thread_options
-    {
-        // Override the default UID with a custom one
-        uid id;
-        // < 16 bytes for UNIX
-        fstring short_name;
-        fstring name;
-        fstring description;
-        i32 scheduler_priority;
-        // How much memory to increase the arena size by each time
-        i32 permanant_block_size;
-        i32 scratch_block_size;
-        // allocator_type
-    };
-
-    fresult
-    thread_self_background_priority();
-
-    fresult
-    thread_self_name( fstring name );
 
     FORWARD struct logger;
     PROC logger_write_message(
