@@ -50,8 +50,9 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
     // Leave the redzone poisioned
     memory_unpoison( result, bytes );
     block->head_size += used_bytes + 100;
-    TYON_LOGF( "bytes alignment block head size {} {} {} {}",
-               bytes, alignment, block->size, block->head_size );
+    // Debug tracing
+    /* TYON_LOGF( "bytes alignment block head size {} {} {} {}",
+                  bytes, alignment, block->size, block->head_size ); */
 
     return result;
 }
@@ -119,7 +120,8 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         if (address == nullptr) { return; }
 
         std::scoped_lock _lock( this->lock );
-        TYON_LOGF( "Deleted heap pointer {}", (void*)address );
+        // Debug tracing
+        /* TYON_LOGF( "Deleted heap pointer {}", (void*)address ); */
         auto iter = used.indexer_full();
 
         ERROR_GUARD( iter.do_iteration, "Christ what has gone wrong" );
@@ -139,7 +141,6 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         // Move entry to free list
         free.push_tail( *x_entry );
         used.remove_node( iter.value );
-        TYON_LOGF( "DEALLOCATE NEW LIST SIZE: {}", used.list_size );
     }
 /** Clear all stored allocations and zero memory */
     PROC memory_heap_allocator::blank_all() -> void
