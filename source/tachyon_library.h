@@ -1796,7 +1796,7 @@ namespace tyon
         { return (size.x * size.y); }
 
         isize size_bytes()
-        { return (size.x * size.y * sizeof(data)); }
+        { return (size.x * size.y * sizeof(t_pixel)); }
 
         t_pixel&
         operator[] ( isize i )
