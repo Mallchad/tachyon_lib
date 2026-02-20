@@ -686,7 +686,7 @@ namespace tyon
     FUNCTION time_now_utc();
 
     inline
-    PROC time_now_monotonic() -> u64
+    PROC time_now_ns() -> u64
     {
         using t_duration = chrono::duration<u64, std::nano>;
         t_duration epoch = chrono::steady_clock::now().time_since_epoch();
