@@ -708,6 +708,7 @@ namespace tyon
         tyon::source_location call_point
     ) -> void
     {
+        PROFILE_SCOPE_FUNCTION();
         context->write_message( category, message, type, call_point );
     }
 
