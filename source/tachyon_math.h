@@ -237,14 +237,14 @@ namespace tyon
         {
           v2_f32 translation;
           v2_f32 rotation;
-          v2_f32 scale;
+          v2_f32 scale = { 1.0, 1.0 };
         };
 
         struct transform_3d
         {
-          v3_f32 translation;
-          v3_f32 rotation;
-          v3_f32 scale;
+          v3_f32 translation { 0.0, 0.0, 0.0 };
+          v3_f32 rotation = { 0.0, 0.0, 0.0 };
+          v3_f32 scale =  { 1.0, 1.0, 1.0 };
         };
 
         struct box_2d
