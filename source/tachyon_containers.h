@@ -138,6 +138,30 @@ struct generic_search_result
     bool match_found = false;
 };
 
+/** A standard rgba color container.
+
+    It's more convenient to use it abgra because that's the little endian
+representation and it also means it plainly.  WARNING: This breaks on big endian
+systems. Things like Vulkan plainly only support */
+
+#if (REFLECTION_LITTLE_ENDIAN)
+struct rgba
+{
+    union {
+        struct { u8 a; u8 b; u8 g; u8 r; };
+        u32 hex;
+    };
+};
+#else
+struct rgba
+{
+    union {
+        struct { u8 r; u8 g; u8 b; u8 a };
+        u32 hex;
+    };
+};
+#endif // REFLECTION_LITTLE_ENDIAN
+
 template <typename T>
 struct array
 {
