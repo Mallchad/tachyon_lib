@@ -5,14 +5,16 @@ namespace tyon
 
 CONSTRUCTOR memory_heap_allocator::memory_heap_allocator()
 {
-        TYON_LOG( "New heap block" );
-        buffer* block = &blocks.push_tail( {} );
-        block->data = malloc( 400_MiB );
-        block->size = 400_MiB;
+    PROFILE_SCOPE_FUNCTION();
+    TYON_LOG( "New heap block" );
+    buffer* block = &blocks.push_tail( {} );
+    block->data = malloc( 400_MiB );
+    block->size = 400_MiB;
 }
 
 PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_pointer
 {
+    PROFILE_SCOPE_FUNCTION();
     std::scoped_lock _lock( this->lock );
     buffer* block = blocks.tail_address();
     bool add_block = (block->head_size + bytes + alignment > block->size);
@@ -56,12 +58,14 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
 
     PROC memory_heap_allocator::allocate_raw_fast( i64 bytes, isize alignment ) -> raw_pointer
     {
+        PROFILE_SCOPE_FUNCTION();
         std::scoped_lock _lock( this->lock );
         return nullptr;
     }
 
     PROC memory_heap_allocator::allocate_relocate( void* reference, i64 bytes ) -> raw_pointer
     {
+        PROFILE_SCOPE_FUNCTION();
         std::scoped_lock _lock( this->lock );
 
         heap_entry x_entry {};
@@ -110,6 +114,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
 
     PROC memory_heap_allocator::deallocate( void* address ) -> void
     {
+        PROFILE_SCOPE_FUNCTION();
         // NOTE: Passing nullptr is a valid operation, simplifies error handlig.
         if (address == nullptr) { return; }
 
@@ -139,6 +144,7 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
 /** Clear all stored allocations and zero memory */
     PROC memory_heap_allocator::blank_all() -> void
     {
+        PROFILE_SCOPE_FUNCTION();
         std::scoped_lock _lock( this->lock );
     }
     allocator_info memory_heap_allocator::get_memory_statistics()
