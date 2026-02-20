@@ -384,7 +384,7 @@ struct array
     COPY_ASSIGNMENT operator= ( const t_self& rhs )
     {
         this->change_allocation( rhs.size_ );
-        this->head_size = rhs.size_;
+        this->head_size = rhs.head_size;
         for (i64 i=0; i < rhs.head_size; ++i )
         {
             data[i] = rhs.data[i];
@@ -467,7 +467,7 @@ struct array
     FUNCTION linear_search( t_single_comparison comparator )
     {
         search_result<T> result;
-        for (i64 i=0; i < size_; ++i)
+        for (i64 i=0; i < size(); ++i)
         {
             if (comparator( data[i] ))
             {
@@ -485,7 +485,7 @@ struct array
     FUNCTION linear_search_value( T comparison )
     {
         search_result<T> result;
-        for (i64 i=0; i < size_; ++i)
+        for (i64 i=0; i < size(); ++i)
         {
             if (comparison ==data[i])
             {
