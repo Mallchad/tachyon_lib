@@ -90,6 +90,7 @@ namespace tyon
 
     /// Has no time period adjustments, is most accurate for time measurements
     using time_monotonic = chrono::time_point< chrono::steady_clock >;
+    using time_monotonic_ns = u64;
     /// Calender time from system_clock
     using time_date = chrono::time_point< chrono::system_clock >;
     using time_date_ns = u64;
@@ -683,6 +684,15 @@ namespace tyon
 
     time_date
     FUNCTION time_now_utc();
+
+    inline
+    PROC time_now_monotonic() -> u64
+    {
+        using t_duration = chrono::duration<u64, std::nano>;
+        t_duration epoch = chrono::steady_clock::now().time_since_epoch();
+        u64 result = chrono::duration_cast< t_duration >( epoch ).count();
+        return result;
+    }
 
     template <typename t_numeric = u64>
     t_numeric
