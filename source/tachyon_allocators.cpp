@@ -108,7 +108,8 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
            So we have to copy only everything up to that point. */
         i64 copy_bytes = std::min( x_entry.active_size, bytes );
         memory_copy_raw( result, x_entry.data, copy_bytes );
-        TYON_LOGF( "Copying bytes for reallocation: {:<10}", x_entry.active_size );
+        // Debug tracing
+        /* TYON_LOGF( "Copying bytes for reallocation: {:<10}", x_entry.active_size ); */
 
         return result;
     }
