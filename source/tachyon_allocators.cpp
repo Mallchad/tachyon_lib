@@ -123,15 +123,19 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         std::scoped_lock _lock( this->lock );
         // Debug tracing
         /* TYON_LOGF( "Deleted heap pointer {}", (void*)address ); */
-        auto iter = used.indexer_full();
 
-        ERROR_GUARD( iter.do_iteration, "Christ what has gone wrong" );
-        heap_entry* x_entry = nullptr;
+        heap_entry x_entry {};
+        node_link<heap_entry>* x_node = nullptr;
         bool match = false;
-        for (; iter.do_iteration; iter.forward())
+        i64 index = 0;
+        i64 size = used.nodes.size();
+        for (i64 i=0; i < size; ++i)
         {
-            x_entry = &iter.value->value;
-            if (iter.value->value.data == address)
+            // Reverse walk to take advantance of allocation recency
+            index = (size - 1 - i);
+            x_node = &used.nodes[ index ];
+            x_entry = x_node->value;
+            if (x_entry.data == address)
             { match = true; break; }
         }
         if (match == false)
@@ -140,10 +144,10 @@ PROC memory_heap_allocator::allocate_raw( isize bytes, isize alignment ) -> raw_
         }
 
         // Move entry to free list
-        free.push_tail( *x_entry );
-        used.remove_node( iter.value );
+        free.push_tail( x_entry );
+        used.remove_node( x_node );
     }
-/** Clear all stored allocations and zero memory */
+
     PROC memory_heap_allocator::blank_all() -> void
     {
         PROFILE_SCOPE_FUNCTION();
