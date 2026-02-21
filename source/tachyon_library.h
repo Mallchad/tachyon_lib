@@ -430,6 +430,7 @@ namespace tyon
         template <typename T>
         T* allocate( isize count )
         {
+            PROFILE_SCOPE_FUNCTION();
             T* result = nullptr;
             i64 size_bytes = (sizeof(T) * count);
             i64 alignment = memory_padding( alignof(T), result );
@@ -490,6 +491,7 @@ namespace tyon
         T*
         allocate( isize count )
         {
+            PROFILE_SCOPE_FUNCTION();
             isize size = (count * sizeof(T));
             buffer* block = &(blocks.back());
             isize alignment = memory_padding( alignof(T), block->data + block->head_size );
