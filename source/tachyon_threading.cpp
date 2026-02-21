@@ -31,20 +31,24 @@ PROC thread_self_init( thread_options options ) -> fresult
 
 PROC thread_destroy( thread_context* arg ) -> void
 {
-    TYON_LOGF( "Destroying thread '{:<10}' {}", g_thread->options.name, g_thread->id );
+    TYON_LOGF( "Destroying thread '{:<10}' {}", arg->options.name, arg->id );
     TYON_LOG( "Thread statistics at cleanup: " );
-    TYON_LOGF( "{:<10}", g_thread->permanant->get_memory_statistics() );
-    TYON_LOGF( "{:<10}", g_thread->scratch->get_memory_statistics() );
-    g_thread->scratch->~i_allocator();
-    g_thread->permanant->~i_allocator();
-    g_thread->~thread_context();
+    TYON_LOGF( "{:<10}", arg->permanant->get_memory_statistics() );
+    TYON_LOGF( "{:<10}", arg->scratch->get_memory_statistics() );
+    arg->scratch->~i_allocator();
+    arg->permanant->~i_allocator();
+    arg->~thread_context();
 
 }
 
 PROC thread_self_interupt( bool throw_on_interupt ) -> fresult
 {
     // No internal signal for thread interupts yet. Just do interupt handling tasks
-    return false;
+    bool cooperate_kill_thread = false;
+    if (throw_on_interupt && cooperate_kill_thread)
+    {   throw( "Thread Exit Signalled" );
+    }
+    return cooperate_kill_thread;
 }
 
 

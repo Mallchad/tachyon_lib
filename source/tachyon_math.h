@@ -1209,9 +1209,10 @@ namespace tyon
             PROC absolute<f32>( const f32& arg ) -> f32
             {   return fabsf( arg ); }
 
+            /* NOTE: CUDA does not support fabsl, long doubles are rarely used anyway */
             template <> TYON_CUDA_SHARED inline
             PROC absolute<f64>( const f64& arg ) -> f64
-            {   return fabsl( arg ); }
+            {   return fabs( arg ); }
 
             //* NOTE: Don't be an idiot like I did and try to define absolute for an unsigned integer */
 

@@ -40,11 +40,14 @@ cuda_dependency = [
 compiler_args = [
     # Holy hell this complains on the dumbest shit
     # '-Werror=all',
+  # TODO: clang only flag
+    # '-Weverything',
     '-Wextra',
     '-Wpedantic',
 
     '-Wno-unused-parameter',
-    '-Wno-unused-variable'
+    '-Wno-unused-variable',
+    '-Wno-c++98-compat'
   ]
 
 test_core = executable(

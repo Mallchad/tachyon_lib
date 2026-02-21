@@ -37,7 +37,6 @@ namespace tyon
     file_write_binary( file* arg )
     {
         fstring filename = arg->filename.string();
-        bool write_ok = false;
         /** O_DSYNC - Don't return from the function until the data AND metadata is actually written.
             O_DIRECT - minimize caching effects, needs to be paired with O_SYNC or DSYNC.
             O_CREAT - create file if it doesn't exist already

@@ -137,7 +137,6 @@ namespace tyon
     raw_pointer memory_stack_allocator::allocate_raw( isize bytes, isize alignment )
     {
         isize size = (bytes);
-        isize type_size = 1;
         buffer* block = &(blocks.back());
         isize alignment_bytes = memory_padding( alignment, block->data + block->head_size );
         void* head_data = (block->data + block->head_size + alignment_bytes);

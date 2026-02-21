@@ -441,11 +441,13 @@ struct array
         change_allocation( isize(count) );
     }
 
-    usize
+    /* NOTE: I tried to make this compatible with vector containers using
+       usize. But now I realize I actually just don't want to have compat with
+       that stuff. And it complicates my code by having signed compare warnings.
+       Which I don't care for. */
+    isize
     FUNCTION size()
-    {
-        return head_size;
-    }
+    {   return head_size; }
 
     PROC back() -> T&
     {

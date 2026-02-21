@@ -144,6 +144,9 @@ namespace tyon
     #define TYON_SOURCE_LOCATION() ::tyon::source_location { __LINE__, 0, __FILE__, __func__ }
 #endif // __GNUC__
 
+    template <typename T> constexpr
+    PROC unused( T arg ) -> void
+    {   (void)arg; }
 
     template<typename... t_formattable> void
     FORWARD FUNCTION log(
@@ -488,7 +491,6 @@ namespace tyon
         allocate( isize count )
         {
             isize size = (count * sizeof(T));
-            isize type_size = sizeof(T);
             buffer* block = &(blocks.back());
             isize alignment = memory_padding( alignof(T), block->data + block->head_size );
             raw_pointer* head_data = (block->data + block->head_size + alignment);
@@ -498,6 +500,8 @@ namespace tyon
             if (size_exceeded) [[unlikely]]
             {
                 buffer new_block;
+                // TODO: This is broken, it's supposed to round up to the
+                // nearest page size to minimize wastage
                 isize allocation = (block_size * ceil(f32(size) / block_size));
                 new_block.data = reinterpret_cast<byte*>(std::malloc( allocation ));
                 new_block.size = allocation;
@@ -1553,6 +1557,7 @@ namespace tyon
         // Covnert each character into hex half-byte value and shift into the right plce
         for (i32 i=0; i < 16; ++i)
         {
+            // TODO: need to cast to silence conversion warning, we're hardcapped at 16
             high = hex_value[ i32(buf[ i*2 +0 ]) ];
             low  = hex_value[ i32(buf[ i*2 +1 ]) ];
             result.d[i] = (high << 4) | low;
@@ -1625,7 +1630,7 @@ namespace tyon
        that doesn't work either.*/
     TYON_COMPILED_PROC
     PROC operator ""_uuid ( literal_string arg, std::size_t size ) -> u128
-    {   return uuid( arg ); }
+    {   unused(size); return uuid( arg ); }
 
     }
 
