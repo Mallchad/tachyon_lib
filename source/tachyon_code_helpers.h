@@ -169,6 +169,11 @@ struct version
 /// Use this macro or std::invoke
 #define INVOKE_MEMBER(object, function, ...) ((object).*(function))(__VA_ARGS__)
 
+// Macro Concatonation, very helpful for identifier building
+#define TYON_CONCAT_IMPL( x, y ) x##y
+#define TYON_CONCAT( x, y ) TYON_CONCAT_IMPL( x, y )
+
+
 }
 // -- End of Code Helpers
 // *************************

@@ -69,6 +69,33 @@
     #define TYON_CUDA_KERNEL
 #endif
 
+#ifdef TRACY_ENABLE
+#define PROFILE_SCOPE( name )                                       \
+    ZoneNamedN( TYON_CONCAT(__tracy, __COUNTER__), (name), true );
+#define PROFILE_SCOPE_FUNCTION()                            \
+    ZoneNamed( TYON_CONCAT(__tracy, __COUNTER__), true );
+
+#define TIME_SCOPED( name )                                         \
+    auto TYON_CONCAT(_profile_block_, __LINE__) =                   \
+    ::tyon::time_scope( (name) , "time taken to execute function"); \
+    ZoneNamedN( TYON_CONCAT(__tracy, __COUNTER__), (name), true );
+
+// Time the function scope this macro is in and log the result
+#define TIME_SCOPED_FUNCTION()                                          \
+    auto TYON_CONCAT(_profile_block_, __LINE__) =                       \
+    ::tyon::time_scope( __FUNCTION__ , "time taken to execute function"); \
+    ZoneNamed( TYON_CONCAT(__tracy, __COUNTER__), true );
+
+#else // TRACY_ENABLE
+
+#define PROFILE_SCOPE( name )
+#define PROFILE_SCOPE_FUNCTION()
+#define TIME_SCOPED( name )
+#define TIME_SCOPED_FUNCTION()
+
+#endif // TRACY_ENABLE
+
+
 namespace tyon
 {
     // Alias namespace
@@ -840,35 +867,6 @@ namespace tyon
         CONSTRUCTOR time_scope( procedure_time_scope _destructor );
         DESTRUCTOR ~time_scope();
     };
-
-    #define TYON_CONCAT_IMPL( x, y ) x##y
-    #define TYON_CONCAT( x, y ) TYON_CONCAT_IMPL( x, y )
-
-    #ifdef TRACY_ENABLE
-    #define PROFILE_SCOPE( name ) \
-        ZoneNamedN( TYON_CONCAT(__tracy, __COUNTER__), (name), true );
-    #define PROFILE_SCOPE_FUNCTION()                                                \
-        ZoneNamed( TYON_CONCAT(__tracy, __COUNTER__), true );
-
-    #define TIME_SCOPED( name ) \
-        auto TYON_CONCAT(_profile_block_, __LINE__) =                               \
-            ::tyon::time_scope( (name) , "time taken to execute function");         \
-        ZoneNamedN( TYON_CONCAT(__tracy, __COUNTER__), (name), true );
-
-    // Time the function scope this macro is in and log the result
-    #define TIME_SCOPED_FUNCTION() \
-        auto TYON_CONCAT(_profile_block_, __LINE__) =                               \
-            ::tyon::time_scope( __FUNCTION__ , "time taken to execute function");   \
-        ZoneNamed( TYON_CONCAT(__tracy, __COUNTER__), true );
-
-    #else // TRACY_ENABLE
-
-    #define PROFILE_SCOPE( name )
-    #define PROFILE_SCOPE_FUNCTION()
-    #define TIME_SCOPED( name )
-    #define TIME_SCOPED_FUNCTION()
-
-    #endif // TRACY_ENABLE
 
     #define f_TIME_SCOPED_ACCUMULATED( NAME, ID ) \
         {                                                                           \

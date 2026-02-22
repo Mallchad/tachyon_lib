@@ -103,6 +103,8 @@
 
 #ifdef TRACY_ENABLE
 #include "Tracy.hpp"
+#else
+#error
 #endif // TRACY_ENABLE
 
 
