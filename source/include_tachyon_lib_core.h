@@ -102,9 +102,7 @@
 #include "../external/fmt/include/fmt/std.h"
 
 #ifdef TRACY_ENABLE
-#include "Tracy.hpp"
-#else
-#error
+    #include "Tracy.hpp"
 #endif // TRACY_ENABLE
 
 
