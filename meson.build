@@ -28,7 +28,7 @@ elif system_name == 'windows'
 endif
 
 cuda = import('unstable-cuda')
-tyon_cuda_on = false
+tyon_cuda_on = true
 cuda_dependency = [
   dependency(
   'cuda', version : '>=10',
@@ -96,7 +96,7 @@ if tyon_cuda_on
     build_by_default: true,
     install: true,
     install_dir: 'runtime',
-    output : 'tachyon_lib_tests_cuda.so',
+    output : 'tachyon_lib_tests_cuda',
     input : 'source/tests/tachyon_lib_tests_cuda.cu',
     command : [
       'nvcc',

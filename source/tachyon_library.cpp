@@ -70,7 +70,9 @@ namespace tyon
         (void)address; (void)size;
 #if (defined(__SANITIZE_ADDRESS__))
         __asan_poison_memory_region( address, size );
-#else
+#elif TYON_DEBUG_POISON
+        /* NOTE: Turns out this is hilariously slow on x86 CPUs compared to zeroing because of
+           a special instruction dedicated to zeroing */
         memset( address, 0XFF, size );
 #endif // address sanitizer
     }
@@ -116,6 +118,7 @@ namespace tyon
     void
     memory_stack_allocator::blank_all()
     {
+        PROFILE_SCOPE_FUNCTION();
         buffer* x_block;
         for (int i=0; i < i32(blocks.size()); ++i)
         {
@@ -136,6 +139,7 @@ namespace tyon
 
     raw_pointer memory_stack_allocator::allocate_raw( isize bytes, isize alignment )
     {
+        PROFILE_SCOPE_FUNCTION();
         isize size = (bytes);
         buffer* block = &(blocks.back());
         isize alignment_bytes = memory_padding( alignment, block->data + block->head_size );
@@ -185,6 +189,7 @@ namespace tyon
 
     PROC memory_stack_allocator::allocate_raw_fast( i64 bytes, isize alignment ) -> raw_pointer
     {
+        PROFILE_SCOPE_FUNCTION();
         buffer* block = &(blocks.back());
         isize alignment_bytes = memory_padding( alignment, block->data + block->head_size );
         isize allocation_size = (alignment + block->head_size);
@@ -196,6 +201,7 @@ namespace tyon
 
     PROC memory_stack_allocator::allocate_relocate( void* reference, i64 bytes ) -> raw_pointer
     {
+        PROFILE_SCOPE_FUNCTION();
         raw_pointer result;
         if (reference == nullptr)
         {   return nullptr;
@@ -227,6 +233,7 @@ namespace tyon
     void
     memory_stack_allocator::deallocate( void* address )
     {
+        PROFILE_SCOPE_FUNCTION();
         void(0);
     }
 
@@ -284,6 +291,7 @@ namespace tyon
 
     DESTRUCTOR memory_stack_allocator::~memory_stack_allocator()
     {
+        PROFILE_SCOPE_FUNCTION();
         buffer x_block;
         for (int i=0; i < i32(blocks.size()); ++i)
         {
@@ -301,6 +309,7 @@ namespace tyon
 
     PROC resource_arena::run_cleanup() -> void
     {
+        PROFILE_SCOPE_FUNCTION();
         constexpr bool debug = true;
         for (i32 i=0; i < destroy_stack.size(); ++i)
         {
