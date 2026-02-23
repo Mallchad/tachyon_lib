@@ -758,16 +758,41 @@ struct linked_list
         // Set index before proceeding
         new_node->index = list_size;
         if (target_node->next >= 0)
-        {   new_node->next = target_node->next;
+        {   t_node& next_node = nodes[ target_node->next ];
+            next_node.prev = new_node->index;
         }
+        new_node->next = target_node->next;
         new_node->prev = target_node->index;
         target_node->next = new_node->index;
         new_node->value = value;
         ++list_size;
+        if (target_node->index == tail_)
+        {   tail_ = new_node->index;
+        }
 
-        ERROR_GUARD( (head_ == -1 && tail_ == -1) || (head_ = -1 && tail_ == -1) ||
-                     (head_ >= 0 && tail_ >= 0),
-                     "Wut" );
+        return new_node;
+    }
+    PROC
+    insert_before( t_node* target_node, T value ) -> t_node*
+    {
+        ERROR_GUARD( (target_node >= nodes.address(0)) && (target_node <= nodes.address( nodes.size_ )),
+                     "A node from outside this container has been used as an argument" );
+        t_node* new_node = &nodes.push_tail( {} );
+        // Set index before proceeding
+        new_node->index = list_size;
+
+        if (target_node->prev >= 0)
+        {   t_node& prev_node = nodes[ target_node->prev ];
+            prev_node.next = new_node->index;
+        }
+        new_node->prev = target_node->prev;
+        new_node->next = target_node->index;
+        target_node->prev = new_node->index;
+        new_node->value = value;
+        ++list_size;
+        if (target_node->index == head_)
+        {   head_ = new_node->index;
+        }
         return new_node;
     }
 
