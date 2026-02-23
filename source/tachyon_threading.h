@@ -26,8 +26,8 @@ struct thread_options
         TODO: We will provide enums that map to priority for general usage later */
     i32 scheduler_priority;
     // How much memory to increase the arena size by each time
-    i32 permanant_block_size;
-    i32 scratch_block_size;
+    i64 permanant_block_size;
+    i64 scratch_block_size;
     // allocator_type
 };
 
