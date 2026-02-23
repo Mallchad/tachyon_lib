@@ -1680,10 +1680,15 @@ namespace tyon
             return (difference == 0);
         }
 
+        constexpr TYON_CUDA_SHARED
+        PROC operator !=( uid rhs ) -> bool
+        {   return ! (*this == rhs); }
+
         constexpr PROC valid() -> bool
         {
             auto empty = u128 {};
-            return (*this != empty);
+            bool result = (*this != empty);
+            return result;
         }
 
         explicit operator i64()
