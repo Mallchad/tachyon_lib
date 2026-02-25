@@ -121,6 +121,8 @@ namespace tyon
     /// Calender time from system_clock
     using time_date = chrono::time_point< chrono::system_clock >;
     using time_date_ns = u64;
+    using time_duration = chrono::duration<u64, std::nano>;;
+    using time_duration_ns = u64;
 
     enum class e_log_entry
     {
