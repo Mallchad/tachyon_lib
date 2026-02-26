@@ -367,6 +367,9 @@ struct array
     tail_address()
     { return (data + head+head_size -1); }
 
+    PROC tail_index() -> i64
+    { return (head+head_size -1); }
+
     T&
     operator []( isize i )
     {
