@@ -1693,7 +1693,7 @@ namespace tyon
         {
             uid empty = uid {};
             uid& self = *this;
-            bool result = !(*this != empty);
+            bool result = (*this != empty);
             return result;
         }
 
