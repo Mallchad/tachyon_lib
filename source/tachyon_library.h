@@ -1641,10 +1641,10 @@ namespace tyon
 
     struct uid
     {
-        i64 id;
+        i64 id = 0;
         u128 uuid;
 
-        CONSTRUCTOR uid() = default;
+        constexpr CONSTRUCTOR uid() {}
         constexpr CONSTRUCTOR uid( i64 _id, u128 _uuid ) : id( _id ), uuid( _uuid ) {}
         constexpr CONSTRUCTOR uid( u128 _uuid ) : id(0), uuid( _uuid ) {}
         constexpr CONSTRUCTOR uid( i64 _id )
@@ -1682,10 +1682,18 @@ namespace tyon
             return (difference == 0);
         }
 
+// Only needed in ROOT/cling for some reason
+#ifdef __CLING__
+        constexpr TYON_CUDA_SHARED
+        PROC operator !=( uid rhs ) -> bool
+        {   return ! (*this == rhs);
+        }
+#endif //  __CLING__
         constexpr PROC valid() -> bool
         {
-            auto empty = u128 {};
-            bool result = (*this != empty);
+            uid empty = uid {};
+            uid& self = *this;
+            bool result = !(*this != empty);
             return result;
         }
 
