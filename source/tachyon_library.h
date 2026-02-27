@@ -71,20 +71,20 @@
 
 #ifdef TRACY_ENABLE
 #define PROFILE_SCOPE( name )                                       \
-    ZoneNamedN( TYON_CONCAT(__tracy, __COUNTER__), (name), true );
+    ZoneNamedN( TYON_CONCAT(tyon_tracy__, __COUNTER__), (name), true );
 #define PROFILE_SCOPE_FUNCTION()                            \
-    ZoneNamed( TYON_CONCAT(__tracy, __COUNTER__), true );
+    ZoneNamed( TYON_CONCAT(tyon_tracy__, __COUNTER__), true );
 
 #define TIME_SCOPED( name )                                         \
     auto TYON_CONCAT(_profile_block_, __LINE__) =                   \
     ::tyon::time_scope( (name) , "time taken to execute function"); \
-    ZoneNamedN( TYON_CONCAT(__tracy, __COUNTER__), (name), true );
+    ZoneNamedN( TYON_CONCAT(tyon_tracy__, __COUNTER__), (name), true );
 
 // Time the function scope this macro is in and log the result
 #define TIME_SCOPED_FUNCTION()                                          \
     auto TYON_CONCAT(_profile_block_, __LINE__) =                       \
     ::tyon::time_scope( __FUNCTION__ , "time taken to execute function"); \
-    ZoneNamed( TYON_CONCAT(__tracy, __COUNTER__), true );
+    ZoneNamed( TYON_CONCAT(tyon_tracy__, __COUNTER__), true );
 
 #else // TRACY_ENABLE
 
@@ -477,7 +477,7 @@ namespace tyon
         /** Clear all stored allocations and zero memory */
         virtual void blank_all() PURE;
         virtual allocator_info get_memory_statistics() PURE;
-        virtual DESTRUCTOR ~i_allocator() {}
+        virtual DESTRUCTOR ~i_allocator();
     };
     using i_memory_allocator = i_allocator;
 
@@ -734,7 +734,7 @@ namespace tyon
     FUNCTION time_to_epoch_nanoseconds( time_date arg )
     {
         using namespace std::chrono;
-        using t_duration = duration<t_numeric, std::nano >;
+        using t_duration = duration<t_numeric, std::nano >; (void)t_duration{};
         t_numeric result = time_point_cast<t_duration>( arg ).time_since_epoch().count();
 
         return result;
@@ -745,7 +745,7 @@ namespace tyon
     FUNCTION time_to_epoch_nanoseconds( time_monotonic arg )
     {
         using namespace std::chrono;
-        using t_duration = duration<t_numeric, std::nano >;
+        using t_duration = duration<t_numeric, std::nano >; (void)t_duration{};
         t_numeric result = time_point_cast<time_monotonic, t_duration>( arg.time_since_epoch() );
 
         return result;
@@ -755,7 +755,7 @@ namespace tyon
     t_numeric
     FUNCTION time_now_utc_seconds()
     {
-        using t_duration = chrono::duration<t_numeric, std::ratio<1>>;
+        using t_duration = chrono::duration<t_numeric, std::ratio<1>>;  (void)t_duration{};
         time_date::duration epoch = chrono::system_clock::now().time_since_epoch();
         t_numeric result = chrono::duration_cast< t_duration >( epoch ).count();
         return result;

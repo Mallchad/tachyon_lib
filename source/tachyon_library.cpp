@@ -86,6 +86,9 @@ namespace tyon
 #endif // address sanitizer
     }
 
+    DESTRUCTOR i_allocator::~i_allocator()
+    {}
+
     CONSTRUCTOR memory_stack_allocator::memory_stack_allocator( isize _block_size )
     {
         this->os_page_size = 4096;

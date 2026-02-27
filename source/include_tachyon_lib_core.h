@@ -97,14 +97,20 @@
     #pragma warning "Unicode not supported on CUDA compiler so can't use FMT_UNICODE"
 #endif // REFLECTION_COMPILER_CUDA
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
+#pragma GCC diagnostic ignored "-Wextra"
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wreserved-macro-identifier"
+#pragma GCC diagnostic ignored "-Wswitch-default"
+#pragma clang diagnostic ignored "-Weverything"
 #include "../external/fmt/include/fmt/format.h"
 #include "../external/fmt/include/fmt/color.h"
 #include "../external/fmt/include/fmt/std.h"
+#pragma GCC diagnostic pop
 
-#ifdef TRACY_ENABLE
-    #include "Tracy.hpp"
-#endif // TRACY_ENABLE
-
+#include "include_tracy.h"
 
 /** -- Project Local --
  * We put all defines here in a namespace not to stop namespace resolution,
@@ -114,6 +120,18 @@
  *
  * The other 'tyon' files haven't been updated correctly to work this way so it's being left for now
  */
+
+/** Enable warnings via pragma instead of build system.
+
+    We have to do this below external depencies or it will vommit errors and
+    warnings on code we do not control. We can and should investigate errors on
+    dependencies too, but this should be done on a case by case basis
+
+    Additionally it is preferable to this this outside of the build system
+    because it makes our libraries more portable, and easier to use as 3rd party
+    dependencies */
+#include "include_warnings.h"
+
 /* NOTE: DO NOT TOUCH the order on these includes, their order is baked by
    dependency resolution order. */
 #include "tachyon_library.h"
