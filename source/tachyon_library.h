@@ -1658,7 +1658,7 @@ namespace tyon
             return *this;
         }
 
-        constexpr TYON_CUDA_SHARED
+        TYON_CUDA_SHARED
         PROC operator ==( uid rhs ) -> bool
         {
             bool difference = (
@@ -1682,18 +1682,19 @@ namespace tyon
             return (difference == 0);
         }
 
-// Only needed in ROOT/cling for some reason
-#ifdef __CLING__
+        /** NOTE: WTF, one compiler complained about setting up != when you
+            don't need to, another complained it's not a valid operation, I
+            don't even know what to do anymore */
         constexpr TYON_CUDA_SHARED
         PROC operator !=( uid rhs ) -> bool
         {   return ! (*this == rhs);
         }
-#endif //  __CLING__
+
         constexpr PROC valid() -> bool
         {
             uid empty = uid {};
             uid& self = *this;
-            bool result = (*this != empty);
+            bool result = (self != empty);
             return result;
         }
 
