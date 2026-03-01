@@ -1690,15 +1690,15 @@ namespace tyon
         {   return ! (*this == rhs);
         }
 
-        constexpr PROC valid() -> bool
+        constexpr PROC valid() const -> bool
         {
             uid empty = uid {};
-            uid& self = *this;
+            const uid& self = *this;
             bool result = (self != empty);
             return result;
         }
 
-        explicit operator i64()
+        explicit operator i64() const
         {   return id; }
     };
 

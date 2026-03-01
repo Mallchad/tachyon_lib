@@ -5,6 +5,10 @@
 #pragma GCC diagnostic push
 
 // -- Set Warnings as Errors --
+// Extremely horrible bug that manifests as a codegen bug rather than a logic issue.
+// You should prefer -fno-strict-aliasing in most cases and use this for performance hunting.
+#pragma GCC diagnostic error "-Wstrict-aliasing=3"
+
 // Horrible and surprising cause of bugs with single line if statements.
 #pragma GCC diagnostic error "-Wmisleading-indentation"
 
