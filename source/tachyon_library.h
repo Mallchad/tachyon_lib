@@ -1658,8 +1658,8 @@ namespace tyon
             return *this;
         }
 
-        TYON_CUDA_SHARED
-        PROC operator ==( uid rhs ) -> bool
+        constexpr TYON_CUDA_SHARED
+        PROC operator ==( uid rhs ) const -> bool
         {
             bool difference = (
                 (uuid.d[0]   ^ rhs.uuid.d[0]) |
@@ -1686,7 +1686,7 @@ namespace tyon
             don't need to, another complained it's not a valid operation, I
             don't even know what to do anymore */
         constexpr TYON_CUDA_SHARED
-        PROC operator !=( uid rhs ) -> bool
+        PROC operator !=( uid rhs ) const -> bool
         {   return ! (*this == rhs);
         }
 

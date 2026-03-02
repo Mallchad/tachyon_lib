@@ -304,7 +304,7 @@ namespace tyon
         }
     }
 
-    TYON_FORCEINLINE isize
+    isize
     memory_align( isize bytes, i32 alignment )
     {
         return (bytes + (alignment - (bytes % alignment)));
