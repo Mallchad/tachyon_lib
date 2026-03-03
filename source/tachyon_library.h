@@ -1816,12 +1816,12 @@ namespace tyon
         { return (size.x * size.y * sizeof(t_pixel)); }
 
         /** Ratio of vertical size to horizontal size v:h = ratio:1 */
-        isize aspect_ratio_vh()
-        {   return (size.y/ size.x);
+        f32 aspect_ratio_vh()
+        {   return (f32(size.y)/ size.x);
         }
 
-        isize aspect_ratio_hv()
-        {   return (size.x/ size.y);
+        f32 aspect_ratio_hv()
+        {   return (f32(size.x)/ size.y);
         }
 
         t_pixel&
