@@ -1248,6 +1248,46 @@ namespace tyon
             TYON_CUDA_SHARED
             PROC minimum(const f64& a, const f64& b) -> f64;
 
+            /* DOCS NOTE: I don't use const for 4 main reasons,
+               1 - it's noisy and makes small amounts of code harder to read
+
+               2 - constness is mostly about  the programmer being stupid in C++
+               "you  are  likely  to  make  a mistake  so  you  should  babygate
+               yourself", I think outside of specific contexts this is minimally
+               helpful and you can't really  patch over bad and bad programmers-
+               either the  programmer should  improve or  be told  to work  on a
+               different project.
+
+               3 - This is more complicated. const is... Viral...  When you use
+               it a lot it leaks down into other code, and causes incompatible
+               type errors.  This is not only error prone and tricky to use, but
+               it wastes a huge amount of mental overhead trying to make it fit
+               const in.
+
+               4 -  const is  a lie. I  said earlier const  is mostly  about the
+               programmer being stupid. I really  meant that. You see, const has
+               no physical  meaning in  the hardware, there's  no such  thing as
+               "const" memory", there's READ_ONLY  memory, but that usually goes
+               in pages, >4 KiB.
+
+               This is important when reasoning about performance and aliasing
+               rules.  Because as far as the compiler is concerned- many times,
+               it can't assume that 'const T& x' is safe to optimize out, or
+               cache. This is one of the rationale behind using references (T&)
+               in the first place. Yet it is sometimes wrong, because it is
+               still a mutable pointer, and still often had indirection and
+               uncachable access. On the other hand pass-by-value you can safely
+               assume you are the sole owner. The trade off being, you spend
+               some memory for this.
+
+               But in my view, always expensive is a better tradeoff than
+               "sometimes" faster.
+            */
+            TYON_CUDA_SHARED
+            PROC minimum( v2_f32 a,  v2_f32  b ) -> v2_f32;
+
+            TYON_CUDA_SHARED
+            PROC minimum( v2_f64 a,  v2_f64  b ) -> v2_f64;
 
 
             // Max
@@ -1257,7 +1297,11 @@ namespace tyon
             TYON_CUDA_SHARED
             PROC maximum(const f64& a, const f64& b) -> f64;
 
+            TYON_CUDA_SHARED
+            PROC maximum( v2_f32 a,  v2_f32  b ) -> v2_f32;
 
+            TYON_CUDA_SHARED
+            PROC maximum( v2_f64 a,  v2_f64  b ) -> v2_f64;
 
             // Round down
             TYON_CUDA_SHARED
